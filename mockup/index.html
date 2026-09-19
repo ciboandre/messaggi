@@ -57,7 +57,10 @@ button { font: inherit; cursor: pointer; }
 .mock-bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10; background: var(--surface); border-bottom: 1px solid var(--line); padding-block: 10px; padding-inline: 16px; }
 .mock-bar .in { max-width: 1120px; margin: 0 auto; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
 .mock-bar .nome { font-family: var(--display); font-weight: 800; font-size: 1.15rem; letter-spacing: -0.02em; display: flex; align-items: center; gap: 8px; }
-.mock-bar .nome i { width: 26px; height: 26px; border-radius: 8px; background: linear-gradient(135deg, var(--grad-b), var(--grad-c)); display: inline-block; }
+.mock-bar .nome i { width: 26px; height: 26px; border-radius: 8px; background: linear-gradient(135deg, var(--grad-b), var(--grad-c)); display: inline-grid; place-items: center; color: #fff; }
+.sym { width: 1em; height: 1em; display: inline-block; vertical-align: -0.12em; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; }
+.sym-tile { width: 60%; height: 60%; }
+.m .sym { width: .72em; height: .72em; margin-right: .06em; vertical-align: -0.06em; }
 .mock-bar .nome span { font-family: var(--body); font-size: .72rem; color: var(--ink-3); font-weight: 500; margin-left: 4px; }
 .switch { display: flex; gap: 4px; margin-left: auto; background: var(--surface-2); padding: 4px; border-radius: 999px; flex-wrap: wrap; }
 .switch button { background: transparent; border: 0; color: var(--ink-2); padding: 7px 14px; border-radius: 999px; font-size: .86rem; font-weight: 600; }
@@ -200,7 +203,7 @@ tfoot td { border-top: 1px solid var(--surface-3); border-bottom: 0; font-weight
 .seg span { flex: 1; text-align: center; padding: 6px; border-radius: 999px; color: var(--ink-2); }
 .seg .on { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-card); }
 .splash { background: linear-gradient(160deg, var(--grad-a), var(--grad-b) 60%, var(--grad-c)); color: #fff; border-radius: 24px; padding: 34px 20px 26px; text-align: center; }
-.splash .logo { width: 64px; height: 64px; border-radius: 20px; background: rgba(255,255,255,.18); margin: 0 auto 14px; }
+.splash .logo { width: 64px; height: 64px; border-radius: 20px; background: rgba(255,255,255,.18); margin: 0 auto 14px; display: grid; place-items: center; color: #fff; }
 .splash h2 { color: #fff; font-size: 1.7rem; font-weight: 800; letter-spacing: -0.03em; }
 .splash p { opacity: .85; font-size: .88rem; margin-top: 6px; }
 
@@ -221,9 +224,15 @@ tfoot td { border-top: 1px solid var(--surface-3); border-bottom: 0; font-weight
 .testata .who i { width: 40px; height: 40px; border-radius: 14px; background: linear-gradient(135deg, var(--grad-b), var(--grad-c)); display: inline-block; }
 </style>
 
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="manto" viewBox="0 0 100 100">
+    <path d="M28 80 V24 L50 52 L72 24 V80" stroke-width="11"/>
+    <path d="M50 10 V92" stroke-width="7"/>
+  </symbol>
+</svg>
 <div class="mock-bar">
   <div class="in">
-    <div class="nome"><i></i>Manti <span>mockup · 15 dicembre 2026 · mese 3</span></div>
+    <div class="nome"><i><svg class="sym sym-tile"><use href="#manto"/></svg></i>Manti <span>mockup · 15 dicembre 2026 · mese 3</span></div>
     <div class="switch" role="tablist">
       <button role="tab" id="tab-sito" aria-selected="true" data-vista="sito">Sito pubblico</button>
       <button role="tab" id="tab-app" aria-selected="false" data-vista="app">App</button>
@@ -240,7 +249,7 @@ tfoot td { border-top: 1px solid var(--surface-3); border-bottom: 0; font-weight
   <div class="hero">
     <div>
       <div class="ey"><i></i> Pubblicato oggi alle 06:00 · registro verificato, 412 righe su 412</div>
-      <div class="big">1,021<small>€ per manto</small></div>
+      <div class="big">1,021<small>€ per 1 <svg class="sym"><use href="#manto"/></svg></small></div>
       <div class="delta">▲ 2,1% dalla partenza · non è mai sceso</div>
       <p class="come">Il valore non lo decide nessuno: è la riserva in euro divisa per i manti in circolazione. Sale a ogni vendita con sovrapprezzo, a ogni conversione, con gli interessi della riserva e con la metà di ogni multa che viene bruciata. Non esiste un'operazione che lo faccia scendere.</p>
       <div style="display:flex;gap:10px;margin-top:18px;flex-wrap:wrap">
@@ -390,7 +399,7 @@ tfoot td { border-top: 1px solid var(--surface-3); border-bottom: 0; font-weight
         <div class="statusbar"><span>9:41</span><span>●●● ᯤ ▮</span></div>
         <div class="corpo">
           <div class="splash" style="margin-top:8px">
-            <div class="logo"></div>
+            <div class="logo"><svg class="sym sym-tile"><use href="#manto"/></svg></div>
             <h2>Manti</h2>
             <p>La banca dei manti. Il conto lo crei tu, qui.</p>
           </div>
@@ -421,7 +430,7 @@ tfoot td { border-top: 1px solid var(--surface-3); border-bottom: 0; font-weight
           <div class="saldo-card">
             <div class="tasso">1 manto = 1,021 € ▲</div>
             <div class="l">Saldo</div>
-            <div class="m">71,30<small>manti</small></div>
+            <div class="m"><svg class="sym"><use href="#manto"/></svg>71,30<small>manti</small></div>
             <div class="e">≈ 71,30 € se converti oggi · aggiornato alle 06:00</div>
           </div>
           <div class="azioni">
@@ -610,7 +619,7 @@ tfoot td { border-top: 1px solid var(--surface-3); border-bottom: 0; font-weight
         <div class="saldo-card" style="margin-top:14px">
           <div class="tasso">1 manto = 1,021 €</div>
           <div class="l">Saldo</div>
-          <div class="m">2.000,00<small>manti</small></div>
+          <div class="m"><svg class="sym"><use href="#manto"/></svg>2.000,00<small>manti</small></div>
           <div class="e">≈ 2.041 € · comprati 3.000 a 1,00 il 1 ottobre · pagati 1.000 in due fine mese</div>
         </div>
         <div class="griglia g3" style="margin-top:16px">
@@ -854,7 +863,7 @@ tfoot td { border-top: 1px solid var(--surface-3); border-bottom: 0; font-weight
           <div class="card pad">
             <div class="saldo-card" style="background:linear-gradient(135deg,#3A1518,var(--bad) 60%,#FF8A5B)">
               <div class="l">Saldo</div>
-              <div class="m">18,00<small>manti</small></div>
+              <div class="m"><svg class="sym"><use href="#manto"/></svg>18,00<small>manti</small></div>
               <div class="e">≈ 18,37 € · metà delle multe pagate; l'altra metà è bruciata</div>
             </div>
             <div class="azioni" style="grid-template-columns:repeat(3,1fr)"><button><i>→</i>Bonifico</button><button><i>€</i>Converti</button><button><i>▣</i>Inquadra</button></div>
