@@ -84,7 +84,7 @@ ${correzioni}
 ${aziende}
 ${verbali}
 ${registro}
-<footer>Pubblicato ${r ? esc(r.pubblicato) : ''}${r?.ultima_riga ? `, riga ${r.ultima_riga.seq}, hash <code>${esc(r.ultima_riga.hash)}</code>` : ''}. Lo stato in <a href="stato.json">stato.json</a>.</footer>
+<footer>${r?.ultima_riga ? `Registro al giorno ${esc(r.giorno ?? '—')}, riga ${r.ultima_riga.seq} del ${esc(r.ultima_riga.ts)}, hash <code>${esc(r.ultima_riga.hash)}</code>.` : 'Registro vuoto.'} Lo stato in <a href="stato.json">stato.json</a>. Questa pagina la genera <code>node motore/pubblica.js</code> dal solo registro: chiunque può rifarla e confrontarla byte per byte.</footer>
 </body></html>
 `;
 }

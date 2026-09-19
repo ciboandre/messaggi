@@ -83,15 +83,30 @@ test('una riga invalida in mezzo: il motore si ferma lì, mostra l\'ultimo stato
   assert.match(html, /ultima riga buona \(seq 2\)/);
 });
 
-test('registro illeggibile o assente: pagina di errore, niente stato', () => {
+test('registro assente vale vuoto; illeggibile è un errore con pagina e senza stato', () => {
   const dir = mkdtempSync(join(tmpdir(), 'manti-'));
   const esito = pubblica(join(dir, 'manca.jsonl'), join(dir, 'sito'));
-  assert.equal(esito.ok, false);
-  assert.match(esito.errore.motivo, /illeggibile/);
-  assert.ok(existsSync(join(dir, 'sito', 'index.html')));
-  assert.ok(!existsSync(join(dir, 'sito', 'stato.json')));
+  assert.equal(esito.ok, true);
+  assert.equal(esito.seq, -1);
+  assert.match(readFileSync(join(dir, 'sito', 'index.html'), 'utf8'), /Registro vuoto/);
   writeFileSync(join(dir, 'rotto.jsonl'), '{"seq":0}\nnon json\n');
-  assert.match(pubblica(join(dir, 'rotto.jsonl'), join(dir, 'sito')).errore.motivo, /linea 2: JSON non valido/);
+  const rotto = pubblica(join(dir, 'rotto.jsonl'), join(dir, 'sito2'));
+  assert.equal(rotto.ok, false);
+  assert.match(rotto.errore.motivo, /illeggibile.*linea 2: JSON non valido/);
+  assert.ok(existsSync(join(dir, 'sito2', 'index.html')));
+  assert.ok(!existsSync(join(dir, 'sito2', 'stato.json')));
+});
+
+test('deterministico: due esecuzioni sullo stesso registro danno gli stessi byte', () => {
+  const reg = registroDiProva();
+  const dir = mkdtempSync(join(tmpdir(), 'manti-'));
+  const ledger = join(dir, 'ledger.jsonl');
+  writeFileSync(ledger, reg.righe.map(rigaAJsonl).join(''));
+  pubblica(ledger, join(dir, 'a'));
+  pubblica(ledger, join(dir, 'b'));
+  assert.equal(readFileSync(join(dir, 'a', 'index.html'), 'utf8'), readFileSync(join(dir, 'b', 'index.html'), 'utf8'));
+  assert.equal(readFileSync(join(dir, 'a', 'stato.json'), 'utf8'), readFileSync(join(dir, 'b', 'stato.json'), 'utf8'));
+  assert.ok(!readFileSync(join(dir, 'a', 'index.html'), 'utf8').includes(new Date().toISOString().slice(0, 4) + '-' + new Date().toISOString().slice(5, 7)), 'nessuna data di oggi nella pagina');
 });
 
 test('riassunto: nessun BigInt, tutto serializzabile', () => {

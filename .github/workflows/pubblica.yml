@@ -1,0 +1,64 @@
+# Il motore giornaliero come verificatore pubblico.
+#
+# Questa Action non firma niente e non ha chiavi: esegue `pubblica`, che
+# legge ledger.jsonl, verifica ogni riga da capo e scrive sito/. Le righe
+# le scrive la banca dalla sua macchina e le committa; qui si ricontrolla
+# soltanto, e chiunque può rifare lo stesso in locale con lo stesso
+# comando e ottenere gli stessi byte.
+#
+# Se una riga non passa, `pubblica` esce con 1: il sito viene pubblicato
+# lo stesso (ultimo stato buono con l'avviso) e poi il run fallisce, così
+# la catena rotta si vede nella scheda dei run. Non si "passa comunque".
+#
+# Il cron è in UTC: 05:00 UTC sono le 06:00 italiane d'inverno, le 07:00
+# d'estate. Va bene così: la pubblicazione è giornaliera, non all'ora.
+
+name: Pubblica il sito dal registro
+
+on:
+  schedule:
+    - cron: '0 5 * * *'
+  push:
+    branches: [main]
+    paths: ['ledger.jsonl', 'motore/**', 'nucleo/**', 'package-lock.json', '.github/workflows/pubblica.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  pubblica:
+    runs-on: ubuntu-24.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4.2.2
+      - uses: actions/setup-node@v4.1.0
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Verifica il registro e genera il sito
+        id: motore
+        run: |
+          set +e
+          node motore/pubblica.js ledger.jsonl sito
+          echo "esito=$?" >> "$GITHUB_OUTPUT"
+      - uses: actions/configure-pages@v5.0.0
+      - uses: actions/upload-pages-artifact@v3.0.1
+        with:
+          path: sito
+      - id: deploy
+        uses: actions/deploy-pages@v4.0.5
+      - name: Catena rotta = run fallito
+        if: steps.motore.outputs.esito != '0'
+        run: |
+          echo "::error::Il registro non passa la verifica: vedi il passo 'Verifica il registro'."
+          exit 1

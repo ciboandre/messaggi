@@ -8,8 +8,13 @@
 // sua regola, il motore scrive quale e perché, e il sito mostra l'ultimo
 // stato buono con l'avviso al posto dei numeri. Esce con codice 1, così
 // chi lo esegue (una GitHub Action) lo vede.
+//
+// L'uscita è deterministica: dipende solo dal registro. Nessuna data di
+// generazione, nessun ordine che venga da fuori. Due esecuzioni sullo
+// stesso file danno gli stessi byte, e chiunque può rifare il sito in
+// locale e confrontarlo. Un registro assente vale come vuoto.
 
-import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
+import { readFileSync, mkdirSync, writeFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { Registro } from '../nucleo/registro.js';
 import { righeDaJsonl } from '../nucleo/registro-file.js';
@@ -48,7 +53,6 @@ export function riassunto(registro) {
   const verbali = Object.values(s.verbali ?? {});
   const n = (x) => (x === undefined || x === null ? null : String(x));
   return {
-    pubblicato: new Date().toISOString().replace(/\.\d{3}Z$/, 'Z'),
     ultima_riga: ultima ? { seq: ultima.seq, hash: ultima.hash, ts: ultima.ts } : null,
     giorno: s.giorno ?? null,
     n_giorni: s.n_giorni ?? 0,
@@ -95,7 +99,7 @@ export function riassunto(registro) {
 export function pubblica(percorsoRegistro, cartellaSito) {
   let righe;
   try {
-    righe = righeDaJsonl(readFileSync(percorsoRegistro, 'utf8'));
+    righe = existsSync(percorsoRegistro) ? righeDaJsonl(readFileSync(percorsoRegistro, 'utf8')) : [];
   } catch (e) {
     righe = [];
     mkdirSync(cartellaSito, { recursive: true });
