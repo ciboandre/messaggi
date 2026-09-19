@@ -1,208 +1,234 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Manti</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap">
 <style>
 :root {
-  --ground: #F5F6F2; --surface: #FFFFFF; --surface-2: #EEF0EA; --line: #D9DDD3; --line-strong: #B9C0B6;
-  --ink: #18211C; --ink-2: #5A665F; --ink-3: #8A958E;
-  --accent: #1E6B52; --accent-ink: #FFFFFF; --accent-soft: #DCEDE4;
-  --brass: #9A7433; --brass-soft: #F3EAD6;
-  --ok: #2E7D4F; --ok-soft: #DFF0E5; --warn: #A8620F; --warn-soft: #F8EBD3; --bad: #B23A3A; --bad-soft: #F6DFDF;
-  --phone: #1A1F1D; --shadow: 0 24px 60px rgba(24,33,28,.18);
-  --display: "Fraunces", "Iowan Old Style", Georgia, serif;
-  --body: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
-  --mono: "IBM Plex Mono", "SFMono-Regular", Menlo, monospace;
+  --ground: #F4F4F7; --surface: #FFFFFF; --surface-2: #F0F0F4; --surface-3: #E6E6EC; --line: #E9E9EE;
+  --ink: #0F0F14; --ink-2: #6B6B78; --ink-3: #A0A0AC;
+  --accent: #3B5BFF; --accent-soft: #E9EDFF;
+  --grad-a: #1B1F3A; --grad-b: #3B5BFF; --grad-c: #7C4DFF;
+  --ok: #17A05E; --ok-soft: #E3F6EC; --warn: #E08A00; --warn-soft: #FFF2DC; --bad: #E5484D; --bad-soft: #FDE7E8;
+  --cta: #0F0F14; --cta-ink: #FFFFFF;
+  --phone: #0B0B0F; --shadow: 0 30px 70px rgba(15,15,20,.22); --shadow-card: 0 1px 2px rgba(15,15,20,.04), 0 8px 24px rgba(15,15,20,.06);
+  --display: "Manrope", "Inter", -apple-system, "Segoe UI", sans-serif;
+  --body: "Inter", -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, monospace;
+  --r: 20px; --r-s: 14px;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --ground: #111614; --surface: #181F1C; --surface-2: #1F2825; --line: #2C3632; --line-strong: #46534D;
-    --ink: #E7ECE8; --ink-2: #98A69E; --ink-3: #6E7B74;
-    --accent: #5CC39A; --accent-ink: #0E1A14; --accent-soft: #1D3A2F;
-    --brass: #D2AA5E; --brass-soft: #33291A;
-    --ok: #5CC39A; --ok-soft: #1D3A2F; --warn: #E0A052; --warn-soft: #3A2C16; --bad: #E07070; --bad-soft: #3E1F1F;
-    --phone: #0A0D0C; --shadow: 0 24px 60px rgba(0,0,0,.5);
+    --ground: #0B0B0F; --surface: #16161C; --surface-2: #1E1E26; --surface-3: #2A2A34; --line: #23232C;
+    --ink: #F3F3F7; --ink-2: #9A9AA8; --ink-3: #62626F;
+    --accent: #6C85FF; --accent-soft: #1C2246;
+    --ok: #34C77B; --ok-soft: #12301F; --warn: #F2A93B; --warn-soft: #362810; --bad: #FF6B6F; --bad-soft: #3A1B1D;
+    --cta: #FFFFFF; --cta-ink: #0F0F14;
+    --phone: #2A2A34; --shadow: 0 30px 70px rgba(0,0,0,.6); --shadow-card: none;
   }
 }
 :root[data-theme="dark"] {
-  --ground: #111614; --surface: #181F1C; --surface-2: #1F2825; --line: #2C3632; --line-strong: #46534D;
-  --ink: #E7ECE8; --ink-2: #98A69E; --ink-3: #6E7B74;
-  --accent: #5CC39A; --accent-ink: #0E1A14; --accent-soft: #1D3A2F;
-  --brass: #D2AA5E; --brass-soft: #33291A;
-  --ok: #5CC39A; --ok-soft: #1D3A2F; --warn: #E0A052; --warn-soft: #3A2C16; --bad: #E07070; --bad-soft: #3E1F1F;
-  --phone: #0A0D0C; --shadow: 0 24px 60px rgba(0,0,0,.5);
+  --ground: #0B0B0F; --surface: #16161C; --surface-2: #1E1E26; --surface-3: #2A2A34; --line: #23232C;
+  --ink: #F3F3F7; --ink-2: #9A9AA8; --ink-3: #62626F;
+  --accent: #6C85FF; --accent-soft: #1C2246;
+  --ok: #34C77B; --ok-soft: #12301F; --warn: #F2A93B; --warn-soft: #362810; --bad: #FF6B6F; --bad-soft: #3A1B1D;
+  --cta: #FFFFFF; --cta-ink: #0F0F14;
+  --phone: #2A2A34; --shadow: 0 30px 70px rgba(0,0,0,.6); --shadow-card: none;
 }
 
 * { box-sizing: border-box; }
 html { height: 100%; }
 body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
-a { color: var(--accent); text-decoration: none; }
+a { color: var(--accent); text-decoration: none; font-weight: 500; }
 a:hover { text-decoration: underline; }
-h1, h2, h3, h4 { margin: 0; text-wrap: balance; }
-h1 { font-family: var(--display); font-weight: 500; font-size: 2rem; line-height: 1.1; letter-spacing: -0.01em; }
-h2 { font-family: var(--display); font-weight: 500; font-size: 1.35rem; line-height: 1.2; }
-h3 { font-size: .74rem; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-2); }
+h1, h2, h3, h4 { margin: 0; text-wrap: balance; font-family: var(--display); }
+h1 { font-weight: 800; font-size: 2rem; line-height: 1.1; letter-spacing: -0.03em; }
+h2 { font-weight: 700; font-size: 1.25rem; line-height: 1.2; letter-spacing: -0.02em; }
+h3 { font-family: var(--body); font-size: .8rem; font-weight: 600; color: var(--ink-2); }
 p { margin: 0; }
 .muto { color: var(--ink-2); }
 .piccolo { font-size: .84rem; }
-.mono { font-family: var(--mono); font-size: .8rem; }
+.mono { font-family: var(--mono); font-size: .78rem; }
 .num { font-variant-numeric: tabular-nums; }
-.cifra { font-family: var(--display); font-variant-numeric: tabular-nums; font-weight: 500; }
+.cifra { font-family: var(--display); font-weight: 800; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
 button { font: inherit; cursor: pointer; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 
-.mock-bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10; background: var(--ink); color: var(--ground); padding-block: 10px; padding-inline: 16px; }
-.mock-bar .in { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
-.mock-bar .nome { font-family: var(--display); font-size: 1.1rem; font-weight: 500; }
-.mock-bar .nome span { font-family: var(--body); font-size: .72rem; opacity: .6; margin-left: 8px; letter-spacing: .06em; text-transform: uppercase; }
-.switch { display: flex; gap: 4px; margin-left: auto; background: rgba(255,255,255,.08); padding: 4px; border-radius: 10px; flex-wrap: wrap; }
-.switch button { background: transparent; border: 0; color: inherit; opacity: .7; padding: 6px 12px; border-radius: 7px; font-size: .86rem; font-weight: 500; }
-.switch button[aria-selected="true"] { background: var(--ground); color: var(--ink); opacity: 1; }
+.mock-bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10; background: var(--surface); border-bottom: 1px solid var(--line); padding-block: 10px; padding-inline: 16px; }
+.mock-bar .in { max-width: 1120px; margin: 0 auto; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.mock-bar .nome { font-family: var(--display); font-weight: 800; font-size: 1.15rem; letter-spacing: -0.02em; display: flex; align-items: center; gap: 8px; }
+.mock-bar .nome i { width: 26px; height: 26px; border-radius: 8px; background: linear-gradient(135deg, var(--grad-b), var(--grad-c)); display: inline-block; }
+.mock-bar .nome span { font-family: var(--body); font-size: .72rem; color: var(--ink-3); font-weight: 500; margin-left: 4px; }
+.switch { display: flex; gap: 4px; margin-left: auto; background: var(--surface-2); padding: 4px; border-radius: 999px; flex-wrap: wrap; }
+.switch button { background: transparent; border: 0; color: var(--ink-2); padding: 7px 14px; border-radius: 999px; font-size: .86rem; font-weight: 600; }
+.switch button[aria-selected="true"] { background: var(--cta); color: var(--cta-ink); }
 
-.vista { max-width: 1100px; margin: 0 auto; padding-block: 28px 60px; padding-inline: 16px; }
+.vista { max-width: 1120px; margin: 0 auto; padding-block: 28px 70px; padding-inline: 16px; }
 
-.pannello { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
-.pannello.pad { padding: 18px 20px; }
+.card { background: var(--surface); border-radius: var(--r); box-shadow: var(--shadow-card); }
+.card.pad { padding: 20px 22px; }
 .griglia { display: grid; gap: 14px; }
 .g2 { grid-template-columns: repeat(2, minmax(0,1fr)); }
 .g3 { grid-template-columns: repeat(3, minmax(0,1fr)); }
 .g4 { grid-template-columns: repeat(4, minmax(0,1fr)); }
 @media (max-width: 820px) { .g3, .g4 { grid-template-columns: repeat(2, minmax(0,1fr)); } }
 @media (max-width: 520px) { .g2, .g3, .g4 { grid-template-columns: 1fr; } }
-.sezione { margin-top: 32px; }
+.sezione { margin-top: 28px; }
 .sezione > .testa { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
 .scroll { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; font-size: .9rem; }
-th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
-th { font-size: .72rem; text-transform: uppercase; letter-spacing: .07em; color: var(--ink-2); font-weight: 600; }
+th, td { text-align: left; padding: 11px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: .74rem; color: var(--ink-2); font-weight: 600; }
 th.r, td.r { text-align: right; font-variant-numeric: tabular-nums; }
 tbody tr:last-child td { border-bottom: 0; }
-tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weight: 600; }
-.pill { display: inline-block; font-size: .7rem; font-weight: 600; letter-spacing: .04em; padding: 2px 8px; border-radius: 999px; background: var(--surface-2); color: var(--ink-2); white-space: nowrap; }
+tfoot td { border-top: 1px solid var(--surface-3); border-bottom: 0; font-weight: 700; }
+.pill { display: inline-block; font-size: .72rem; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: var(--surface-2); color: var(--ink-2); white-space: nowrap; }
 .pill.ok { background: var(--ok-soft); color: var(--ok); }
 .pill.warn { background: var(--warn-soft); color: var(--warn); }
 .pill.bad { background: var(--bad-soft); color: var(--bad); }
-.pill.brass { background: var(--brass-soft); color: var(--brass); }
 .pill.acc { background: var(--accent-soft); color: var(--accent); }
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 9px 14px; border-radius: 8px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); font-weight: 500; font-size: .9rem; }
-.btn.primario { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
-.btn.pericolo { background: var(--bad); border-color: var(--bad); color: #fff; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 18px; border-radius: 999px; border: 0; background: var(--surface-2); color: var(--ink); font-weight: 600; font-size: .9rem; }
+.btn.primario { background: var(--cta); color: var(--cta-ink); }
+.btn.acc { background: var(--accent); color: #fff; }
+.btn.pericolo { background: var(--bad); color: #fff; }
 .btn.largo { width: 100%; }
-.btn.mini { padding: 5px 10px; font-size: .8rem; }
-.btn[disabled] { opacity: .5; cursor: default; }
-.campo { display: grid; gap: 5px; }
+.btn.mini { padding: 7px 12px; font-size: .8rem; }
+.btn[disabled] { opacity: .45; cursor: default; }
+.campo { display: grid; gap: 6px; }
 .campo label { font-size: .78rem; font-weight: 600; color: var(--ink-2); }
-.campo input, .campo select, .campo textarea { width: 100%; padding: 9px 11px; border: 1px solid var(--line-strong); border-radius: 8px; font: inherit; background: var(--surface); color: var(--ink); }
+.campo input, .campo select, .campo textarea { width: 100%; padding: 12px 14px; border: 0; border-radius: var(--r-s); font: inherit; background: var(--surface-2); color: var(--ink); }
 .campo textarea { min-height: 90px; resize: vertical; }
 .form { display: grid; gap: 14px; }
-.conto { background: var(--surface-2); border-radius: 8px; padding: 10px 12px; font-size: .88rem; display: grid; gap: 4px; }
+.conto { background: var(--surface-2); border-radius: var(--r-s); padding: 12px 14px; font-size: .88rem; display: grid; gap: 5px; }
 .conto div { display: flex; justify-content: space-between; gap: 12px; }
-.conto .tot { border-top: 1px solid var(--line-strong); margin-top: 4px; padding-top: 6px; font-weight: 600; }
-.nota { border-left: 3px solid var(--warn); background: var(--warn-soft); padding: 10px 14px; border-radius: 0 8px 8px 0; font-size: .88rem; }
-.nota.ok { border-color: var(--ok); background: var(--ok-soft); }
-.nota.bad { border-color: var(--bad); background: var(--bad-soft); }
-.nota.info { border-color: var(--accent); background: var(--accent-soft); }
+.conto .tot { border-top: 1px solid var(--surface-3); margin-top: 4px; padding-top: 7px; font-weight: 700; }
+.nota { background: var(--warn-soft); color: var(--ink); padding: 12px 14px; border-radius: var(--r-s); font-size: .86rem; }
+.nota.ok { background: var(--ok-soft); }
+.nota.bad { background: var(--bad-soft); }
+.nota.info { background: var(--accent-soft); }
 
 /* sito */
-.bollettino { display: grid; grid-template-columns: minmax(0,1.4fr) minmax(0,1fr); gap: 14px; }
-@media (max-width: 820px) { .bollettino { grid-template-columns: 1fr; } }
-.tasso { padding: 26px 28px; display: flex; flex-direction: column; gap: 10px; border-color: var(--line-strong); }
-.tasso .eyebrow { display: flex; gap: 10px; align-items: center; font-size: .78rem; color: var(--ink-2); }
-.tasso .eyebrow .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); display: inline-block; }
-.tasso .grande { font-family: var(--display); font-size: clamp(2.6rem, 6vw, 4.2rem); line-height: 1; font-weight: 500; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
-.tasso .grande small { font-size: .38em; color: var(--ink-2); font-weight: 400; margin-left: .2em; }
-.tasso .delta { color: var(--ok); font-weight: 600; font-size: .95rem; }
-.tasso .come { margin-top: auto; font-size: .86rem; color: var(--ink-2); max-width: 46ch; }
-.stat { padding: 16px 18px; display: grid; gap: 4px; }
-.stat .v { font-family: var(--display); font-size: 1.6rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
-.stat .v small { font-size: .6em; color: var(--ink-2); }
+.hero { background: linear-gradient(135deg, var(--grad-a) 0%, var(--grad-b) 55%, var(--grad-c) 100%); color: #fff; border-radius: 28px; padding: 30px 32px; display: grid; grid-template-columns: minmax(0,1.3fr) minmax(0,1fr); gap: 24px; position: relative; overflow: hidden; }
+.hero::after { content: ""; position: absolute; right: -80px; top: -120px; width: 360px; height: 360px; border-radius: 50%; background: rgba(255,255,255,.10); }
+@media (max-width: 820px) { .hero { grid-template-columns: 1fr; } }
+.hero .ey { font-size: .8rem; opacity: .8; display: flex; align-items: center; gap: 8px; }
+.hero .ey i { width: 8px; height: 8px; border-radius: 50%; background: #5CF0A0; display: inline-block; }
+.hero .big { font-family: var(--display); font-weight: 800; font-size: clamp(2.8rem, 7vw, 4.6rem); line-height: 1; letter-spacing: -0.04em; margin-top: 10px; font-variant-numeric: tabular-nums; }
+.hero .big small { font-size: .32em; font-weight: 600; opacity: .8; margin-left: .3em; letter-spacing: 0; }
+.hero .delta { margin-top: 10px; display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,.16); padding: 6px 12px; border-radius: 999px; font-size: .84rem; font-weight: 600; }
+.hero .come { margin-top: 18px; font-size: .88rem; opacity: .85; max-width: 46ch; }
+.hero .kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-content: start; position: relative; }
+.kpi { background: rgba(255,255,255,.12); border-radius: 16px; padding: 14px 16px; backdrop-filter: blur(6px); }
+.kpi h3 { color: rgba(255,255,255,.75); }
+.kpi .v { font-family: var(--display); font-weight: 800; font-size: 1.5rem; letter-spacing: -0.03em; margin-top: 2px; font-variant-numeric: tabular-nums; }
+.kpi .v small { font-size: .6em; font-weight: 600; opacity: .8; }
+.kpi .s { font-size: .76rem; opacity: .8; margin-top: 2px; }
+.stat { padding: 18px 20px; display: grid; gap: 4px; }
+.stat .v { font-family: var(--display); font-weight: 800; font-size: 1.7rem; letter-spacing: -0.03em; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.stat .v small { font-size: .55em; color: var(--ink-2); font-weight: 600; }
 .stat .s { font-size: .8rem; color: var(--ink-2); }
 .grafico { width: 100%; height: auto; display: block; }
 .grafico text { font-family: var(--body); font-size: 11px; fill: var(--ink-2); }
 .grafico .griglia-l { stroke: var(--line); }
-.grafico .linea { stroke: var(--accent); fill: none; stroke-width: 2.5; stroke-linejoin: round; }
-.grafico .area { fill: var(--accent); opacity: .12; }
+.grafico .linea { stroke: var(--accent); fill: none; stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; }
+.grafico .area { fill: var(--accent); opacity: .10; }
 .grafico .punto { fill: var(--accent); }
-.grafico .punto-fine { fill: var(--surface); stroke: var(--accent); stroke-width: 3; }
-.garanzie { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--surface); }
-.garanzie > div { padding: 16px 18px; border-right: 1px solid var(--line); }
-.garanzie > div:last-child { border-right: 0; }
-.garanzie strong { display: block; margin-bottom: 4px; font-family: var(--display); font-weight: 500; font-size: 1.05rem; }
-@media (max-width: 700px) { .garanzie { grid-template-columns: 1fr; } .garanzie > div { border-right: 0; border-bottom: 1px solid var(--line); } .garanzie > div:last-child { border-bottom: 0; } }
-.firma { margin-top: 36px; padding-top: 14px; border-top: 1px solid var(--line-strong); font-size: .8rem; color: var(--ink-2); display: flex; flex-wrap: wrap; gap: 6px 18px; }
-.firma code { font-family: var(--mono); color: var(--ink); }
-.sentenza { display: grid; gap: 6px; padding: 14px 16px; border-bottom: 1px solid var(--line); }
+.grafico .punto-fine { fill: var(--surface); stroke: var(--accent); stroke-width: 3.5; }
+.garanzie { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 14px; }
+@media (max-width: 700px) { .garanzie { grid-template-columns: 1fr; } }
+.garanzie .card { padding: 18px 20px; }
+.garanzie strong { display: block; font-family: var(--display); font-weight: 700; font-size: 1.05rem; margin-bottom: 4px; letter-spacing: -0.01em; }
+.garanzie i { display: block; width: 36px; height: 36px; border-radius: 12px; background: var(--accent-soft); margin-bottom: 12px; }
+.firma { margin-top: 32px; font-size: .78rem; color: var(--ink-3); display: flex; flex-wrap: wrap; gap: 6px 18px; }
+.firma code { font-family: var(--mono); color: var(--ink-2); }
+.sentenza { display: grid; gap: 6px; padding: 16px 20px; border-bottom: 1px solid var(--line); }
 .sentenza:last-child { border-bottom: 0; }
 .sentenza .cap { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; font-size: .84rem; color: var(--ink-2); }
 .sentenza .mot { font-size: .9rem; }
 
 /* app */
-.telefoni { display: flex; gap: 28px; flex-wrap: wrap; justify-content: center; align-items: flex-start; margin-top: 24px; }
+.telefoni { display: flex; gap: 26px; flex-wrap: wrap; justify-content: center; align-items: flex-start; margin-top: 24px; }
 .telefono-wrap { display: grid; gap: 10px; justify-items: center; }
-.telefono-wrap .did { font-size: .82rem; color: var(--ink-2); }
-.telefono { width: 350px; max-width: 100%; background: var(--phone); border-radius: 42px; padding: 10px; box-shadow: var(--shadow); }
-.schermo { background: var(--ground); border-radius: 33px; height: 720px; overflow: hidden; display: flex; flex-direction: column; position: relative; }
-.statusbar { height: 42px; display: flex; justify-content: space-between; align-items: center; padding: 0 24px; font-size: .78rem; font-weight: 600; }
-.corpo { flex: 1; overflow-y: auto; padding: 0 16px 90px; }
-.tabbar { position: absolute; left: 0; right: 0; bottom: 0; height: 72px; background: var(--surface); border-top: 1px solid var(--line); display: flex; justify-content: space-around; padding-top: 10px; font-size: .64rem; color: var(--ink-3); }
-.tabbar div { text-align: center; }
-.tabbar i { display: block; width: 22px; height: 22px; border-radius: 6px; background: var(--line); margin: 0 auto 4px; }
-.tabbar .on { color: var(--accent); font-weight: 600; }
-.tabbar .on i { background: var(--accent); }
-.tabbar .badge { position: relative; }
-.tabbar .badge::after { content: "1"; position: absolute; top: -4px; right: 10px; background: var(--bad); color: #fff; font-size: .6rem; font-weight: 600; width: 16px; height: 16px; border-radius: 50%; display: grid; place-items: center; }
-.saldo { text-align: center; padding: 20px 0 12px; }
-.saldo .m { font-family: var(--display); font-size: 2.7rem; line-height: 1; font-weight: 500; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
-.saldo .m small { font-size: .4em; color: var(--brass); font-weight: 500; letter-spacing: 0; }
-.saldo .e { color: var(--ink-2); font-size: .9rem; margin-top: 8px; }
-.azioni { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 14px 0 18px; }
-.azioni .btn { flex-direction: column; gap: 4px; padding: 10px 6px; font-size: .78rem; }
-.azioni .btn i { display: block; width: 22px; height: 22px; border-radius: 6px; background: var(--accent-soft); }
-.azioni .btn.primario i { background: rgba(255,255,255,.3); }
-.lista { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
-.voce { display: flex; align-items: center; gap: 12px; padding: 11px 13px; border-bottom: 1px solid var(--line); }
+.telefono-wrap .did { font-size: .82rem; color: var(--ink-2); font-weight: 500; }
+.telefono { width: 350px; max-width: 100%; background: var(--phone); border-radius: 48px; padding: 9px; box-shadow: var(--shadow); }
+.schermo { background: var(--ground); border-radius: 40px; height: 730px; overflow: hidden; display: flex; flex-direction: column; position: relative; }
+.statusbar { height: 46px; display: flex; justify-content: space-between; align-items: center; padding: 0 26px; font-size: .78rem; font-weight: 600; }
+.isola { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 100px; height: 26px; background: #0B0B0F; border-radius: 999px; }
+.corpo { flex: 1; overflow-y: auto; padding: 0 16px 96px; }
+.tabbar { position: absolute; left: 0; right: 0; bottom: 0; height: 78px; background: var(--surface); border-top: 1px solid var(--line); display: flex; justify-content: space-around; padding-top: 10px; font-size: .64rem; color: var(--ink-3); font-weight: 500; }
+.tabbar div { text-align: center; position: relative; }
+.tabbar i { display: block; width: 24px; height: 24px; border-radius: 8px; background: var(--surface-3); margin: 0 auto 4px; }
+.tabbar .on { color: var(--ink); font-weight: 600; }
+.tabbar .on i { background: var(--ink); }
+.tabbar .badge::after { content: "1"; position: absolute; top: -4px; right: 6px; background: var(--bad); color: #fff; font-size: .6rem; font-weight: 700; width: 16px; height: 16px; border-radius: 50%; display: grid; place-items: center; }
+.saldo-card { background: linear-gradient(135deg, var(--grad-a) 0%, var(--grad-b) 60%, var(--grad-c) 100%); color: #fff; border-radius: 24px; padding: 20px 20px 18px; position: relative; overflow: hidden; }
+.saldo-card::after { content: ""; position: absolute; right: -50px; top: -70px; width: 200px; height: 200px; border-radius: 50%; background: rgba(255,255,255,.10); }
+.saldo-card .l { font-size: .76rem; opacity: .8; }
+.saldo-card .m { font-family: var(--display); font-weight: 800; font-size: 2.4rem; letter-spacing: -0.04em; line-height: 1.05; margin-top: 4px; font-variant-numeric: tabular-nums; }
+.saldo-card .m small { font-size: .42em; font-weight: 600; opacity: .85; letter-spacing: 0; margin-left: .2em; }
+.saldo-card .e { font-size: .84rem; opacity: .85; margin-top: 8px; }
+.saldo-card .tasso { position: absolute; right: 16px; top: 16px; background: rgba(255,255,255,.18); padding: 4px 10px; border-radius: 999px; font-size: .72rem; font-weight: 600; }
+.azioni { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 16px 0 20px; }
+.azioni button { background: transparent; border: 0; color: var(--ink); display: grid; justify-items: center; gap: 6px; font-size: .72rem; font-weight: 600; padding: 0; }
+.azioni button i { width: 52px; height: 52px; border-radius: 50%; background: var(--surface); box-shadow: var(--shadow-card); display: grid; place-items: center; font-style: normal; font-size: 1.1rem; }
+.azioni button.p i { background: var(--cta); color: var(--cta-ink); }
+.lista { background: var(--surface); border-radius: var(--r); box-shadow: var(--shadow-card); }
+.voce { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-bottom: 1px solid var(--line); }
 .voce:last-child { border-bottom: 0; }
-.av { width: 36px; height: 36px; border-radius: 50%; background: var(--surface-2); color: var(--ink-2); display: grid; place-items: center; font-weight: 600; font-size: .78rem; flex-shrink: 0; }
-.av.premio { background: var(--brass-soft); color: var(--brass); }
-.av.me { background: var(--accent-soft); color: var(--accent); }
+.av { width: 40px; height: 40px; border-radius: 50%; background: var(--surface-2); color: var(--ink-2); display: grid; place-items: center; font-weight: 700; font-size: .8rem; flex-shrink: 0; }
+.av.premio { background: var(--accent-soft); color: var(--accent); }
+.av.me { background: var(--cta); color: var(--cta-ink); }
 .av.multa { background: var(--bad-soft); color: var(--bad); }
+.av.ok { background: var(--ok-soft); color: var(--ok); }
 .voce .t { flex: 1; min-width: 0; }
-.voce .t b { display: block; font-weight: 500; font-size: .9rem; }
+.voce .t b { display: block; font-weight: 600; font-size: .9rem; }
 .voce .t span { display: block; font-size: .76rem; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.voce .imp { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
-.voce .imp small { display: block; font-weight: 400; color: var(--ink-2); font-size: .74rem; }
+.voce .imp { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; white-space: nowrap; }
+.voce .imp small { display: block; font-weight: 500; color: var(--ink-2); font-size: .74rem; }
 .piu { color: var(--ok); }
 .titolo-schermo { display: flex; align-items: center; gap: 12px; padding: 8px 0 16px; }
-.titolo-schermo h2 { font-size: 1.25rem; }
-.importo-in { font-family: var(--display); font-size: 1.9rem; text-align: center; padding: 12px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--surface); font-variant-numeric: tabular-nums; }
-.blocco { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px; display: grid; gap: 8px; }
-.qr { width: 200px; height: 200px; margin: 0 auto; background: #fff; padding: 10px; border-radius: 10px; border: 1px solid var(--line); }
+.titolo-schermo h2 { font-size: 1.35rem; }
+.titolo-schermo .back { width: 36px; height: 36px; border-radius: 50%; background: var(--surface); box-shadow: var(--shadow-card); display: grid; place-items: center; font-weight: 700; }
+.importo-in { font-family: var(--display); font-weight: 800; font-size: 2.6rem; letter-spacing: -0.04em; text-align: center; padding: 8px; font-variant-numeric: tabular-nums; }
+.blocco { background: var(--surface); border-radius: var(--r); box-shadow: var(--shadow-card); padding: 16px; display: grid; gap: 8px; }
+.qr { width: 190px; height: 190px; margin: 0 auto; background: #fff; padding: 12px; border-radius: 18px; }
 .qr svg { width: 100%; height: 100%; display: block; }
 .coord { font-family: var(--mono); font-size: .72rem; word-break: break-all; text-align: center; color: var(--ink-2); }
+.chip-row { display: flex; gap: 6px; justify-content: center; }
+.chip-row .btn { padding: 6px 12px; font-size: .78rem; }
+.seg { display: flex; background: var(--surface-2); border-radius: 999px; padding: 3px; font-size: .78rem; font-weight: 600; }
+.seg span { flex: 1; text-align: center; padding: 6px; border-radius: 999px; color: var(--ink-2); }
+.seg .on { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-card); }
+.splash { background: linear-gradient(160deg, var(--grad-a), var(--grad-b) 60%, var(--grad-c)); color: #fff; border-radius: 24px; padding: 34px 20px 26px; text-align: center; }
+.splash .logo { width: 64px; height: 64px; border-radius: 20px; background: rgba(255,255,255,.18); margin: 0 auto 14px; }
+.splash h2 { color: #fff; font-size: 1.7rem; font-weight: 800; letter-spacing: -0.03em; }
+.splash p { opacity: .85; font-size: .88rem; margin-top: 6px; }
 
 /* pannelli */
-.pann { display: grid; grid-template-columns: 210px minmax(0,1fr); gap: 24px; }
+.pann { display: grid; grid-template-columns: 220px minmax(0,1fr); gap: 24px; }
 @media (max-width: 820px) { .pann { grid-template-columns: 1fr; } }
-.menu { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 64px); align-self: start; display: grid; gap: 2px; }
+.menu { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 66px); align-self: start; display: grid; gap: 3px; }
 @media (max-width: 820px) { .menu { position: static; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); } }
-.menu .cap { font-size: .68rem; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-3); padding: 12px 10px 4px; }
-.menu a { display: flex; justify-content: space-between; align-items: center; padding: 7px 10px; border-radius: 7px; color: var(--ink-2); font-size: .9rem; }
-.menu a.on { background: var(--surface); color: var(--ink); font-weight: 500; border: 1px solid var(--line); }
-.budget-barra { height: 8px; background: var(--line); border-radius: 999px; overflow: hidden; margin: 8px 0 4px; }
-.budget-barra i { display: block; height: 100%; background: var(--accent); }
-.cat-in { width: 100%; border: 0; border-bottom: 1px dashed var(--line-strong); background: transparent; font: inherit; font-weight: 500; color: var(--ink); padding: 2px 0; }
-.cat-q { width: 52px; text-align: right; border: 1px solid var(--line-strong); border-radius: 6px; padding: 3px 6px; font: inherit; background: var(--surface); color: var(--ink); }
+.menu .cap { font-size: .68rem; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-3); padding: 12px 12px 4px; font-weight: 600; }
+.menu a { display: flex; justify-content: space-between; align-items: center; padding: 9px 12px; border-radius: 12px; color: var(--ink-2); font-size: .9rem; font-weight: 500; }
+.menu a.on { background: var(--surface); color: var(--ink); font-weight: 600; box-shadow: var(--shadow-card); }
+.budget-barra { height: 8px; background: var(--surface-2); border-radius: 999px; overflow: hidden; margin: 8px 0 4px; }
+.budget-barra i { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
+.cat-in { width: 100%; border: 0; background: transparent; font: inherit; font-weight: 600; color: var(--ink); padding: 2px 0; }
+.cat-q { width: 56px; text-align: right; border: 0; border-radius: 8px; padding: 5px 8px; font: inherit; background: var(--surface-2); color: var(--ink); }
+.testata { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.testata .who { display: flex; align-items: center; gap: 10px; }
+.testata .who i { width: 40px; height: 40px; border-radius: 14px; background: linear-gradient(135deg, var(--grad-b), var(--grad-c)); display: inline-block; }
 </style>
 
 <div class="mock-bar">
   <div class="in">
-    <div class="nome">Manti <span>mockup · 15 dicembre 2026 · mese 3</span></div>
+    <div class="nome"><i></i>Manti <span>mockup · 15 dicembre 2026 · mese 3</span></div>
     <div class="switch" role="tablist">
       <button role="tab" id="tab-sito" aria-selected="true" data-vista="sito">Sito pubblico</button>
-      <button role="tab" id="tab-app" aria-selected="false" data-vista="app">App della banca</button>
-      <button role="tab" id="tab-azienda" aria-selected="false" data-vista="azienda">Pannello azienda</button>
-      <button role="tab" id="tab-polizia" aria-selected="false" data-vista="polizia">Pannello polizia</button>
+      <button role="tab" id="tab-app" aria-selected="false" data-vista="app">App</button>
+      <button role="tab" id="tab-azienda" aria-selected="false" data-vista="azienda">Azienda</button>
+      <button role="tab" id="tab-polizia" aria-selected="false" data-vista="polizia">Polizia</button>
     </div>
   </div>
 </div>
@@ -210,36 +236,36 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
 <!-- ================= SITO PUBBLICO ================= -->
 <section class="vista" id="vista-sito" role="tabpanel">
 
-  <div class="bollettino">
-    <div class="pannello tasso">
-      <div class="eyebrow"><span class="dot"></span> Pubblicato oggi alle 06:00 · registro verificato, 412 righe su 412</div>
-      <div class="grande">1,037<small>€ per manto</small></div>
+  <div class="hero">
+    <div>
+      <div class="ey"><i></i> Pubblicato oggi alle 06:00 · registro verificato, 412 righe su 412</div>
+      <div class="big">1,037<small>€ per manto</small></div>
       <div class="delta">▲ 0,5% da fine ottobre · 3,7% dalla partenza</div>
       <p class="come">Il valore non lo decide nessuno: è la riserva in euro divisa per i manti in circolazione. Cambia solo a fine mese, quando entrano gli euro del fatturato ed escono stipendi e premi. Sale ogni volta che un premio non viene assegnato.</p>
     </div>
-    <div class="griglia" style="grid-template-columns: 1fr 1fr; gap: 14px">
-      <div class="pannello stat"><h3>Riserva</h3><div class="v">939,28<small> €</small></div><div class="s">1.000 versati, 60,72 pagati</div></div>
-      <div class="pannello stat"><h3>In circolazione</h3><div class="v">906,20</div><div class="s">manti, di cui 1,20 della banca</div></div>
-      <div class="pannello stat"><h3>Emessi</h3><div class="v">965<small> / 990</small></div><div class="s">25 manti di premi non assegnati, mai emessi</div></div>
-      <div class="pannello stat"><h3>Dicembre</h3><div class="v">480</div><div class="s">manti in arrivo il 31: 240 di stipendi, fino a 240 di premi</div></div>
+    <div class="kpis">
+      <div class="kpi"><h3>Riserva</h3><div class="v">939,28<small> €</small></div><div class="s">1.000 versati, 60,72 pagati</div></div>
+      <div class="kpi"><h3>In circolazione</h3><div class="v">906,20</div><div class="s">manti, di cui 1,20 della banca</div></div>
+      <div class="kpi"><h3>Emessi</h3><div class="v">965<small> / 990</small></div><div class="s">25 di premi mai emessi</div></div>
+      <div class="kpi"><h3>Dicembre</h3><div class="v">480</div><div class="s">in arrivo il 31: 240 stipendi, fino a 240 premi</div></div>
     </div>
   </div>
 
   <div class="sezione griglia g2">
-    <div class="pannello pad">
+    <div class="card pad">
       <h3>Andamento del valore</h3>
       <svg class="grafico" viewBox="0 0 460 200" aria-label="Valore del manto da ottobre a oggi">
         <g class="griglia-l"><line x1="50" y1="20" x2="440" y2="20"/><line x1="50" y1="55" x2="440" y2="55"/><line x1="50" y1="90" x2="440" y2="90"/><line x1="50" y1="125" x2="440" y2="125"/><line x1="50" y1="160" x2="440" y2="160"/></g>
         <text x="8" y="24">1,04</text><text x="8" y="59">1,03</text><text x="8" y="94">1,02</text><text x="8" y="129">1,01</text><text x="8" y="164">1,00</text>
         <path class="area" d="M70,160 L180,52 L300,33 L410,31 L410,160 Z"/>
         <polyline class="linea" points="70,160 180,52 300,33 410,31"/>
-        <circle class="punto" cx="70" cy="160" r="3.5"/><circle class="punto" cx="180" cy="52" r="3.5"/><circle class="punto" cx="300" cy="33" r="3.5"/>
-        <circle class="punto-fine" cx="410" cy="31" r="5"/>
+        <circle class="punto" cx="70" cy="160" r="4"/><circle class="punto" cx="180" cy="52" r="4"/><circle class="punto" cx="300" cy="33" r="4"/>
+        <circle class="punto-fine" cx="410" cy="31" r="6"/>
         <text x="58" y="186">1 ott</text><text x="165" y="186">31 ott</text><text x="283" y="186">30 nov</text><text x="397" y="186">oggi</text>
       </svg>
       <p class="piccolo muto" style="margin-top:6px">1,000 alla partenza · 1,031 il 31 ottobre (15 manti di premi non emessi) · 1,036 il 30 novembre (10 non emessi) · 1,037 oggi.</p>
     </div>
-    <div class="pannello pad">
+    <div class="card pad">
       <h3>Il conto di oggi</h3>
       <div class="conto" style="margin-top:8px">
         <div><span>Versato in riserva (ottobre + novembre)</span><span class="num">1.000,00 €</span></div>
@@ -256,7 +282,7 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
   <div class="sezione griglia g2">
     <div>
       <div class="testa" style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px"><h2>Catalogo dei premi</h2><span class="piccolo muto">v3 · dal 1 dic · <a href="#">storia</a></span></div>
-      <div class="pannello scroll">
+      <div class="card scroll">
         <table>
           <thead><tr><th>Comportamento</th><th class="r">Quota</th><th class="r">A dicembre</th></tr></thead>
           <tbody>
@@ -273,7 +299,7 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
     </div>
     <div>
       <div class="testa" style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px"><h2>Tariffario delle multe</h2><span class="piccolo muto">v2 · dal 15 nov · <a href="#">storia</a></span></div>
-      <div class="pannello scroll">
+      <div class="card scroll">
         <table>
           <thead><tr><th>Infrazione</th><th class="r">Manti</th><th class="r">In euro</th></tr></thead>
           <tbody>
@@ -291,7 +317,7 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
 
   <div class="sezione">
     <div class="testa"><h2>Sentenze del giudice</h2><span class="piccolo muto">Istruzioni del giudice <a href="#">v1.2</a>, pubbliche · modello e versione nel registro</span></div>
-    <div class="pannello">
+    <div class="card">
       <div class="sentenza">
         <div class="cap"><span class="pill ok">annullata</span><b>S-004</b> · verbale V-019 · Ritardo oltre 10 minuti · 5,00 manti · 11 dic · istruzioni v1.2</div>
         <div class="mot"><b>Contestazione:</b> il ricorrente documenta uno sciopero dei mezzi pubblici il giorno del verbale, con orario di arrivo compatibile con il primo mezzo disponibile. <b>Replica della polizia:</b> nessuna. <b>Decisione:</b> il tariffario punisce il ritardo evitabile; uno sciopero proclamato è causa esterna e documentata. Il verbale è annullato.</div>
@@ -309,7 +335,7 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
 
   <div class="sezione">
     <div class="testa"><h2>Registro</h2><span class="piccolo muto">412 righe · <a href="#">scarica ledger.jsonl</a> · <a href="#">come verificarlo</a></span></div>
-    <div class="pannello scroll">
+    <div class="card scroll">
       <table>
         <thead><tr><th class="r">#</th><th>Quando</th><th>Tipo</th><th>Dettaglio</th><th>Hash</th></tr></thead>
         <tbody>
@@ -321,7 +347,7 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
           <tr><td class="r">407</td><td>11 dic 17:02</td><td><span class="pill ok">sentenza</span></td><td>S-004 · V-019 annullata · istruzioni v1.2 · fascicolo <span class="mono">88a1…</span></td><td class="mono">a4f3…d1e0</td></tr>
           <tr><td class="r">406</td><td>10 dic 09:40</td><td><span class="pill">bonifico</span></td><td>2 entrate → 2 uscite · 9,80 + 41,00 · causale cifrata</td><td class="mono">0c9b…55a8</td></tr>
           <tr><td class="r">…</td><td colspan="4" class="muto">righe da 3 a 405</td></tr>
-          <tr><td class="r">2</td><td>31 ott 23:59</td><td><span class="pill brass">fine mese</span></td><td>stipendi 10 × 25,00 · premi 235,00 in 21 uscite · non emessi 15,00 · attivi 10</td><td class="mono">c3d2…8e7b</td></tr>
+          <tr><td class="r">2</td><td>31 ott 23:59</td><td><span class="pill warn">fine mese</span></td><td>stipendi 10 × 25,00 · premi 235,00 in 21 uscite · non emessi 15,00 · attivi 10</td><td class="mono">c3d2…8e7b</td></tr>
           <tr><td class="r">1</td><td>1 ott 00:00</td><td><span class="pill">azienda</span></td><td>registrata "Cibotari S.r.l." · chiave <span class="mono">4a91…0e2c</span></td><td class="mono">6e30…b19f</td></tr>
           <tr><td class="r">0</td><td>1 ott 00:00</td><td><span class="pill">genesi</span></td><td>500 manti il primo mese · −2% al mese · 50% stipendi · commissione 2% · 15 giorni</td><td class="mono">9a1c…e4d8</td></tr>
         </tbody>
@@ -330,12 +356,10 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
     <p class="piccolo muto" style="margin-top:8px">Nessun nome, mai. Ogni uscita va a un indirizzo usato una volta sola, che solo il destinatario riconosce. Non si può sapere di chi è un indirizzo né sommare il saldo di qualcuno.</p>
   </div>
 
-  <div class="sezione">
-    <div class="garanzie">
-      <div><strong>Nessuno tocca i numeri</strong><span class="piccolo muto">Questa pagina la genera il motore ogni mattina rileggendo il registro da capo. Nessun numero è scritto a mano.</span></div>
-      <div><strong>Ogni riga è firmata</strong><span class="piccolo muto">Chi chiede un movimento lo firma con la propria chiave. Ogni riga è agganciata alla precedente: cambiarne una rompe tutte quelle dopo.</span></div>
-      <div><strong>Puoi rifare i conti</strong><span class="piccolo muto">Scarica registro e motore, esegui, e ottieni questa stessa pagina. Se non coincide, si vede.</span></div>
-    </div>
+  <div class="sezione garanzie">
+    <div class="card"><i></i><strong>Nessuno tocca i numeri</strong><span class="piccolo muto">Questa pagina la genera il motore ogni mattina rileggendo il registro da capo. Nessun numero è scritto a mano.</span></div>
+    <div class="card"><i></i><strong>Ogni riga è firmata</strong><span class="piccolo muto">Chi chiede un movimento lo firma con la propria chiave. Ogni riga è agganciata alla precedente: cambiarne una rompe tutte quelle dopo.</span></div>
+    <div class="card"><i></i><strong>Puoi rifare i conti</strong><span class="piccolo muto">Scarica registro e motore, esegui, e ottieni questa stessa pagina. Se non coincide, si vede.</span></div>
   </div>
 
   <div class="firma">
@@ -343,34 +367,31 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
   </div>
 </section>
 
-<!-- ================= APP DELLA BANCA ================= -->
+<!-- ================= APP ================= -->
 <section class="vista" id="vista-app" role="tabpanel" hidden>
-  <h1>App della banca</h1>
+  <h1>App</h1>
   <p class="muto" style="margin-top:6px; max-width: 62ch">L'unica app che il correntista vede. Chiunque la installa e apre un conto da solo, anche chi non lavora in azienda. Un conto in manti, l'euro come controvalore. Nessun nome di altri correntisti, nessun saldo altrui. Si paga con QR o con bonifico alle coordinate. La sezione Multe compare solo dopo la registrazione presso un'azienda: un esterno vede Conto, Rubrica e Sicurezza.</p>
 
   <div class="telefoni">
 
     <div class="telefono-wrap">
       <div class="telefono"><div class="schermo">
+        <div class="isola"></div>
         <div class="statusbar"><span>9:41</span><span>●●● ᯤ ▮</span></div>
         <div class="corpo">
-          <div style="text-align:center;padding:26px 0 10px">
-            <div class="cifra" style="font-size:2rem">Manti</div>
-            <div class="muto piccolo">La banca dei manti</div>
+          <div class="splash" style="margin-top:8px">
+            <div class="logo"></div>
+            <h2>Manti</h2>
+            <p>La banca dei manti. Il conto lo crei tu, qui.</p>
           </div>
-          <div class="form">
+          <div class="form" style="margin-top:14px">
             <div class="blocco">
-              <h3>Apri il conto</h3>
-              <p class="piccolo muto">Il conto si crea qui, sul tuo telefono. Non serve un'email, un numero, un documento o il permesso di nessuno.</p>
-              <p class="piccolo muto">Ti mostreremo <b>dodici parole</b>. Scrivile su carta e conservale: sono l'unico modo per ritrovare i tuoi manti se cambi telefono. Nessuno ne ha una copia, nemmeno la banca.</p>
+              <b>Apri il conto</b>
+              <p class="piccolo muto">Non serve un'email, un numero, un documento o il permesso di nessuno. Ti mostreremo <b>dodici parole</b>: scrivile su carta. Sono l'unico modo per ritrovare i tuoi manti se cambi telefono. Nessuno ne ha una copia, nemmeno la banca.</p>
               <button class="btn primario largo">Crea il conto</button>
+              <button class="btn largo">Ho già le dodici parole</button>
             </div>
-            <div class="blocco">
-              <h3>Ho già un conto</h3>
-              <p class="piccolo muto">Inserisci le tue dodici parole per ritrovarlo.</p>
-              <button class="btn largo">Recupera con la frase</button>
-            </div>
-            <div class="nota info piccolo">Con il conto puoi ricevere manti da chiunque, pagare con QR e fare bonifici. Se lavori in azienda, mostra le tue coordinate all'ufficio: riceverai stipendio e premi, e comparirà la sezione Multe. Per convertire in euro dovrai farti identificare dalla banca, una volta sola.</div>
+            <div class="nota info piccolo">Con il conto ricevi manti da chiunque, paghi con QR e fai bonifici. Se lavori in azienda, mostra le tue coordinate all'ufficio: riceverai stipendio e premi, e comparirà la sezione Multe. Per convertire in euro dovrai farti identificare dalla banca, una volta sola.</div>
           </div>
         </div>
       </div></div>
@@ -379,27 +400,31 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
 
     <div class="telefono-wrap">
       <div class="telefono"><div class="schermo">
+        <div class="isola"></div>
         <div class="statusbar"><span>9:41</span><span>●●● ᯤ ▮</span></div>
         <div class="corpo">
-          <div style="display:flex;justify-content:space-between;align-items:center;padding-top:4px">
-            <div><div class="piccolo muto">Il tuo conto</div><b style="font-size:1.05rem">Manti</b></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0 14px">
             <div class="av me">tu</div>
+            <div class="seg" style="width:180px"><span class="on">Manti</span><span>Euro</span></div>
+            <div class="av">⚙</div>
           </div>
-          <div class="saldo">
-            <div class="piccolo muto">Saldo</div>
-            <div class="m">71,30 <small>manti</small></div>
-            <div class="e">≈ 73,94 € · oggi 1 manto = 1,037 € <span class="piu">▲</span></div>
+          <div class="saldo-card">
+            <div class="tasso">1 manto = 1,037 € ▲</div>
+            <div class="l">Saldo</div>
+            <div class="m">71,30<small>manti</small></div>
+            <div class="e">≈ 73,94 € · aggiornato alle 06:00</div>
           </div>
           <div class="azioni">
-            <button class="btn primario"><i></i>Ricevi</button>
-            <button class="btn"><i></i>Inquadra</button>
-            <button class="btn"><i></i>Bonifico</button>
+            <button class="p"><i>＋</i>Ricevi</button>
+            <button><i>▣</i>Inquadra</button>
+            <button><i>→</i>Bonifico</button>
+            <button><i>€</i>Converti</button>
           </div>
-          <div class="nota bad piccolo" style="margin-bottom:14px"><b>1 multa da pagare</b> · V-031 · 2,00 manti · scade il 27 dicembre. <a href="#">Apri</a></div>
-          <h3 style="margin-bottom:8px">Movimenti</h3>
+          <div class="nota bad piccolo" style="margin-bottom:14px;display:flex;justify-content:space-between;align-items:center"><span><b>1 multa da pagare</b> · V-031 · 2,00 manti · scade il 27 dic</span><a href="#">Apri</a></div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px"><h3>Movimenti</h3><a href="#" class="piccolo">Tutti</a></div>
           <div class="lista">
-            <div class="voce"><div class="av">→</div><div class="t"><b>Pagamento con QR</b><span>14 dic · "caffè" · riga 412</span></div><div class="imp">−3,00<small>3,11 €</small></div></div>
-            <div class="voce"><div class="av">←</div><div class="t"><b>Bonifico ricevuto</b><span>10 dic · "grazie per l'aiuto" · riga 406</span></div><div class="imp piu">+9,80<small>10,16 €</small></div></div>
+            <div class="voce"><div class="av">☕</div><div class="t"><b>Pagamento con QR</b><span>14 dic · "caffè" · riga 412</span></div><div class="imp">−3,00<small>3,11 €</small></div></div>
+            <div class="voce"><div class="av ok">↓</div><div class="t"><b>Bonifico ricevuto</b><span>10 dic · "grazie per l'aiuto" · riga 406</span></div><div class="imp piu">+9,80<small>10,16 €</small></div></div>
             <div class="voce"><div class="av premio">★</div><div class="t"><b>Premio · Settimana puntuale</b><span>30 nov · fine mese · 3% di 490</span></div><div class="imp piu">+14,70<small>15,24 €</small></div></div>
             <div class="voce"><div class="av premio">€</div><div class="t"><b>Stipendio di novembre</b><span>30 nov · 245 ÷ 10 dipendenti</span></div><div class="imp piu">+24,50<small>25,40 €</small></div></div>
             <div class="voce"><div class="av">€</div><div class="t"><b>Convertiti in euro</b><span>20 nov · 30,00 manti, commissione 0,60 · pagata</span></div><div class="imp">−30,00<small>30,31 €</small></div></div>
@@ -414,19 +439,21 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
 
     <div class="telefono-wrap">
       <div class="telefono"><div class="schermo">
+        <div class="isola"></div>
         <div class="statusbar"><span>9:41</span><span>●●● ᯤ ▮</span></div>
         <div class="corpo">
-          <div class="titolo-schermo"><a href="#" class="piccolo">‹ Conto</a><h2>Ricevi</h2></div>
+          <div class="titolo-schermo"><span class="back">‹</span><h2>Ricevi</h2></div>
           <div class="form">
-            <div class="blocco" style="gap:12px">
+            <div class="blocco" style="gap:12px;text-align:center">
               <div class="qr"><svg id="qr1" viewBox="0 0 25 25" shape-rendering="crispEdges"></svg></div>
-              <div class="coord">MNT1 q8f3 k2ma 9x7d hv4t ...<br>indirizzo nuovo, valido per un pagamento</div>
-              <div class="piccolo muto" style="text-align:center">Chi inquadra paga a questo indirizzo. Nessun altro potrà collegarlo a te.</div>
+              <div class="coord">mnt1 q8f3 k2ma 9x7d hv4t …</div>
+              <div class="piccolo muto">Indirizzo nuovo, valido per un pagamento. Chi inquadra paga a te; nessun altro potrà collegarlo a te.</div>
             </div>
-            <div class="campo"><label for="ric-imp">Importo richiesto, facoltativo</label><div class="importo-in">12,00</div><div class="piccolo muto" style="text-align:center">≈ 12,44 €</div></div>
-            <div class="campo"><label for="ric-cau">Causale, facoltativa, la legge solo chi paga</label><input id="ric-cau" type="text" value="pranzo di ieri"></div>
-            <button class="btn largo">Condividi le mie coordinate per un bonifico</button>
-            <p class="piccolo muto" style="text-align:center">Le coordinate sono come un IBAN: chi le ha può inviarti manti, non può vedere il tuo saldo.</p>
+            <div class="campo"><label for="ric-imp" style="text-align:center">Importo richiesto, facoltativo</label><div class="importo-in">12,00</div><div class="piccolo muto" style="text-align:center;margin-top:-6px">≈ 12,44 €</div></div>
+            <div class="campo"><label for="ric-cau">Causale, la legge solo chi paga</label><input id="ric-cau" type="text" value="pranzo di ieri"></div>
+            <button class="btn primario largo">Condividi link di pagamento</button>
+            <button class="btn largo">Condividi le mie coordinate</button>
+            <p class="piccolo muto" style="text-align:center">Le coordinate sono come un IBAN: chi le ha può inviarti manti, anche se non lavora in azienda. Non può vedere il tuo saldo.</p>
           </div>
         </div>
         <div class="tabbar"><div class="on"><i></i>Conto</div><div class="badge"><i></i>Multe</div><div><i></i>Rubrica</div><div><i></i>Sicurezza</div></div>
@@ -436,22 +463,22 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
 
     <div class="telefono-wrap">
       <div class="telefono"><div class="schermo">
+        <div class="isola"></div>
         <div class="statusbar"><span>9:41</span><span>●●● ᯤ ▮</span></div>
         <div class="corpo">
-          <div class="titolo-schermo"><a href="#" class="piccolo">‹ Conto</a><h2>Bonifico</h2></div>
+          <div class="titolo-schermo"><span class="back">‹</span><h2>Bonifico</h2></div>
           <div class="form">
-            <div class="campo"><label>A chi</label>
-              <div class="lista"><div class="voce"><div class="av">LF</div><div class="t"><b>Luca</b><span class="mono">MNT1 3ka9 …  (dalla rubrica)</span></div><a href="#" class="piccolo">cambia</a></div></div>
-            </div>
-            <div class="campo"><label>Quanti manti</label><div class="importo-in">10,00</div><div class="piccolo muto" style="text-align:center">≈ 10,37 € · ne hai 71,30</div></div>
-            <div class="campo"><label for="bon-cau">Causale, facoltativa, la legge solo Luca</label><input id="bon-cau" type="text" value="turno di sabato"></div>
+            <div class="lista"><div class="voce"><div class="av">L</div><div class="t"><b>Luca</b><span class="mono">mnt1 3ka9 … · dalla rubrica</span></div><a href="#" class="piccolo">cambia</a></div></div>
+            <div class="campo"><div class="importo-in">10,00</div><div class="piccolo muto" style="text-align:center;margin-top:-6px">≈ 10,37 € · ne hai 71,30</div></div>
+            <div class="chip-row"><button class="btn">5</button><button class="btn">10</button><button class="btn">20</button><button class="btn">Tutto</button></div>
+            <div class="campo"><label for="bon-cau">Causale, la legge solo Luca</label><input id="bon-cau" type="text" value="turno di sabato"></div>
             <div class="conto">
               <div><span>Invii</span><span class="num">10,00</span></div>
               <div><span>Commissione</span><span class="num">0,00</span></div>
               <div class="tot"><span>Saldo dopo</span><span class="num">61,30</span></div>
             </div>
             <div class="nota piccolo">Definitivo. Se sbagli destinatario, devi chiedergli di restituire.</div>
-            <button class="btn primario largo">Firma con Face ID e invia</button>
+            <button class="btn primario largo">Invia con Face ID</button>
           </div>
         </div>
         <div class="tabbar"><div class="on"><i></i>Conto</div><div class="badge"><i></i>Multe</div><div><i></i>Rubrica</div><div><i></i>Sicurezza</div></div>
@@ -461,15 +488,16 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
 
     <div class="telefono-wrap">
       <div class="telefono"><div class="schermo">
+        <div class="isola"></div>
         <div class="statusbar"><span>9:41</span><span>●●● ᯤ ▮</span></div>
         <div class="corpo">
           <div class="titolo-schermo"><h2>Multe</h2></div>
           <div class="form">
-            <div class="blocco" style="border-color: var(--bad)">
+            <div class="blocco">
               <div style="display:flex;justify-content:space-between;align-items:center"><span class="pill bad">da pagare</span><span class="piccolo muto">scade il 27 dic · 12 giorni</span></div>
-              <div><b style="font-family:var(--display);font-size:1.2rem">V-031 · Parolaccia in sala</b></div>
+              <div class="cifra" style="font-size:1.3rem">V-031 · Parolaccia in sala</div>
               <div class="piccolo muto">12 dicembre, 10:00 · polizia · "In sala, davanti al tavolo 4, verso le 9:50."</div>
-              <div class="cifra" style="font-size:1.6rem">2,00 manti <span class="muto" style="font-size:.9rem;font-family:var(--body)">≈ 2,07 €</span></div>
+              <div class="cifra" style="font-size:2rem">2,00 <span class="muto" style="font-size:.9rem;font-family:var(--body);font-weight:500">manti ≈ 2,07 €</span></div>
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
                 <button class="btn primario">Paga ora</button>
                 <button class="btn">Contesta</button>
@@ -478,7 +506,7 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
             </div>
             <h3>Chiuse</h3>
             <div class="lista">
-              <div class="voce"><div class="av">✓</div><div class="t"><b>V-019 · Ritardo oltre 10 minuti</b><span>contestata il 3 dic · <b style="color:var(--ok)">annullata</b> dal giudice, S-004</span></div><div class="imp muto">5,00</div></div>
+              <div class="voce"><div class="av ok">✓</div><div class="t"><b>V-019 · Ritardo oltre 10 minuti</b><span>contestata il 3 dic · annullata dal giudice, S-004</span></div><div class="imp muto">5,00</div></div>
               <div class="voce"><div class="av">✓</div><div class="t"><b>V-014 · Postazione in disordine</b><span>pagata l'8 nov</span></div><div class="imp muto">3,00</div></div>
             </div>
           </div>
@@ -490,9 +518,10 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
 
     <div class="telefono-wrap">
       <div class="telefono"><div class="schermo">
+        <div class="isola"></div>
         <div class="statusbar"><span>9:41</span><span>●●● ᯤ ▮</span></div>
         <div class="corpo">
-          <div class="titolo-schermo"><a href="#" class="piccolo">‹ Multe</a><h2>Contesta V-031</h2></div>
+          <div class="titolo-schermo"><span class="back">‹</span><h2>Contesta V-031</h2></div>
           <div class="form">
             <div class="conto">
               <div><span>Infrazione</span><span>Parolaccia in sala</span></div>
@@ -500,9 +529,9 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
               <div><span>Data</span><span>12 dic, 10:00</span></div>
             </div>
             <div class="campo"><label for="con-txt">Le tue ragioni</label><textarea id="con-txt">Alle 9:50 ero in magazzino a scaricare, non in sala. In sala c'era Andrea. Il turno lo conferma.</textarea></div>
-            <div class="campo"><label>Allegati, facoltativi</label><button class="btn">+ Foto o documento</button></div>
+            <button class="btn largo">+ Foto o documento</button>
             <div class="nota info piccolo">Decide il giudice, un'intelligenza artificiale con istruzioni pubbliche. Legge il verbale, il tariffario, le tue ragioni e l'eventuale replica della polizia. Non sa chi sei. La sentenza è definitiva e viene pubblicata senza il tuo nome. Finché è aperta, nessun termine corre.</div>
-            <button class="btn primario largo">Firma e invia la contestazione</button>
+            <button class="btn primario largo">Invia la contestazione</button>
           </div>
         </div>
         <div class="tabbar"><div><i></i>Conto</div><div class="on badge"><i></i>Multe</div><div><i></i>Rubrica</div><div><i></i>Sicurezza</div></div>
@@ -512,28 +541,29 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
 
     <div class="telefono-wrap">
       <div class="telefono"><div class="schermo">
+        <div class="isola"></div>
         <div class="statusbar"><span>9:41</span><span>●●● ᯤ ▮</span></div>
         <div class="corpo">
           <div class="titolo-schermo"><h2>Sicurezza</h2></div>
           <div class="form">
             <div class="blocco">
-              <h3>La tua frase di recupero</h3>
+              <b>Frase di recupero</b>
               <p class="piccolo muto">Dodici parole scritte al primo avvio. Sono l'unico modo per ritrovare il conto su un altro telefono. Non esiste una copia presso la banca.</p>
-              <button class="btn largo">Mostra la frase, con Face ID</button>
+              <button class="btn largo">Mostra con Face ID</button>
             </div>
             <div class="blocco">
-              <h3>Le tue coordinate</h3>
-              <span class="mono" style="word-break:break-all">MNT1 q8f3 k2ma 9x7d hv4t 2rrp 6c0e lz3n 8yq1</span>
+              <b>Le tue coordinate</b>
+              <span class="mono" style="word-break:break-all">mnt1 q8f3 k2ma 9x7d hv4t 2rrp 6c0e lz3n 8yq1 …</span>
               <p class="piccolo muto">Dalle a chi deve farti un bonifico. Non rivelano il saldo. Ogni pagamento che ricevi va comunque a un indirizzo diverso.</p>
             </div>
             <div class="blocco">
-              <h3>Registrazione</h3>
+              <b>Registrazione</b>
               <span class="pill ok">dipendente di Cibotari S.r.l.</span>
-              <p class="piccolo muto">Attestato firmato dall'azienda il 1 ottobre 2026. È quello che abilita stipendio, premi e la sezione Multe. Se lasci l'azienda, la sezione sparisce e il conto resta tuo.</p>
+              <p class="piccolo muto">Attestato firmato dall'azienda il 1 ottobre 2026. Abilita stipendio, premi e la sezione Multe. Se lasci l'azienda, la sezione sparisce e il conto resta tuo.</p>
             </div>
             <div class="blocco">
-              <h3>Chi sa cosa</h3>
-              <p class="piccolo muto">Nessun altro correntista sa che esisti. Nessuno, nemmeno la banca, sa il tuo saldo: lo calcola solo questa app dalle tue entrate. L'azienda sa quanto ti ha pagato di stipendio e premi. La polizia sa le multe che ti ha fatto. La banca sa chi sei solo se ti sei identificato per convertire.</p>
+              <b>Chi sa cosa</b>
+              <p class="piccolo muto">Nessun altro correntista sa che esisti. Nessuno, nemmeno la banca, sa il tuo saldo: lo calcola solo questa app dalle tue entrate. L'azienda sa quanto ti ha pagato. La polizia sa le multe che ti ha fatto. La banca sa chi sei solo se ti sei identificato per convertire.</p>
               <button class="btn largo">Verifica le mie righe nel registro</button>
             </div>
           </div>
@@ -546,7 +576,7 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
   </div>
 </section>
 
-<!-- ================= PANNELLO AZIENDA ================= -->
+<!-- ================= AZIENDA ================= -->
 <section class="vista" id="vista-azienda" role="tabpanel" hidden>
   <div class="pann">
     <nav class="menu">
@@ -564,23 +594,25 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
     </nav>
     <main>
       <div id="az-mese">
-        <div class="piccolo muto">Cibotari S.r.l. · chiave azienda <span class="mono">4a91…0e2c</span></div>
-        <h1 style="margin-top:4px">Fine mese di dicembre</h1>
-        <p class="muto" style="margin-top:6px">Il 31 alle 23:59 firmi una sola transazione: versamento in riserva, stipendi, premi e trattenute insieme. Fino ad allora prepari.</p>
+        <div class="testata">
+          <div class="who"><i></i><div><div class="piccolo muto">Cibotari S.r.l. · chiave <span class="mono">4a91…0e2c</span></div><h1 style="font-size:1.6rem">Fine mese di dicembre</h1></div></div>
+          <button class="btn primario" disabled>Firma il fine mese · 31 dic</button>
+        </div>
+        <p class="muto" style="margin-top:10px">Il 31 alle 23:59 firmi una sola transazione: versamento in riserva, stipendi, premi e trattenute insieme. Fino ad allora prepari.</p>
         <div class="griglia g3" style="margin-top:16px">
-          <div class="pannello stat" style="border-color: var(--line-strong)"><h3>Emissione di dicembre</h3><div class="v">480<small> manti</small></div><div class="s">mese 3 · 500 × 0,98²</div></div>
-          <div class="pannello stat"><h3>Stipendi</h3><div class="v">240<small> = 10 × 24,00</small></div><div class="s">metà dell'emissione, 10 dipendenti attivi</div></div>
-          <div class="pannello stat"><h3>Premi preparati</h3><div class="v">187,20<small> / 240</small></div><div class="budget-barra"><i style="width:78%"></i></div><div class="s">52,80 ancora assegnabili. Il non assegnato non si emette</div></div>
-          <div class="pannello stat"><h3>Trattenute</h3><div class="v">0</div><div class="s">nessuna multa definitiva non pagata</div></div>
-          <div class="pannello stat"><h3>Valore atteso il 31</h3><div class="v">≈ 1,040<small> €</small></div><div class="s">se i premi restano 187,20 e il fatturato è 50.000</div></div>
-          <div class="pannello stat"><h3>Conto azienda</h3><div class="v">0,00</div><div class="s">l'azienda non tiene manti: emette e basta</div></div>
+          <div class="card stat"><h3>Emissione di dicembre</h3><div class="v">480<small> manti</small></div><div class="s">mese 3 · 500 × 0,98²</div></div>
+          <div class="card stat"><h3>Stipendi</h3><div class="v">240<small> = 10 × 24,00</small></div><div class="s">metà dell'emissione, 10 dipendenti attivi</div></div>
+          <div class="card stat"><h3>Premi preparati</h3><div class="v">187,20<small> / 240</small></div><div class="budget-barra"><i style="width:78%"></i></div><div class="s">52,80 ancora assegnabili. Il non assegnato non si emette</div></div>
+          <div class="card stat"><h3>Trattenute</h3><div class="v">0</div><div class="s">nessuna multa definitiva non pagata</div></div>
+          <div class="card stat"><h3>Valore atteso il 31</h3><div class="v">≈ 1,040<small> €</small></div><div class="s">se i premi restano 187,20 e il fatturato è 50.000</div></div>
+          <div class="card stat"><h3>Conto azienda</h3><div class="v">0,00</div><div class="s">l'azienda non tiene manti: emette e basta</div></div>
         </div>
       </div>
 
       <div class="sezione" id="az-premi">
         <div class="testa"><h2>Premi da assegnare</h2><span class="piccolo muto">catalogo v3 · quote sull'emissione di 480</span></div>
         <div class="griglia g2">
-          <div class="pannello pad form">
+          <div class="card pad form">
             <div class="campo"><label for="p-dip">Dipendente</label><select id="p-dip"><option>Sara Conti</option><option>Marco Rossi</option><option>Giulia Bianchi</option><option>Luca Ferrari</option><option>Andrea Greco</option><option>Elena Ricci</option><option>Davide Moretti</option><option>Chiara Gallo</option><option>Matteo Fontana</option><option>Francesca Serra</option></select></div>
             <div class="campo"><label for="p-voce">Comportamento</label><select id="p-voce"><option>Giornata senza parolacce · 1% · 4,80</option><option>Settimana puntuale · 3% · 14,40</option><option>Recensione positiva di un cliente · 4% · 19,20</option><option>Problema segnalato e risolto · 2% · 9,60</option><option>Aiuto a un collega · 2% · 9,60</option><option>Mese senza errori · 10% · 48,00</option></select></div>
             <div class="campo"><label for="p-n">Quante volte nel mese</label><input id="p-n" type="number" value="1" min="1"></div>
@@ -588,10 +620,10 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
               <div><span>Sara Conti riceve il 31</span><span class="num">4,80 manti</span></div>
               <div class="tot"><span>Premi preparati dopo</span><span class="num">192,00 / 240</span></div>
             </div>
-            <div><button class="btn">Aggiungi alla lista del 31</button></div>
+            <div><button class="btn acc">Aggiungi alla lista del 31</button></div>
             <p class="piccolo muto">Le assegnazioni restano in bozza fino alla firma di fine mese. Più avanti si compileranno da sole dai dati del mese.</p>
           </div>
-          <div class="pannello pad">
+          <div class="card pad">
             <h3>Lista preparata per il 31</h3>
             <div class="scroll" style="margin-top:8px">
               <table>
@@ -615,7 +647,7 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
       <div class="sezione" id="az-riserva">
         <div class="testa"><h2>Versamento in riserva</h2></div>
         <div class="griglia g2">
-          <div class="pannello pad form">
+          <div class="card pad form">
             <div class="campo"><label for="r-fatt">Fatturato di dicembre, netto IVA</label><input id="r-fatt" type="text" placeholder="si compila il 31"></div>
             <div class="conto">
               <div><span>Quota 1%, stimata</span><span class="num">500,00 €</span></div>
@@ -624,7 +656,7 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
             </div>
             <p class="piccolo muto">Il versamento va fatto davvero sul conto separato. Qui lo registri, e il registro lo mostra a tutti.</p>
           </div>
-          <div class="pannello pad">
+          <div class="card pad">
             <h3>Fine mese passati</h3>
             <table style="margin-top:8px">
               <thead><tr><th>Mese</th><th class="r">Versato</th><th class="r">Stipendi</th><th class="r">Premi</th><th class="r">Non emessi</th></tr></thead>
@@ -639,7 +671,7 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
 
       <div class="sezione" id="az-conv">
         <div class="testa"><h2>Conversioni</h2><span class="piccolo muto">le esegue la banca; qui vedi cosa devi pagare in euro</span></div>
-        <div class="pannello pad">
+        <div class="card pad">
           <div class="scroll">
             <table>
               <thead><tr><th>Eseguita</th><th>Dipendente</th><th class="r">Manti</th><th class="r">Euro dovuti</th><th>Stato</th><th></th></tr></thead>
@@ -656,7 +688,7 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
 
       <div class="sezione" id="az-catalogo">
         <div class="testa"><h2>Catalogo dei premi</h2><span class="piccolo muto">v3 · dal 1 dic · <a href="#">storia</a></span></div>
-        <div class="pannello pad">
+        <div class="card pad">
           <div class="scroll">
             <table>
               <thead><tr><th>Comportamento</th><th>Regola</th><th class="r">Quota</th><th class="r">A dic.</th><th></th></tr></thead>
@@ -679,7 +711,7 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
 
       <div class="sezione" id="az-tariffario">
         <div class="testa"><h2>Tariffario delle multe</h2><span class="piccolo muto">v2 · dal 15 nov · <a href="#">storia</a></span></div>
-        <div class="pannello pad">
+        <div class="card pad">
           <div class="scroll">
             <table>
               <thead><tr><th>Infrazione</th><th>Quando</th><th class="r">Manti</th><th class="r">Verbali a dic.</th><th></th></tr></thead>
@@ -700,21 +732,21 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
       </div>
 
       <div class="sezione" id="az-dip">
-        <div class="testa"><h2>Dipendenti</h2><button class="btn mini">+ Registra un dipendente</button></div>
-        <div class="pannello scroll">
+        <div class="testa"><h2>Dipendenti</h2><button class="btn mini acc">+ Registra un dipendente</button></div>
+        <div class="card scroll">
           <table>
             <thead><tr><th>Nome</th><th>Coordinate</th><th>Dal</th><th class="r">Stipendi ricevuti</th><th class="r">Premi ricevuti</th><th>Multe definitive</th><th>Stato</th></tr></thead>
             <tbody>
-              <tr><td>Marco Rossi</td><td class="mono">MNT1 q8f3…</td><td>1 ott</td><td class="r">49,50</td><td class="r">24,50</td><td class="muto">nessuna</td><td><span class="pill ok">attivo</span></td></tr>
-              <tr><td>Giulia Bianchi</td><td class="mono">MNT1 7hh2…</td><td>1 ott</td><td class="r">49,50</td><td class="r">96,40</td><td class="muto">nessuna</td><td><span class="pill ok">attivo</span></td></tr>
-              <tr><td>Luca Ferrari</td><td class="mono">MNT1 3ka9…</td><td>1 ott</td><td class="r">49,50</td><td class="r">63,70</td><td class="muto">nessuna</td><td><span class="pill ok">attivo</span></td></tr>
-              <tr><td>Sara Conti</td><td class="mono">MNT1 pp0d…</td><td>1 ott</td><td class="r">49,50</td><td class="r">44,10</td><td class="muto">nessuna</td><td><span class="pill ok">attivo</span></td></tr>
-              <tr><td>Andrea Greco</td><td class="mono">MNT1 zz41…</td><td>1 ott</td><td class="r">49,50</td><td class="r">58,80</td><td class="muto">nessuna</td><td><span class="pill ok">attivo</span></td></tr>
-              <tr><td>Elena Ricci</td><td class="mono">MNT1 e2mm…</td><td>1 ott</td><td class="r">49,50</td><td class="r">34,30</td><td class="muto">nessuna</td><td><span class="pill ok">attivo</span></td></tr>
-              <tr><td>Davide Moretti</td><td class="mono">MNT1 4rr8…</td><td>1 ott</td><td class="r">49,50</td><td class="r">19,60</td><td><span class="pill warn">V-022 · 5,00 · scade 20 dic</span></td><td><span class="pill ok">attivo</span></td></tr>
-              <tr><td>Chiara Gallo</td><td class="mono">MNT1 c9x1…</td><td>1 ott</td><td class="r">49,50</td><td class="r">63,70</td><td class="muto">nessuna</td><td><span class="pill ok">attivo</span></td></tr>
-              <tr><td>Matteo Fontana</td><td class="mono">MNT1 8dd3…</td><td>1 ott</td><td class="r">49,50</td><td class="r">39,20</td><td class="muto">nessuna</td><td><span class="pill ok">attivo</span></td></tr>
-              <tr><td>Francesca Serra</td><td class="mono">MNT1 n5k7…</td><td>1 ott</td><td class="r">49,50</td><td class="r">25,60</td><td class="muto">nessuna</td><td><span class="pill ok">attivo</span></td></tr>
+              <tr><td>Marco Rossi</td><td class="mono">mnt1 q8f3…</td><td>1 ott</td><td class="r">49,50</td><td class="r">24,50</td><td class="muto">nessuna</td><td><span class="pill ok">attivo</span></td></tr>
+              <tr><td>Giulia Bianchi</td><td class="mono">mnt1 7hh2…</td><td>1 ott</td><td class="r">49,50</td><td class="r">96,40</td><td class="muto">nessuna</td><td><span class="pill ok">attivo</span></td></tr>
+              <tr><td>Luca Ferrari</td><td class="mono">mnt1 3ka9…</td><td>1 ott</td><td class="r">49,50</td><td class="r">63,70</td><td class="muto">nessuna</td><td><span class="pill ok">attivo</span></td></tr>
+              <tr><td>Sara Conti</td><td class="mono">mnt1 pp0d…</td><td>1 ott</td><td class="r">49,50</td><td class="r">44,10</td><td class="muto">nessuna</td><td><span class="pill ok">attivo</span></td></tr>
+              <tr><td>Andrea Greco</td><td class="mono">mnt1 zz41…</td><td>1 ott</td><td class="r">49,50</td><td class="r">58,80</td><td class="muto">nessuna</td><td><span class="pill ok">attivo</span></td></tr>
+              <tr><td>Elena Ricci</td><td class="mono">mnt1 e2mm…</td><td>1 ott</td><td class="r">49,50</td><td class="r">34,30</td><td class="muto">nessuna</td><td><span class="pill ok">attivo</span></td></tr>
+              <tr><td>Davide Moretti</td><td class="mono">mnt1 4rr8…</td><td>1 ott</td><td class="r">49,50</td><td class="r">19,60</td><td><span class="pill warn">V-022 · 5,00 · scade 20 dic</span></td><td><span class="pill ok">attivo</span></td></tr>
+              <tr><td>Chiara Gallo</td><td class="mono">mnt1 c9x1…</td><td>1 ott</td><td class="r">49,50</td><td class="r">63,70</td><td class="muto">nessuna</td><td><span class="pill ok">attivo</span></td></tr>
+              <tr><td>Matteo Fontana</td><td class="mono">mnt1 8dd3…</td><td>1 ott</td><td class="r">49,50</td><td class="r">39,20</td><td class="muto">nessuna</td><td><span class="pill ok">attivo</span></td></tr>
+              <tr><td>Francesca Serra</td><td class="mono">mnt1 n5k7…</td><td>1 ott</td><td class="r">49,50</td><td class="r">25,60</td><td class="muto">nessuna</td><td><span class="pill ok">attivo</span></td></tr>
             </tbody>
           </table>
         </div>
@@ -723,7 +755,7 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
 
       <div class="sezione" id="az-polizia">
         <div class="testa"><h2>Polizia</h2></div>
-        <div class="pannello pad form" style="max-width:520px">
+        <div class="card pad form" style="max-width:520px">
           <div class="conto">
             <div><span>In carica</span><span>Andrea Greco</span></div>
             <div><span>Dal</span><span>1 ottobre 2026</span></div>
@@ -740,7 +772,7 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
   </div>
 </section>
 
-<!-- ================= PANNELLO POLIZIA ================= -->
+<!-- ================= POLIZIA ================= -->
 <section class="vista" id="vista-polizia" role="tabpanel" hidden>
   <div class="pann">
     <nav class="menu">
@@ -753,10 +785,11 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
     </nav>
     <main>
       <div id="po-nuovo">
-        <div class="piccolo muto">Polizia in carica: Andrea Greco · chiave <span class="mono">0f3e…b71c</span></div>
-        <h1 style="margin-top:4px">Nuovo verbale</h1>
+        <div class="testata">
+          <div class="who"><i style="background:linear-gradient(135deg,var(--bad),#FF8A5B)"></i><div><div class="piccolo muto">Polizia in carica: Andrea Greco · chiave <span class="mono">0f3e…b71c</span></div><h1 style="font-size:1.6rem">Nuovo verbale</h1></div></div>
+        </div>
         <div class="griglia g2" style="margin-top:16px">
-          <div class="pannello pad form">
+          <div class="card pad form">
             <div class="campo"><label for="v-dip">Dipendente</label><select id="v-dip"><option>Davide Moretti</option><option>Marco Rossi</option><option>Giulia Bianchi</option><option>Luca Ferrari</option><option>Sara Conti</option><option>Elena Ricci</option><option>Chiara Gallo</option><option>Matteo Fontana</option><option>Francesca Serra</option></select></div>
             <div class="campo"><label for="v-voce">Infrazione, dal tariffario</label><select id="v-voce"><option>Parolaccia in sala · 2,00</option><option>Ritardo oltre 10 minuti · 5,00</option><option>Telefono personale in servizio · 3,00</option><option>Postazione in disordine · 3,00</option><option>Cliente lasciato senza risposta · 8,00</option></select></div>
             <div class="campo"><label for="v-quando">Quando</label><input id="v-quando" type="datetime-local" value="2026-12-15T09:50"></div>
@@ -767,9 +800,9 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
               <div class="tot"><span>Da pagare a</span><span>conto polizia</span></div>
             </div>
             <button class="btn pericolo">Firma ed emetti il verbale</button>
-            <p class="piccolo muto">Il multato lo riceve subito nell'app, con il QR per pagare. Nel registro pubblico compare numero, infrazione e importo, non il nome. Non puoi cambiare l'importo: lo fissa il tariffario.</p>
+            <p class="piccolo muto">Il multato lo riceve subito nell'app, con il QR per pagare. Nel registro pubblico compare numero, infrazione e importo, non il nome. Non puoi cambiare l'importo: lo fissa il tariffario. Puoi multare solo dipendenti registrati.</p>
           </div>
-          <div class="pannello pad">
+          <div class="card pad">
             <h3>Dicembre finora</h3>
             <div class="griglia g2" style="margin-top:10px">
               <div class="stat" style="padding:0"><div class="v">9</div><div class="s">verbali emessi</div></div>
@@ -784,7 +817,7 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
 
       <div class="sezione" id="po-verbali">
         <div class="testa"><h2>Verbali</h2></div>
-        <div class="pannello scroll">
+        <div class="card scroll">
           <table>
             <thead><tr><th>N.</th><th>Quando</th><th>Dipendente</th><th>Infrazione</th><th class="r">Manti</th><th>Scade</th><th>Stato</th></tr></thead>
             <tbody>
@@ -803,14 +836,14 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
 
       <div class="sezione" id="po-cont">
         <div class="testa"><h2>Contestazioni aperte</h2></div>
-        <div class="pannello pad form">
-          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px"><b style="font-family:var(--display);font-size:1.15rem">V-027 · Parolaccia in sala · 2,00 manti</b><span class="piccolo muto">contestato il 7 dic · replica entro il 10 dic</span></div>
+        <div class="card pad form">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px"><b class="cifra" style="font-size:1.15rem">V-027 · Parolaccia in sala · 2,00 manti</b><span class="piccolo muto">contestato il 7 dic · replica entro il 10 dic</span></div>
           <div class="conto">
             <div><span>Il tuo verbale</span><span style="text-align:right;max-width:60%">"Al banco, con un collega, ore 16:20."</span></div>
             <div><span>La contestazione</span><span style="text-align:right;max-width:60%">"Stavo citando il cliente che l'aveva appena detta, tra virgolette. Il collega può confermare."</span></div>
           </div>
           <div class="campo"><label for="rep">La tua replica, facoltativa. La legge solo il giudice</label><textarea id="rep">Confermo che il cliente l'aveva detta prima. La ripetizione è avvenuta a voce alta con altri clienti al banco.</textarea></div>
-          <div><button class="btn primario">Firma e invia la replica</button> <button class="btn">Non replicare</button></div>
+          <div><button class="btn primario">Invia la replica</button> <button class="btn">Non replicare</button></div>
           <div class="nota info piccolo">Il giudice decide dopo la replica o dopo 3 giorni senza. Non sa chi è il multato né chi sei tu: legge solo verbale, tariffario, contestazione e replica.</div>
         </div>
       </div>
@@ -818,22 +851,22 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
       <div class="sezione" id="po-conto">
         <div class="testa"><h2>Conto polizia</h2></div>
         <div class="griglia g2">
-          <div class="pannello pad">
-            <div class="saldo" style="padding-top:6px">
-              <div class="piccolo muto">Saldo</div>
-              <div class="m">47,00 <small>manti</small></div>
+          <div class="card pad">
+            <div class="saldo-card" style="background:linear-gradient(135deg,#3A1518,var(--bad) 60%,#FF8A5B)">
+              <div class="l">Saldo</div>
+              <div class="m">47,00<small>manti</small></div>
               <div class="e">≈ 48,72 € · raccolti dalle multe</div>
             </div>
-            <div class="azioni" style="grid-template-columns:1fr 1fr"><button class="btn">Bonifico</button><button class="btn">Converti in euro</button></div>
+            <div class="azioni" style="grid-template-columns:repeat(3,1fr)"><button><i>→</i>Bonifico</button><button><i>€</i>Converti</button><button><i>▣</i>Inquadra</button></div>
             <p class="piccolo muto">È un conto come gli altri. Quello che ci fate, cene o altro, lo decidete voi. Anche qui, nessuno vede il saldo dal registro.</p>
           </div>
-          <div class="pannello pad">
+          <div class="card pad">
             <h3>Ultime entrate</h3>
-            <div class="lista" style="margin-top:8px">
+            <div class="lista" style="margin-top:8px;box-shadow:none;background:var(--surface-2)">
               <div class="voce"><div class="av multa">!</div><div class="t"><b>V-028 pagato</b><span>14 dic · riga 411</span></div><div class="imp piu">+5,00</div></div>
               <div class="voce"><div class="av multa">!</div><div class="t"><b>V-030 pagato</b><span>12 dic · riga 402</span></div><div class="imp piu">+3,00</div></div>
               <div class="voce"><div class="av multa">!</div><div class="t"><b>V-029 pagato</b><span>9 dic · riga 388</span></div><div class="imp piu">+2,00</div></div>
-              <div class="voce"><div class="av">→</div><div class="t"><b>Bonifico · pizzeria (Luca ha anticipato)</b><span>29 nov · cena di novembre</span></div><div class="imp">−38,00</div></div>
+              <div class="voce"><div class="av">🍕</div><div class="t"><b>Bonifico · pizzeria (Luca ha anticipato)</b><span>29 nov · cena di novembre</span></div><div class="imp">−38,00</div></div>
             </div>
           </div>
         </div>
@@ -860,7 +893,6 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
   if (!viste[iniziale]) iniziale = 'sito';
   mostra(iniziale);
 
-  // QR finto ma dall'aspetto credibile: pattern di ricerca veri, moduli pseudocasuali deterministici
   var svg = document.getElementById('qr1');
   if (svg) {
     var n = 25, seed = 7, out = '';
