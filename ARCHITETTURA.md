@@ -286,6 +286,7 @@ Se il modello non risponde o risponde con un esito non ammesso, nessuna sentenza
 | 17 | Simulazione di tre mesi da riga di comando: `node simulazione/tre-mesi.js [giorni] [correntisti] [righe/giorno] [seme]`, scenario con seme, crittografia con casualità vera, invarianti a ogni riga, riserva = euro veri, circolazione = somma dei saldi, replay del motore e tempi per tipo di riga | A |
 | 18 | GitHub Action senza chiavi: `pubblica` su cron (05:00 UTC) e a ogni push del registro, Pages; catena rotta = run fallito; uscita deterministica | B |
 | 19 | Pannello banca da terminale (`banca/cli.js`): frase di dodici parole della banca, genesi, giorno, vendite, tetto, interessi, estratti, correzioni, aziende, giudice, conversioni; ogni riga verificata e accodata, poi git push | A/B |
+| 19b | Conto di prova da terminale (`correntista/cli.js`): frase, coordinate, saldo, pagamento riservato, richiesta di conversione; righe in `ledger.jsonl` come quelle della banca | A/B |
 | 20 | Server via HTTP | C |
 | 21 | Servizio giudice con modello reale | C |
 | 22 | App del correntista con QR | D |

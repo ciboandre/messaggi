@@ -22,51 +22,18 @@
 // shell. Dopo ogni riga: git add ledger.jsonl, commit, push. Il sito lo
 // rifà l'Action.
 
-import { createInterface } from 'node:readline';
 import * as c from './comandi.js';
+import { chiediFrase, mostraFrase, euro, manti, prezzo, fatto as fattoRiga } from '../strumenti/terminale.js';
 
 const [comando, ...args] = process.argv.slice(2);
 const percorso = process.env.MANTI_LEDGER ?? 'ledger.jsonl';
-const euro = (cent) => (Number(cent) / 100).toFixed(2).replace('.', ',') + ' €';
-const manti = (cent) => (Number(cent) / 100).toFixed(2).replace('.', ',') + ' manti';
-const prezzo = (dm) => (dm === null ? '—' : (Number(dm) / 10000).toFixed(4).replace('.', ',') + ' €');
-
-function chiediFrase() {
-  if (process.env.MANTI_FRASE) return Promise.resolve(process.env.MANTI_FRASE);
-  return new Promise((risolvi) => {
-    const rl = createInterface({ input: process.stdin, output: process.stdout, terminal: true });
-    const scrivi = rl._writeToOutput;
-    rl.question('Frase della banca (non viene mostrata): ', (r) => { rl._writeToOutput = scrivi; rl.close(); process.stdout.write('\n'); risolvi(r.trim()); });
-    rl._writeToOutput = () => {};
-  });
-}
-
-function fatto(esito) {
-  console.log(`riga ${esito.riga.seq} accodata, tipo ${esito.riga.type}, hash ${esito.riga.hash}`);
-  console.log('ora: git add ledger.jsonl && git commit -m "Registro: ' + esito.riga.type + ' seq ' + esito.riga.seq + '" && git push');
-}
+const fatto = (esito) => fattoRiga(esito.riga);
 
 async function main() {
   switch (comando) {
     case 'nuova-frase': {
-      // Le parole non passano dal terminale: un terminale può essere
-      // registrato, condiviso, o dentro un'app che ne inoltra l'uscita.
-      // Su Mac compaiono in una finestra di sistema; altrove in un file
-      // leggibile solo dall'utente, da cancellare dopo averle copiate.
       const { frase, pubblica, coordinate } = c.nuovaFrase();
-      const testo = 'Scrivi queste dodici parole su carta, nell\'ordine, e controlla di averle copiate giuste. Poi chiudi.\n\n' + frase;
-      if (process.platform === 'darwin') {
-        const { spawnSync } = await import('node:child_process');
-        const script = 'on run argv\n display dialog (item 1 of argv) with title "Frase della banca" buttons {"Ho copiato le parole"} default button 1\nend run';
-        const esito = spawnSync('osascript', ['-e', script, testo], { stdio: ['ignore', 'ignore', 'ignore'] });
-        if (esito.status !== 0) { console.error('la finestra non si è aperta; riprova, o usa MANTI_FRASE_FILE=percorso per scriverla in un file'); process.exitCode = 1; return; }
-        console.log('Le parole sono comparse in una finestra a parte e non sono state stampate qui.');
-      } else {
-        const { writeFileSync } = await import('node:fs');
-        const percorsoFrase = process.env.MANTI_FRASE_FILE ?? 'frase-banca.txt';
-        writeFileSync(percorsoFrase, testo + '\n', { mode: 0o600 });
-        console.log(`Le parole sono in ${percorsoFrase} (leggibile solo da te). Copiale su carta e poi cancellalo: rm ${percorsoFrase}`);
-      }
+      console.log(mostraFrase(frase, 'Frase della banca'));
       console.log('chiave pubblica della banca: ' + pubblica);
       console.log('coordinate della banca:      ' + coordinate);
       return;
@@ -80,7 +47,7 @@ async function main() {
       return;
     }
   }
-  const frase = await chiediFrase();
+  const frase = await chiediFrase('Frase della banca');
   switch (comando) {
     case 'genesi': {
       const t = args.indexOf('--tetto');
