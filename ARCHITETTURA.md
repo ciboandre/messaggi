@@ -45,7 +45,7 @@ Server, giudice e motore sono programmi separati sullo stesso codice. Il motore 
 |---|---|---|
 | **A. Nucleo** | Chiavi, indirizzi usa e getta, registro, tutte le transazioni, motore da riga di comando, test | Server, sito, app, giudice |
 | **B. Pubblicazione** | Motore su GitHub Actions ogni giorno, sito su GitHub Pages | Server, app, giudice |
-| **C. Server e giudice** | Server che accetta transazioni firmate via HTTP; servizio giudice | App e pannelli |
+| **C. Server e giudice** | Server che accetta transazioni firmate via HTTP; servizio giudice; incasso e identificazione con Stripe | App e pannelli |
 | **D. App e pannelli** | App del correntista con QR; pannelli banca, azienda e polizia | |
 
 Nella fase A tutto si prova da riga di comando con chiavi finte, per tre mesi simulati, prima di coinvolgere chiunque.
@@ -212,7 +212,7 @@ Se il modello non risponde o risponde con un esito non ammesso, nessuna sentenza
 - Formato esatto del catalogo e del tariffario; limiti mensili per voce.
 - Come l'app scorre il registro quando cresce (indice delle uscite per `R`).
 - Come un esterno si identifica presso la banca: di persona, o con documento cifrato nella richiesta.
-- Come la banca verifica l'arrivo degli euro di una vendita prima di firmarla: manuale nella fase di test.
+- Come la banca verifica l'arrivo degli euro di una vendita prima di firmarla: manuale nella fase di test. In fase C, Stripe Checkout con webhook: al pagamento riuscito il server fa firmare la `sale` alla chiave banca, con il riferimento del pagamento nel `body`. Stripe Identity per l'identificazione degli esterni. Il nucleo non vede Stripe: una vendita firmata è una vendita firmata.
 - Backup del registro fuori dal repository.
 - Modello e versione per il giudice.
 

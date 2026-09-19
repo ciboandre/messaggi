@@ -186,6 +186,7 @@ Il motore applica le regole da solo, ogni giorno. Nessuno le aggira senza modifi
 - **QR "paga"**: mostri tu il codice e l'altro incassa.
 - **Premi automatici** su dati del mese.
 - **Canone alle aziende** per il servizio, fuori dalla riserva.
+- **Stripe** per tre cose: incassare gli acquisti di manti con carta o addebito SEPA, con la vendita firmata in automatico all'arrivo del pagamento; identificare chi vuole convertire tramite Stripe Identity; in futuro, pagare le conversioni. Due avvertenze: le regole di Stripe trattano una valuta riconvertibile in denaro come attività da approvare, quindi vale la stessa condizione della licenza; e le commissioni di Stripe si aggiungono al prezzo pagato dal compratore, così in riserva entrano esattamente gli euro del prezzo.
 - **Cose che si comprano solo in manti**: negozio interno, convenzioni.
 
 ## 17. Revisione
