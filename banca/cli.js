@@ -10,7 +10,7 @@
 //   node banca/cli.js estratto <AAAA-MM> <saldo euro> <hash documento> [nota]
 //   node banca/cli.js correzione <hash riga> <euro|-> <motivazione>
 //   node banca/cli.js azienda <chiave> <coordinate> <nome>
-//   node banca/cli.js giudice <chiave> <versione>
+//   node banca/cli.js giudice <chiave> <coordinate> <versione>
 //   node banca/cli.js conversioni            richieste in attesa, con i dati
 //   node banca/cli.js esegui <hash>
 //   node banca/cli.js pagata <hash> [data]
@@ -66,7 +66,7 @@ async function main() {
     case 'estratto': return fatto(await c.estratto(percorso, frase, args[0], args[1], args[2], args[3]));
     case 'correzione': return fatto(await c.correzione(percorso, frase, args[0], args[1] === '-' ? null : args[1], args.slice(2).join(' ')));
     case 'azienda': return fatto(await c.azienda(percorso, frase, args[0], args[1], args.slice(2).join(' ')));
-    case 'giudice': return fatto(await c.giudice(percorso, frase, args[0], args[1]));
+    case 'giudice': return fatto(await c.giudice(percorso, frase, args[0], args[1], args[2]));
     case 'conversioni': {
       const lista = await c.conversioniInAttesa(percorso, frase);
       if (!lista.length) { console.log('nessuna richiesta in attesa'); return; }

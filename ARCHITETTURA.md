@@ -53,6 +53,7 @@ Nella fase A tutto si prova da riga di comando con chiavi finte, per tre mesi si
 ## 3. Tecnologia
 
 - **Node.js** (versione 26 installata). Librerie di sistema: `node:crypto` per hash, casualità e cifratura simmetrica, `node:test` per i test, `node:fs` per il registro.
+- **Due librerie per i QR nell'app**, senza dipendenze a loro volta: `qrcode-generator` per disegnarli, `jsqr` per leggerli dalla fotocamera. Solo nell'app.
 - **Una sola famiglia di dipendenze esterne, noble/scure** dello stesso autore, con audit pubblici e senza dipendenze a loro volta: `@noble/curves` per l'aritmetica su Ed25519, `@noble/hashes` per SHA-256 e SHA-512, `@scure/bip39` per la frase di dodici parole, `@scure/base` per bech32m e base64, `@noble/ciphers` per XChaCha20-Poly1305 sulle causali. Si usano anche al posto di `node:crypto` per hash e firme, così il nucleo gira identico in Node e nel browser (regola: stesso codice sul server e nell'app). Ogni altra aggiunta va motivata nel commit.
 - **Riservatezza alla Monero, scritta in casa.** Nessuna libreria pronta: impegni di Pedersen, prove di intervallo, firme ad anello e immagini di chiave stanno in `nucleo/`, su Ed25519 con le primitive di `@noble/curves`. Nel dettaglio:
   - **secondo generatore** `H = hash_to_curve("manti/H/v1")` con l'Elligator 2 di RFC 9380 che noble espone per Ed25519; nessuno conosce il logaritmo di `H` rispetto a `G`;
@@ -186,7 +187,7 @@ Verifica di una riga: hash uguale, firme valide, `prev` giusto, immagini di chia
 | `reserve.statement` | banca | Mese, saldo dell'estratto conto, hash del documento pubblicato | Il saldo coincide con la riserva calcolata, o la riga spiega la differenza. È un'**affermazione firmata**, non una prova: il registro fa i conti tra le sue righe, non può sapere se gli euro esistono. È l'unico punto in cui la fiducia entra nel sistema |
 | `company.register` | banca | Chiave, coordinate e nome pubblico dell'azienda | Una volta per azienda |
 | `police.appoint` | azienda | Chiave e coordinate della polizia | Sostituisce la precedente |
-| `judge.register` | banca | Chiave del giudice, versione delle istruzioni | Sostituisce la precedente |
+| `judge.register` | banca | Chiave del giudice, coordinate (per cifrargli contestazioni e repliche), versione delle istruzioni | Sostituisce la precedente |
 | `catalog.set` | azienda | Catalogo completo: voci `{ codice, nome, amount }`, codice `[a-z0-9-]` unico | Sostituisce il precedente per quell'azienda |
 | `tariff.set` | azienda | Tariffario completo, stessa forma del catalogo | Sostituisce il precedente per quell'azienda |
 | `transfer` | CLSAG per ogni entrata in anello | Entrate in anello, uscite riservate (almeno una: il resto c'è sempre, anche da zero), prova di intervallo, `ref` facoltativo a un verbale con le due uscite in chiaro | Immagini di chiave nuove, anelli di uscite esistenti e non spese in chiaro, bilancio degli impegni, prova valida. Se `ref` a un verbale: bruciatura `reason: multa:id` per la quota bruciata, alla polizia il resto con `tag: multa`, `ref` e lo scalare `r` dell'indirizzo, così chiunque ricalcola l'indirizzo dalle coordinate della polizia e vede che i manti sono andati lì |
@@ -289,5 +290,5 @@ Se il modello non risponde o risponde con un esito non ammesso, nessuna sentenza
 | 19b | Conto di prova da terminale (`correntista/cli.js`): frase, coordinate, saldo, pagamento riservato, richiesta di conversione; righe in `ledger.jsonl` come quelle della banca | A/B |
 | 20 | Server via HTTP (`server/server.js`): unico scrittore, senza chiavi; `GET /stato`, `GET /registro?da=N`, `GET /prossima`, `POST /righe` con 201/400/409; scritture in fila; `MANTI_PUSH=1` fa il push dopo ogni riga. Banca e correntista lo usano con `MANTI_SERVER=http://…` al posto del file | C |
 | 21 | Servizio giudice con modello reale | C |
-| 22 | App del correntista con QR | D |
+| 22 | App del correntista dal mockup (`app/`): dodici parole con controllo, PIN (le parole cifrate nel telefono con WebCrypto), conto con saldo e movimenti, ricevi con QR, inquadra, bonifico, compra, converti, multe con pagamento e contestazione, rubrica, sicurezza. Il nucleo gira nel browser; il server la serve con le librerie; l'Action la copia sul sito in sola lettura | D |
 | 23 | Pannelli azienda e polizia; pannello banca con interfaccia | D |

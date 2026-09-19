@@ -19,11 +19,11 @@
 // sono passate al più 15 righe `day`. Nessun timestamp entra nei termini.
 //
 // Stato:
-//   giudice: { chiave, versione }
+//   giudice: { chiave, coordinate, versione }   le coordinate servono per cifrargli contestazioni e repliche
 //   verbali: { "azienda:numero" → { azienda, numero, voce, amount, giorno, data, consegna,
 //              stato: aperto | pagato | contestato | annullato | confermato, … } }
 
-import { indirizzoDaR } from './portafoglio.js';
+import { indirizzoDaR, decodificaCoordinate } from './portafoglio.js';
 import { formaCausaleValida } from './causale.js';
 import { divisioneMulta } from './banca.js';
 import { verifica } from './chiavi.js';
@@ -78,11 +78,12 @@ const saldabile = (v) => v.stato === 'aperto' || v.stato === 'confermato';
  */
 export function regolaJudgeRegister(riga, stato) {
   const b = /** @type {any} */ (riga.body);
-  soloCampi(b, ['chiave', 'versione'], 'judge.register');
+  soloCampi(b, ['chiave', 'coordinate', 'versione'], 'judge.register');
   if (typeof b.chiave !== 'string' || !RE_HEX64.test(b.chiave)) throw new Error('judge.register: chiave non valida');
   if (b.chiave === stato.genesi.banca.chiave) throw new Error('judge.register: il giudice ha una chiave propria');
+  try { decodificaCoordinate(b.coordinate); } catch { throw new Error('judge.register: coordinate non valide'); }
   if (typeof b.versione !== 'string' || !b.versione.trim() || b.versione.length > 64) throw new Error('judge.register: versione mancante');
-  stato.giudice = { chiave: b.chiave, versione: b.versione };
+  stato.giudice = { chiave: b.chiave, coordinate: b.coordinate, versione: b.versione };
   return [stato.genesi.banca.chiave];
 }
 

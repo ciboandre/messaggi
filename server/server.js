@@ -8,6 +8,7 @@
 // mandata la rifirma sulla nuova posizione. Una riga invalida: 400 con
 // il motivo, e non entra.
 //
+//   GET  /app/…  /nucleo/…  /lib/…   l'app del correntista e le librerie (statici)
 //   GET  /stato             lo stato pubblico (come sito/stato.json)
 //   GET  /registro?da=N     le righe da N in poi, JSONL (per le app)
 //   GET  /prossima          { seq, prev, ts } su cui costruire la riga
@@ -19,12 +20,33 @@
 
 import { createServer } from 'node:http';
 import { spawn } from 'node:child_process';
+import { readFileSync, existsSync, statSync } from 'node:fs';
+import { join, dirname, extname, normalize } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { apriRegistro, accodaSuFile, rigaAJsonl } from '../nucleo/registro-file.js';
 import { PREV_GENESI } from '../nucleo/registro.js';
 import { tipi } from '../nucleo/tipi.js';
 import { riassunto } from '../motore/pubblica.js';
 
 const CORPO_MAX = 512 * 1024;
+const RADICE = join(dirname(fileURLToPath(import.meta.url)), '..');
+const TIPI_FILE = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.webmanifest': 'application/manifest+json' };
+/** Le cartelle servite così come sono: l'app, il nucleo, e le librerie da node_modules. */
+const STATICI = { '/app/': join(RADICE, 'app'), '/nucleo/': join(RADICE, 'nucleo'), '/lib/': join(RADICE, 'node_modules') };
+
+function servi(res, urlPath) {
+  const prefisso = Object.keys(STATICI).find((p) => urlPath.startsWith(p));
+  if (!prefisso) return false;
+  const relativo = normalize(decodeURIComponent(urlPath.slice(prefisso.length))).replace(/^(\.\.[/\\])+/, '');
+  let file = join(STATICI[prefisso], relativo || 'index.html');
+  if (!file.startsWith(STATICI[prefisso])) return false;
+  if (existsSync(file) && statSync(file).isDirectory()) file = join(file, 'index.html');
+  if (!existsSync(file) || !statSync(file).isFile()) { res.writeHead(404); res.end('non trovato'); return true; }
+  const tipo = TIPI_FILE[extname(file)] ?? 'application/octet-stream';
+  res.writeHead(200, { 'content-type': `${tipo}; charset=utf-8`, 'cache-control': 'no-cache' });
+  res.end(readFileSync(file));
+  return true;
+}
 
 /**
  * Avvia il server. Restituisce { server, chiudi }.
@@ -56,6 +78,8 @@ export function avvia({ percorso, porta = 8787, push = false, cartellaGit = proc
       res.writeHead(204, { 'access-control-allow-origin': '*', 'access-control-allow-methods': 'GET, POST', 'access-control-allow-headers': 'content-type' });
       return res.end();
     }
+    if (req.method === 'GET' && (url.pathname === '/' || url.pathname === '/app')) { res.writeHead(302, { location: '/app/' }); return res.end(); }
+    if (req.method === 'GET' && servi(res, url.pathname)) return;
     if (req.method === 'GET' && url.pathname === '/stato') return invia(res, 200, riassunto(registro));
     if (req.method === 'GET' && url.pathname === '/prossima') {
       const u = registro.ultima;

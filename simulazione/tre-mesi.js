@@ -72,7 +72,7 @@ const aziende = [0, 1].map((i) => ({
 gente.forEach((g, i) => { if (i % 3 !== 2) aziende[i % 2].dipendenti.push(g); });
 
 const reg = new Registro({ tipi });
-let orologio = Date.UTC(2027, 0, 1);
+let orologio = Date.UTC(2026, 4, 1);
 const ts = () => { orologio += tra(30, 600) * 1000; return new Date(orologio).toISOString().replace(/\.\d{3}Z$/, 'Z'); };
 const tempi = {};
 const conta = {};
@@ -93,8 +93,8 @@ function accoda(type, body, firmatari, etichetta = type, t0 = performance.now())
 const euroVeri = { incassati: 0n, interessi: 0n, restituiti: 0n, corretti: 0n };
 
 // ── genesi e ruoli ──
-reg.accoda(firmaRiga(preparaRiga(null, { type: 'genesis', ts: '2026-12-31T23:00:00Z', body: { banca: { chiave: banca.pubblica, coordinate: pb.coordinate }, parametri: { sovrapprezzo_pct: 5, commissione_pct: 2, multe_bruciate_pct: 50, tetto_cent: 5000000, giorni_multa: 15 } } }), [firmaDi(banca)]));
-accoda('judge.register', { chiave: giudice.pubblica, versione: 'istruzioni-1' }, [firmaDi(banca)]);
+reg.accoda(firmaRiga(preparaRiga(null, { type: 'genesis', ts: '2026-04-30T23:00:00Z', body: { banca: { chiave: banca.pubblica, coordinate: pb.coordinate }, parametri: { sovrapprezzo_pct: 5, commissione_pct: 2, multe_bruciate_pct: 50, tetto_cent: 5000000, giorni_multa: 15 } } }), [firmaDi(banca)]));
+accoda('judge.register', { chiave: giudice.pubblica, coordinate: portafoglioDaFrase(generaFrase()).coordinate, versione: 'istruzioni-1' }, [firmaDi(banca)]);
 for (const az of aziende) {
   accoda('company.register', { chiave: az.chiave.pubblica, coordinate: az.p.coordinate, nome: az.nome }, [firmaDi(banca)]);
   accoda('police.appoint', { azienda: az.chiave.pubblica, chiave: az.polizia.pubblica, coordinate: az.pol.coordinate }, [firmaDi(az.chiave)]);
@@ -197,8 +197,8 @@ function eseguiConversioni() {
 const t0 = performance.now();
 let ultimoInteresse = null;
 for (let g = 1; g <= Number(GIORNI); g++) {
-  const data = new Date(Date.UTC(2027, 0, g)).toISOString().slice(0, 10);
-  orologio = Math.max(orologio, Date.UTC(2027, 0, g) + 6 * 3600 * 1000);
+  const data = new Date(Date.UTC(2026, 4, g)).toISOString().slice(0, 10);
+  orologio = Math.max(orologio, Date.UTC(2026, 4, g) + 6 * 3600 * 1000);
   accoda('day', { data }, [firmaDi(banca)]);
   if (data.endsWith('-01')) {
     for (const az of aziende) stipendi(az, data);

@@ -51,6 +51,12 @@ jobs:
           set +e
           node motore/pubblica.js ledger.jsonl sito
           echo "esito=$?" >> "$GITHUB_OUTPUT"
+      - name: L'app del correntista accanto al sito
+        run: |
+          mkdir -p sito/app sito/nucleo sito/lib
+          cp -R app/. sito/app/
+          cp nucleo/*.js sito/nucleo/
+          for p in @noble/curves @noble/hashes @noble/ciphers @scure/base @scure/bip39 qrcode-generator jsqr; do mkdir -p "sito/lib/$p" && cp -R "node_modules/$p/." "sito/lib/$p/"; done
       - uses: actions/configure-pages@v5.0.0
       - uses: actions/upload-pages-artifact@v3.0.1
         with:

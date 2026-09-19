@@ -35,7 +35,7 @@ function scenario() {
   reg.accoda(riga(reg, 'company.register', { chiave: aziendaK.pubblica, coordinate: az.coordinate, nome: 'Officina Rossi' }, [firmaDi(banca)]));
   reg.accoda(riga(reg, 'police.appoint', { azienda: aziendaK.pubblica, chiave: poliziaK.pubblica, coordinate: pol.coordinate }, [firmaDi(aziendaK)]));
   reg.accoda(riga(reg, 'tariff.set', { azienda: aziendaK.pubblica, voci: [{ codice: 'ritardo', nome: 'Ritardo oltre 10 minuti', amount: 301 }] }, [firmaDi(aziendaK)]));
-  reg.accoda(riga(reg, 'judge.register', { chiave: giudiceK.pubblica, versione: 'istruzioni-1' }, [firmaDi(banca)]));
+  reg.accoda(riga(reg, 'judge.register', { chiave: giudiceK.pubblica, coordinate: portafoglioDaFrase(generaFrase()).coordinate, versione: 'istruzioni-1' }, [firmaDi(banca)]));
   const prezzo = prezzoAcquisto(reg.stato);
   const i = creaIndirizzo(az.coordinate);
   reg.accoda(riga(reg, 'sale', { euro_cent: 100000, prezzo: Number(prezzo), out: [{ addr: i.addr, eph: i.eph, amount: Number(mantiPerEuro(100000n, prezzo)), tag: 'vendita' }], pagamento: 'b' }, [firmaDi(banca)]));

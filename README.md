@@ -14,6 +14,8 @@ Un conto di prova, prima dell'app: `node correntista/cli.js nuovo` (dodici parol
 
 Il server della banca (`node server/server.js`, porta 8787, `MANTI_PUSH=1` per il push automatico) è l'unico scrittore del registro e non ha chiavi: riceve righe firmate, le verifica e le accoda. Banca e correntista gli parlano con `MANTI_SERVER=http://localhost:8787` davanti ai comandi, invece di scrivere il file.
 
+L'app del correntista è in `app/`: la serve il server (`http://localhost:8787/app/`) e la pubblica il sito. Al primo avvio mostra le dodici parole e le fa ricontrollare; poi PIN, saldo, movimenti, ricevi con QR, inquadra, bonifico, compra, converti, multe. Per pagare serve il server della banca (in Sicurezza si imposta l'indirizzo); sul sito pubblico legge solo.
+
 **Chiunque può ricalcolare il sito.** Il registro è `ledger.jsonl`, una riga per transazione, scritto e committato dalla banca. Il sito pubblico lo genera una GitHub Action ogni giorno alle 05:00 UTC eseguendo solo `node motore/pubblica.js ledger.jsonl sito`: nessuna chiave, nessun segreto, nessuna data di generazione. Lo stesso comando sulla stessa copia del repository produce gli stessi byte, quindi chi non si fida della pagina la rifà da sé e la confronta. Se una riga non passa la verifica, il motore si ferma lì, il sito mostra l'ultimo stato buono con l'avviso, e il run fallisce in modo visibile.
 
 Metodo di lavoro: un passo alla volta, ogni passo discusso, autorizzato, committato e pushato.

@@ -4,6 +4,9 @@
 import { appendFileSync, existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { canonico } from './canonico.js';
 import { Registro } from './registro.js';
+import { righeDaJsonl } from './registro-file-browser.js';
+
+export { righeDaJsonl };
 
 /**
  * Serializza una riga come una linea JSON canonica.
@@ -12,24 +15,6 @@ import { Registro } from './registro.js';
  */
 export function rigaAJsonl(riga) {
   return canonico(riga) + '\n';
-}
-
-/**
- * Legge le righe da testo JSONL. Linee vuote ignorate.
- * @param {string} testo
- * @returns {import('./registro.js').Riga[]}
- */
-export function righeDaJsonl(testo) {
-  return testo
-    .split('\n')
-    .filter((l) => l.trim() !== '')
-    .map((l, i) => {
-      try {
-        return JSON.parse(l);
-      } catch {
-        throw new Error(`linea ${i + 1}: JSON non valido`);
-      }
-    });
 }
 
 /**

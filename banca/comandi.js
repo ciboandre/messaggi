@@ -172,9 +172,10 @@ export function azienda(dest, frase, chiave, coordinate, nome) {
   return consegna(dest, rigaBanca(frase, 'company.register', { chiave, coordinate, nome }));
 }
 
-export function giudice(dest, frase, chiave, versione) {
+export function giudice(dest, frase, chiave, coordinate, versione) {
   if (!RE_HEX64.test(chiave)) throw new Error('chiave del giudice: 64 esadecimali');
-  return consegna(dest, rigaBanca(frase, 'judge.register', { chiave, versione }));
+  controllaCoordinate(coordinate);
+  return consegna(dest, rigaBanca(frase, 'judge.register', { chiave, coordinate, versione }));
 }
 
 /** Le richieste di conversione in attesa, con i dati aperti dalla banca. */
