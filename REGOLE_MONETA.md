@@ -1,7 +1,7 @@
 # Regole dei manti
 
-Versione 3.0 — 19 settembre 2026
-Stato: definitivo per la fase di test. Si rivede prima di vendere manti a soggetti esterni alla prima azienda.
+Versione 3.1 — 19 settembre 2026
+Stato: definitivo per la fase di test. La 3.1 rende riservati importi e mittente dei pagamenti tra correntisti, alla maniera di Monero (sezione 12). Si rivede prima di vendere manti a soggetti esterni alla prima azienda.
 
 ## 1. Scopo
 
@@ -24,6 +24,7 @@ Tutti i numeri del sistema in un posto solo. Ogni parametro è pubblico; quelli 
 | Interessi sulla riserva | 100% in riserva | Conto remunerato; gli interessi non vanno alla banca |
 | Quota delle multe bruciata | 50% | L'altra metà al conto polizia |
 | Commissione su pagamenti e bonifici | 0% | |
+| Dimensione dell'anello | 16 | Uscite tra cui si nasconde ogni entrata spesa da un correntista |
 | Giorni per pagare o contestare una multa | 15 | Dalla data del verbale |
 | Pubblicazione | Giornaliera, 06:00 ora italiana | |
 | Estratto conto della riserva | Mensile | Pubblicato accanto al registro |
@@ -81,7 +82,7 @@ Pubblicato ogni giorno con il conto esplicito. Nessuno lo decide.
 1. Il correntista chiede di convertire dall'app. La richiesta contiene, cifrati per la sola banca, i dati per il pagamento in euro. **Può convertire solo chi è identificato dalla banca**: i dipendenti lo sono dalla registrazione dell'azienda; un esterno si identifica una volta. Tenere, ricevere, pagare e comprare non richiede identificazione.
 2. **Prezzo di conversione** = valore ufficiale del giorno − 2%.
 3. Tutti i manti convertiti vengono **bruciati**. La banca paga gli euro fuori dal sistema e segna la conversione come pagata. Il 2% in euro resta in riserva.
-4. Nel registro compaiono manti bruciati ed euro dovuti, non chi.
+4. Nel registro compaiono manti bruciati ed euro dovuti; non chi, né da quali indirizzi vengono.
 
 Non esistono limiti minimi o massimi. Un dipendente con multe definitive non pagate non può convertire finché non salda (sezione 10).
 
@@ -91,7 +92,8 @@ Non esistono limiti minimi o massimi. Un dipendente con multe definitive non pag
 - **Un dipendente** mostra le coordinate all'azienda, che lo registra e gli consegna un attestato firmato che l'app conserva. Da lì riceve stipendio e premi, e nell'app compare la sezione delle multe. Senza attestato la sezione non esiste e nessuno può multarlo.
 - **Ricevere con QR**: l'app mostra un QR con un indirizzo nuovo, generato al momento, e se si vuole l'importo. Chi paga inquadra, controlla, firma.
 - **Bonifico**: si invia a delle coordinate, una stringa che ognuno condivide con chi vuole, come un IBAN, e che si salva in rubrica. Chi non le ha non può inviare nulla né sapere che quella persona esiste.
-- **Causale** facoltativa, la legge solo il destinatario.
+- **Causale** facoltativa, la legge solo il destinatario. L'**importo** lo leggono solo chi paga e chi riceve; nel registro c'è un impegno crittografico, non un numero.
+- **Chi paga non si vede.** Ogni entrata spesa è mescolata con quindici entrate di altri, prese dal registro; chi guarda sa che una delle sedici è stata spesa, non quale.
 - Nessuna commissione. Ogni movimento è firmato da chi paga ed è **definitivo**. Chi sbaglia destinatario chiede al destinatario di restituire.
 - Cosa si scambia in cambio dei manti, e a che prezzo in euro tra privati, non riguarda il sistema.
 
@@ -121,18 +123,28 @@ Come nella vita reale: verbale, termine, ricorso, esecuzione forzata.
 
 ## 12. Riservatezza
 
-Il registro è pubblico, ma non dice chi è chi. Ogni pagamento va a un **indirizzo usa e getta** che solo il destinatario riconosce. Nessuno può collegare gli indirizzi a una persona né sommare il saldo di qualcuno.
+Il registro è pubblico, ma non dice chi è chi, né quanto passa di mano tra correntisti, né da dove. È il modello di Monero, con una differenza: le righe firmate da un ruolo restano in chiaro.
 
-| | Nomi | Saldo di una persona | Movimenti |
-|---|---|---|---|
-| Altri correntisti, pubblico | no | no | importi e indirizzi anonimi |
-| Azienda | i propri dipendenti | no, sa solo quanto ha pagato | i propri |
-| Polizia | i dipendenti della sua azienda | no | le multe emesse e incassate |
-| Banca | chi si è identificato per convertire, e chi ha comprato da lei | no | valida tutto senza sapere di chi è |
-| Giudice | no | no | il verbale contestato |
-| Il correntista | sé stesso | il proprio | i propri |
+**Tre cose nascoste nei pagamenti tra correntisti:**
+
+1. **Chi riceve.** Ogni pagamento va a un **indirizzo usa e getta** che solo il destinatario riconosce. Nessuno può collegare gli indirizzi a una persona né sommare il saldo di qualcuno.
+2. **Quanto.** L'importo non è scritto: al suo posto c'è un impegno crittografico che permette di verificare che entrate e uscite si equivalgono senza leggerle, e una prova che nessun importo è negativo. Il numero lo conoscono chi paga e chi riceve.
+3. **Chi spende.** Ogni entrata spesa è messa in un **anello** con quindici entrate di altri, prese dal registro. La firma prova che una delle sedici appartiene a chi firma e che non è già stata spesa, senza dire quale. Le quindici esche restano spendibili dai loro proprietari.
+
+**Cosa resta in chiaro, e perché.** Vendite della banca, stipendi, premi e trattenute delle aziende, verbali e loro incasso, conversioni eseguite e ogni bruciatura hanno l'importo visibile e le entrate consumate dichiarate. Servono a calcolare il circolante e quindi il valore: manti venduti meno convertiti meno bruciati. Se fossero nascosti nessuno potrebbe verificare che la riserva copre. Il destinatario di uno stipendio o di un premio è comunque un indirizzo usa e getta: si vede che l'azienda ha pagato dieci stipendi da tanto, non a chi.
+
+| | Nomi | Saldo di una persona | Importi | Movimenti |
+|---|---|---|---|---|
+| Altri correntisti, pubblico | no | no | solo quelli firmati da un ruolo | anelli e indirizzi anonimi |
+| Azienda | i propri dipendenti | no, sa solo quanto ha pagato | i propri | i propri |
+| Polizia | i dipendenti della sua azienda | no | le multe | le multe emesse e incassate |
+| Banca | chi si è identificato per convertire, e chi ha comprato da lei | no | vendite e conversioni | valida tutto senza sapere di chi è né quanto |
+| Giudice | no | no | la multa | il verbale contestato |
+| Il correntista | sé stesso | il proprio | i propri | i propri |
 
 Le causali sono cifrate per il destinatario. L'anagrafica non è nel registro e non si pubblica. Un esterno che non ha mai comprato dalla banca né convertito non compare da nessuna parte.
+
+**Limite dichiarato.** Nei primi giorni, quando il registro ha poche uscite, gli anelli sono piccoli e proteggono poco. La protezione cresce con l'uso.
 
 ## 13. Vincoli di legge
 
@@ -146,18 +158,19 @@ Le causali sono cifrate per il destinatario. L'anagrafica non è nel registro e 
 Il motore applica le regole da solo, ogni giorno. Nessuno le aggira senza modificare il codice, e ogni modifica è pubblica.
 
 1. I manti si creano solo con una vendita registrata dalla banca, con gli euro corrispondenti in riserva, sotto il tetto, al prezzo di acquisto del giorno.
-2. Nessun movimento in uscita da un indirizzo senza la firma della chiave di quell'indirizzo. Nessuna eccezione.
+2. Nessuna entrata si spende senza la chiave del suo indirizzo, e nessuna si spende due volte. Nessuna eccezione.
 3. Nessuna riga del registro può essere modificata o cancellata. Ogni riga è concatenata alla precedente tramite hash.
 4. Gli euro escono dalla riserva solo per conversioni, al prezzo di conversione del giorno, e per ogni euro uscito vengono bruciati almeno altrettanti manti in valore.
 5. Metà di ogni multa pagata viene bruciata.
 6. Il valore è calcolato dal registro, mai inserito a mano. La riserva dichiarata è una riga firmata dalla banca, riconciliata con l'estratto conto mensile.
 7. Catalogo, tariffario e nomina della polizia si cambiano solo con una transazione firmata dall'azienda. Il tetto solo con una firmata dalla banca.
 8. La polizia firma solo verbali e repliche, da tariffario, verso dipendenti della sua azienda. Il giudice firma solo sentenze.
-9. Il registro non contiene nomi. Mai.
+9. Il registro non contiene nomi. Mai. Non contiene importi né mittente dei pagamenti tra correntisti.
+10. Un pagamento riservato è valido solo se la prova dimostra che entrate e uscite si equivalgono e che nessuna uscita è negativa. Il motore non conosce i numeri e non gli servono.
 
 | Fisso (codice) | Modificabile (dati firmati) |
 |---|---|
-| Sovrapprezzo, commissione, quota bruciata | Tetto della riserva |
+| Sovrapprezzo, commissione, quota bruciata, dimensione dell'anello | Tetto della riserva |
 | Formula del valore | Cataloghi e tariffari |
 | Termine di 15 giorni | Verbali, contestazioni, sentenze |
 | Regole di firma e catena | Vendite, conversioni, interessi, estratti |
