@@ -32,9 +32,13 @@
 // Chi prova non è a tempo costante: sotto ci sono i BigInt di JavaScript.
 // Però nessuna istruzione ramifica sul segreto: i bit degli importi entrano
 // in A come scalari 1 o 2, mai come "salta se zero". Chi verifica lavora
-// solo su dati pubblici e usa la moltiplicazione veloce.
+// solo su dati pubblici: non ripiega i generatori punto per punto, ma
+// calcola per ogni base uno scalare solo (prodotto delle sfide e^{±1} e
+// delle potenze di y lungo il suo cammino) e fa un'unica combinazione
+// lineare, che deve dare l'identità.
 
 import { ed25519, ed25519_hasher } from '@noble/curves/ed25519.js';
+import { pippenger } from '@noble/curves/abstract/curve.js';
 import { concatBytes, numberToBytesLE, randomBytes } from '@noble/curves/utils.js';
 import { sha512 } from '@noble/hashes/sha2.js';
 import { scalareDaBytes } from './chiavi.js';
@@ -370,32 +374,48 @@ export function verificaOLancia(commits, prova) {
   tr.assorbi('A', A);
   const y = tr.sfida();
   const z = tr.sfidaDerivata('z');
-
-  const { suHi, delta, suV } = coefficienti(y, z, m);
-  let P = A.add(per(sommeGi[N], mod(-z)))
-    .add(combina(suHi, Hi))
-    .add(per(H, delta))
-    .add(combina(suV, V));
-  let gi = Gi.slice(0, N);
-  let hi = Hi.slice(0, N);
-
-  let n = N;
-  for (let giro = 0; giro < giri; giro++) {
-    const mezzo = n / 2;
-    const ym = pow(y, mezzo);
-    const yInvM = inv(ym);
-    tr.assorbi('LR', L[giro], R[giro]);
-    const e = tr.sfida();
-    const eInv = inv(e);
-    P = P.add(per(L[giro], mul(e, e))).add(per(R[giro], mul(eInv, eInv)));
-    gi = gi.slice(0, mezzo).map((Pg, i) => per(Pg, eInv).add(per(gi[mezzo + i], mul(e, yInvM))));
-    hi = hi.slice(0, mezzo).map((Ph, i) => per(Ph, e).add(per(hi[mezzo + i], eInv)));
-    n = mezzo;
-  }
-
+  const sfide = L.map((Lg, g) => { tr.assorbi('LR', Lg, R[g]); return tr.sfida(); });
   tr.assorbi('AB', A1, B);
   const e = tr.sfida();
-  const sinistra = per(P, mul(e, e)).add(per(A1, e)).add(B);
-  const destra = per(gi[0], mul(e, r)).add(per(hi[0], mul(e, s))).add(per(H, mul(y, mul(r, s)))).add(per(G, d));
-  return sinistra.equals(destra);
+
+  // Il controllo finale è
+  //   e²·P + e·A1 + B  ==  (e·r)·g + (e·s)·h + y·r·s·H + d·G
+  // con P = Â + Σ_g (e_g²·L_g + e_g⁻²·R_g), g = Σ_i σ_i·Gi, h = Σ_i τ_i·Hi,
+  // dove σ_i e τ_i sono i prodotti dei fattori di ripiegamento lungo il
+  // cammino dell'indice i: al giro g l'indice sta nella metà bassa
+  // (fattore e_g⁻¹ per Gi, e_g per Hi) o alta (e_g·y^{−mezzo}, e_g⁻¹).
+  // Portato tutto a sinistra, ogni base ha uno scalare e la somma è zero.
+  const { suHi, delta, suV } = coefficienti(y, z, m);
+  const e2 = mul(e, e);
+  const eInvG = sfide.map(inv);
+  const yInv = inv(y);
+  const sigma = Array(N).fill(1n);
+  const tau = Array(N).fill(1n);
+  for (let g = 0; g < giri; g++) {
+    const mezzo = N >> (g + 1);
+    const altoG = mul(sfide[g], pow(yInv, mezzo));
+    for (let i = 0; i < N; i++) {
+      const alto = ((i >> (giri - 1 - g)) & 1) === 1;
+      sigma[i] = mul(sigma[i], alto ? altoG : eInvG[g]);
+      tau[i] = mul(tau[i], alto ? eInvG[g] : sfide[g]);
+    }
+  }
+  const punti = [];
+  const scalari = [];
+  const aggiungi = (P, k) => { punti.push(P); scalari.push(mod(k)); };
+  for (let i = 0; i < N; i++) {
+    aggiungi(Gi[i], mul(e2, -z) - mul(mul(e, r), sigma[i]));
+    aggiungi(Hi[i], mul(e2, suHi[i]) - mul(mul(e, s), tau[i]));
+  }
+  aggiungi(A, e2);
+  for (let g = 0; g < giri; g++) {
+    aggiungi(L[g], mul(e2, mul(sfide[g], sfide[g])));
+    aggiungi(R[g], mul(e2, mul(eInvG[g], eInvG[g])));
+  }
+  V.forEach((Vj, j) => aggiungi(Vj, mul(e2, suV[j])));
+  aggiungi(H, mul(e2, delta) - mul(y, mul(r, s)));
+  aggiungi(G, -d);
+  aggiungi(A1, e);
+  aggiungi(B, 1n);
+  return pippenger(Punto, punti, scalari).equals(Punto.ZERO);
 }
