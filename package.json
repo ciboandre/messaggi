@@ -8,7 +8,8 @@
     "node": ">=22"
   },
   "scripts": {
-    "test": "node --test test/"
+    "test": "node --test test/",
+    "pubblica": "node motore/pubblica.js ledger.jsonl sito"
   },
   "dependencies": {
     "@noble/ciphers": "^2.4.0",

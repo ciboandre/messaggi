@@ -6,7 +6,7 @@ Il **manto**: una moneta privata emessa da una banca, coperta uno a uno da euro 
 - [Architettura](ARCHITETTURA.md): chiavi, indirizzi usa e getta, registro, transazioni, motore giornaliero, piano dei passi.
 - [Mockup](mockup/index.html): sito pubblico, app, pannelli azienda, polizia e banca, con dati finti.
 
-Codice: `npm test` esegue i test del nucleo (`nucleo/`, `test/`). Node 22 o superiore, nessuna dipendenza.
+Codice: `npm test` esegue i test (`nucleo/`, `motore/`, `test/`); `npm run pubblica` rilegge `ledger.jsonl` e scrive il sito in `sito/`. Node 22 o superiore; dipendenze solo noble/scure.
 
 Metodo di lavoro: un passo alla volta, ogni passo discusso, autorizzato, committato e pushato.
 

@@ -112,6 +112,7 @@ test('pagamento rifiutato: importi sbagliati, metà non alla polizia, verbale in
   assert.throws(() => reg.accoda(costruisci((b) => { b.ref = `${aziendaK.pubblica}:V-9`; chiara(b, 0).reason = `multa:${aziendaK.pubblica}:V-9`; chiara(b, 1).ref = `${aziendaK.pubblica}:V-9`; })), /verbale sconosciuto/);
   assert.throws(() => reg.accoda(costruisci((b) => { b.ref = null; })), /solo per pagare una multa/);
   assert.throws(() => reg.accoda(costruisci((b) => { delete chiara(b, 1).r; })), /senza ref o r/);
+  assert.throws(() => reg.accoda(costruisci((b) => { chiara(b, 1).memo = cifraCausale(new Uint8Array(32), 'ciao'); })), /niente causale/);
   reg.accoda(costruisci(() => {}));
   assert.throws(() => reg.accoda(costruisci(() => {})), /pagato, non si paga/);
 });
@@ -189,6 +190,21 @@ test('trattenuta di un verbale altrui o inesistente, e bruciatura fuori dalle tr
   assert.throws(() => reg.accoda(riga(reg, 'payout', { azienda: aziendaK.pubblica, in: body.in, out, trattenute: [] }, [firmaDi(aziendaK), ...firmatari])), /fuori dalle trattenute/);
   assert.throws(() => reg.accoda(riga(reg, 'payout', { azienda: aziendaK.pubblica, in: body.in, out, trattenute: [ID, ID] }, [firmaDi(aziendaK), ...firmatari])), /ripetute/);
   reg.accoda(riga(reg, 'payout', { azienda: aziendaK.pubblica, in: body.in, out, trattenute: [ID] }, [firmaDi(aziendaK), ...firmatari]));
+});
+
+test('la polizia ritira un verbale aperto, con motivazione; non uno pagato o contestato', () => {
+  const { reg, dip } = scenario();
+  reg.accoda(verbale(reg, dip));
+  const ritira = (firmatario = firmaDi(poliziaK), motivazione = 'persona sbagliata') => riga(reg, 'fine.withdraw', { verbale: ID, motivazione }, [firmatario]);
+  assert.throws(() => reg.accoda(ritira(firmaDi(aziendaK))), /manca la firma/);
+  assert.throws(() => reg.accoda(ritira(undefined, '')), /motivazione/);
+  reg.accoda(ritira());
+  assert.equal(reg.stato.verbali[ID].stato, 'ritirato');
+  assert.throws(() => reg.accoda(ritira()), /si ritira solo se aperto/);
+  assert.throws(() => {
+    const { body, firmatari } = costruisciPagamentoRiservato({ portafoglio: dip, disponibili: mieEntrate(reg, dip), destinazioni: [], stato: reg.stato, multa: ID });
+    reg.accoda(riga(reg, 'transfer', body, firmatari));
+  }, /ritirato, non si paga/);
 });
 
 test('sentenza che conferma: il verbale resta saldabile e definitivo; il registro si ricostruisce', () => {

@@ -94,6 +94,8 @@ export function controllaUscite(out, opz = {}) {
         if (!opz.multeAmmesse) throw new Error(`${dove}: ref e r non ammessi in questo tipo di riga`);
         if (u.tag !== 'multa') throw new Error(`${dove}: ref e r solo sulla metà alla polizia, tag "multa"`);
         if (typeof u.ref !== 'string' || !u.ref || typeof u.r !== 'string' || !RE_HEX64.test(u.r)) throw new Error(`${dove}: metà alla polizia senza ref o r`);
+        // r rivela il segreto condiviso dell'uscita, e con quello si aprirebbe la causale
+        if (u.memo !== undefined) throw new Error(`${dove}: niente causale sulla metà alla polizia, r la renderebbe pubblica`);
       } else if (u.tag === 'multa') {
         throw new Error(`${dove}: la metà alla polizia porta ref e r`);
       }

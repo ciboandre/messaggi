@@ -193,6 +193,26 @@ test('il giorno: date crescenti, la riga non prima del giorno che apre, contator
   assert.throws(() => reg.accoda(giorno('2026-12-03', '2026-12-03T06:00:00Z', { by: altro.pubblica, firma: (h) => firma(altro.privata, h) })), /manca la firma/);
 });
 
+test('correction: solo un interesse, una volta, se la copertura regge; con motivazione', () => {
+  const reg = nuovoRegistro();
+  const a = portafoglioDaFrase(generaFrase());
+  const v = vendita(reg, a.coordinate, 100000);
+  reg.accoda(v);
+  const i = rigaBanca(reg, 'reserve.interest', { euro_cent: 2500, da: '2026-11-01', a: '2026-11-30' });
+  reg.accoda(i);
+  assert.equal(reg.stato.riserva_cent, 102500n);
+  const correggi = (ref, mod = {}) => rigaBanca(reg, 'correction', { ref, motivazione: 'cifra sbagliata: erano 250', ...mod });
+  assert.throws(() => reg.accoda(correggi(v.hash)), /solo reserve.interest/);
+  assert.throws(() => reg.accoda(correggi('f'.repeat(64))), /solo reserve.interest/);
+  assert.throws(() => reg.accoda(correggi(i.hash, { motivazione: ' ' })), /motivazione/);
+  reg.accoda(correggi(i.hash));
+  assert.equal(reg.stato.riserva_cent, 100000n);
+  assert.equal(reg.stato.interessi_cent, 0n);
+  assert.throws(() => reg.accoda(correggi(i.hash)), /già corretta/);
+  // è l'unica riga in cui il valore scende, e lo dice
+  assert.deepEqual(reg.stato.correzioni[i.hash], { correzione: reg.ultima.hash, euro_cent: 2500n, motivazione: 'cifra sbagliata: erano 250', valore_prima: 10250n, valore_dopo: 10000n });
+});
+
 test('il registro si ricostruisce con lo stesso stato, BigInt compresi', () => {
   const reg = nuovoRegistro();
   const a = portafoglioDaFrase(generaFrase());

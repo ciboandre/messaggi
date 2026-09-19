@@ -26,6 +26,22 @@
 // regola di riga. (Confrontare la riserva con il valore *dopo* non dice
 // niente: è vero per costruzione, il valore è riserva / circolazione.)
 //
+// `correction` compensa una riga **valida ma sbagliata nei fatti**, mai
+// una riga invalida: una riga invalida non entra, e se il motore la trova
+// rileggendo da capo la catena è rotta e si ferma lì. Nessuna riga
+// successiva può rammendarla, perché per arrivarci bisognerebbe averla
+// saltata, e le righe riservate lasciano effetti che non si tolgono
+// (uscite usate come esche, immagini spese). Si corregge solo ciò che ha
+// effetti interi in uno stato e nessun anello sotto: oggi
+// `reserve.interest`: la riserva torna indietro di quegli euro. È l'unica
+// riga in cui il valore pubblicato può scendere, perché dichiara che il
+// valore di prima era sbagliato: per questo porta una motivazione
+// pubblica, la firma la banca, e il sito la mostra come tale.
+// `sale` non si corregge: i manti sono già di qualcuno, magari spesi; una
+// vendita senza euro arrivati si vede nell'estratto conto con la nota, e
+// gli euro ce li mette la banca. `cap.set` si corregge con un altro
+// `cap.set`. I verbali li ritira la polizia (`fine.withdraw`).
+//
 // `day` è il calendario. Il registro non ha un orologio che chiunque possa
 // ricontrollare: ha solo le sue righe. La banca apre ogni giorno con una
 // riga `day`, e da lì in poi i termini (i 15 giorni delle multe) si contano
@@ -210,7 +226,33 @@ export function regolaInteressi(riga, stato) {
   }
   stato.riserva_cent += euro;
   stato.interessi_cent = (stato.interessi_cent ?? 0n) + euro;
+  stato.interessi ??= {};
+  stato.interessi[riga.hash] = euro;
   controllaCopertura(stato, valorePrima);
+  return [chiaveBanca(stato)];
+}
+
+/**
+ * `correction`: compensa una riga valida ma sbagliata nei fatti, con
+ * riferimento e motivazione pubblica. Correggibile oggi: `reserve.interest`.
+ * Una riga si corregge una volta sola.
+ * @type {import('./registro.js').RegolaTipo}
+ */
+export function regolaCorrection(riga, stato) {
+  const b = /** @type {any} */ (riga.body);
+  soloCampi(b, ['ref', 'motivazione'], 'correction');
+  preparaStato(stato);
+  if (typeof b.ref !== 'string' || !RE_HEX64.test(b.ref)) throw new Error('correction: riferimento mancante');
+  if (typeof b.motivazione !== 'string' || !b.motivazione.trim() || b.motivazione.length > 500) throw new Error('correction: motivazione mancante');
+  stato.correzioni ??= {};
+  if (stato.correzioni[b.ref]) throw new Error('correction: riga già corretta');
+  const valorePrima = valore(stato);
+  const interesse = stato.interessi?.[b.ref];
+  if (interesse === undefined) throw new Error('correction: la riga non è un interesse; solo reserve.interest si corregge');
+  stato.riserva_cent -= interesse;
+  stato.interessi_cent -= interesse;
+  stato.correzioni[b.ref] = { correzione: riga.hash, euro_cent: interesse, motivazione: b.motivazione, valore_prima: valorePrima, valore_dopo: valore(stato) };
+  if (stato.riserva_cent < 0n) throw new Error('correction: la riserva andrebbe sotto zero');
   return [chiaveBanca(stato)];
 }
 
@@ -263,4 +305,5 @@ export const tipiBanca = {
   sale: regolaSale,
   'reserve.interest': regolaInteressi,
   'reserve.statement': regolaEstratto,
+  correction: regolaCorrection,
 };

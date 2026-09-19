@@ -145,6 +145,22 @@ export function saldaVerbale(stato, id, chiare, opz) {
 }
 
 /**
+ * `fine.withdraw`: la polizia ritira un verbale ancora aperto (sbagliato
+ * nei fatti: persona, voce, giorno). Non è una correzione della banca: è
+ * un atto del ruolo che l'ha emesso, con motivazione pubblica.
+ * @type {import('./registro.js').RegolaTipo}
+ */
+export function regolaFineWithdraw(riga, stato) {
+  const b = /** @type {any} */ (riga.body);
+  soloCampi(b, ['verbale', 'motivazione'], 'fine.withdraw');
+  const v = verbaleDi(stato, b.verbale, 'fine.withdraw');
+  if (v.stato !== 'aperto') throw new Error(`fine.withdraw: verbale ${v.numero} ${v.stato}, si ritira solo se aperto`);
+  if (typeof b.motivazione !== 'string' || !b.motivazione.trim() || b.motivazione.length > MOTIVAZIONE_MAX) throw new Error('fine.withdraw: motivazione mancante');
+  Object.assign(v, { stato: 'ritirato', ritiro: { motivazione: b.motivazione, giorno: stato.n_giorni ?? 0 } });
+  return [stato.aziende[v.azienda].polizia.chiave];
+}
+
+/**
  * `fine.contest`: il multato contesta entro il termine, firmando con la
  * chiave dell'indirizzo di consegna. Testo cifrato per giudice e polizia.
  * @type {import('./registro.js').RegolaTipo}
@@ -206,6 +222,7 @@ export function regolaVerdict(riga, stato) {
 export const tipiMulte = {
   'judge.register': regolaJudgeRegister,
   'fine.issue': regolaFineIssue,
+  'fine.withdraw': regolaFineWithdraw,
   'fine.contest': regolaFineContest,
   'fine.reply': regolaFineReply,
   verdict: regolaVerdict,

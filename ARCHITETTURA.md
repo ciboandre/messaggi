@@ -198,7 +198,8 @@ Verifica di una riga: hash uguale, firme valide, `prev` giusto, immagini di chia
 | `fine.contest` | chiave usa e getta dell'indirizzo di consegna | Verbale, testo cifrato per giudice e polizia | Entro 15 righe `day` dal giorno del verbale; serve un giudice registrato |
 | `fine.reply` | polizia | Verbale, testo cifrato per il giudice | Una per contestazione |
 | `verdict` | giudice | Verbale, esito (annullata / confermata), motivazione pubblica, hash del fascicolo, versione delle istruzioni | Contestazione aperta, dopo la replica o dopo 3 giorni senza; versione uguale a quella registrata |
-| `correction` | banca | Riga errata, movimento inverso, motivazione | Solo per righe segnalate invalide dal motore |
+| `fine.withdraw` | polizia | Verbale, motivazione pubblica | Solo se aperto. È un atto del ruolo che l'ha emesso, non una correzione |
+| `correction` | banca | Riferimento a una riga **valida ma sbagliata nei fatti**, motivazione pubblica | Oggi solo `reserve.interest`: la riserva torna indietro di quegli euro. Una riga si corregge una volta. È l'unica riga in cui il valore può scendere, perché dichiara che quello di prima era sbagliato. Mai per righe invalide: quelle non entrano, e se il motore le trova rileggendo la catena è rotta (sezione 11). `sale` non si corregge (i manti sono già di qualcuno): una vendita senza euro si vede nell'estratto conto, e gli euro ce li mette la banca. `cap.set` si corregge con un altro `cap.set` |
 
 Non esiste un tipo che crei manti senza una `sale`, che tolga euro dalla riserva senza una conversione, o che consumi un'entrata senza la sua chiave. Il codice non li riconosce.
 
@@ -233,7 +234,9 @@ Se il modello non risponde o risponde con un esito non ammesso, nessuna sentenza
 
 ## 11. Il motore giornaliero
 
-`node motore/pubblica.js`, ogni giorno alle 06:00: legge `ledger.jsonl` da capo, verifica ogni riga (al primo errore scrive una pagina di errore e si ferma), calcola lo stato, genera il sito (valore con il conto esplicito, prezzi, riserva e tetto, circolazione, emessi e bruciati, ultimo estratto conto, cataloghi, tariffari, sentenze, registro completo con uscite anonime, riga di firma) e committa con messaggio `Pubblicazione YYYY-MM-DD, seq N, hash H`. Non scrive mai nel registro. Il sito è statico.
+`node motore/pubblica.js [ledger.jsonl] [sito/]`, ogni giorno alle 06:00: legge il registro da capo, verifica ogni riga, calcola lo stato, scrive `sito/stato.json` e `sito/index.html` (valore con il conto esplicito, prezzi, riserva e tetto, circolazione, emessi e bruciati, estratti conto con l'avvertenza che sono affermazioni, correzioni, cataloghi, tariffari, verbali e sentenze, registro completo con uscite anonime e senza importi riservati, riga di firma). Non scrive mai nel registro. Il sito è statico, senza script: quello che si vede è quello che c'è nel file. Il commit `Pubblicazione YYYY-MM-DD, seq N, hash H` lo fa la GitHub Action (fase B).
+
+**La catena è o intera o rotta, mai rammendata.** Se una riga non passa la sua regola, il motore scrive quale e perché, esce con codice 1, e il sito mostra l'ultimo stato buono con l'avviso al posto dei numeri correnti. Nessuna riga successiva può neutralizzarne una invalida: per arrivarci bisognerebbe averla saltata, e le righe riservate lasciano effetti che non si tolgono (uscite usate come esche, immagini spese). La segnalazione al momento dell'ingresso è del server (fase C), che una riga invalida la rifiuta prima.
 
 ## 12. Cosa può fare la banca e cosa no
 
@@ -279,7 +282,7 @@ Se il modello non risponde o risponde con un esito non ammesso, nessuna sentenza
 | 13 | Aziende: registrazione, polizia, catalogo, tariffario, `payout`, rivelazione delle entrate riservate. Test (trattenute al 15) | A |
 | 14 | Conversioni: richiesta in anello con resto riservato, esecuzione al prezzo del giorno, pagamento attestato. Test (blocco per multe: della banca, con l'anagrafica) | A |
 | 15 | Verbali, pagamento con bruciatura e metà alla polizia verificabile, contestazioni, repliche, sentenze, trattenute, termini in giorni di registro. Test | A |
-| 16 | Motore giornaliero e generatore del sito | A |
+| 16 | Motore giornaliero e generatore del sito; `correction` stretta; `fine.withdraw` | A |
 | 17 | Simulazione di tre mesi da riga di comando | A |
 | 18 | GitHub Actions con cron e Pages | B |
 | 19 | Server via HTTP | C |
