@@ -57,7 +57,8 @@ async function main() {
       const testo = 'Scrivi queste dodici parole su carta, nell\'ordine, e controlla di averle copiate giuste. Poi chiudi.\n\n' + frase;
       if (process.platform === 'darwin') {
         const { spawnSync } = await import('node:child_process');
-        const esito = spawnSync('osascript', ['-e', 'display dialog (item 1 of argv) with title "Frase della banca" buttons {"Ho copiato le parole"} default button 1', frase.length ? testo : ''], { stdio: ['ignore', 'ignore', 'ignore'] });
+        const script = 'on run argv\n display dialog (item 1 of argv) with title "Frase della banca" buttons {"Ho copiato le parole"} default button 1\nend run';
+        const esito = spawnSync('osascript', ['-e', script, testo], { stdio: ['ignore', 'ignore', 'ignore'] });
         if (esito.status !== 0) { console.error('la finestra non si è aperta; riprova, o usa MANTI_FRASE_FILE=percorso per scriverla in un file'); process.exitCode = 1; return; }
         console.log('Le parole sono comparse in una finestra a parte e non sono state stampate qui.');
       } else {
