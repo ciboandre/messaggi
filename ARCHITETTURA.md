@@ -1,6 +1,6 @@
 # Architettura del registro
 
-Versione 1.0 — 19 settembre 2026
+Versione 2.0 — 19 settembre 2026
 Stato: proposta per la fase di test. Da confermare prima del primo codice.
 
 Questo documento traduce le [regole](REGOLE_MONETA.md) in struttura tecnica. Ogni scelta rimanda alla sezione delle regole che la giustifica.
@@ -8,223 +8,239 @@ Questo documento traduce le [regole](REGOLE_MONETA.md) in struttura tecnica. Ogn
 ## 1. Le parti del sistema
 
 ```
- dipendenti / azienda                       chiunque partecipi
- (portafoglio: chiave + firma)              (verifica e legge)
-          │                                         ▲
-          │ transazioni firmate                     │ sito statico
-          ▼                                         │
- ┌─────────────────┐    registro     ┌──────────────┴──────┐
- │  banca (server) │ ──────────────▶ │  motore giornaliero │
- │  accetta, valida│                 │  verifica, calcola, │
- │  e accoda       │                 │  pubblica           │
- └─────────────────┘                 └─────────────────────┘
-          │                                         │
-          ▼                                         ▼
-    ledger.jsonl                           repository git
-    (catena di hash)                       (storia pubblica)
+  app del correntista            pannello azienda        pannello polizia
+  (chiavi, QR, bonifici,         (versamenti, stipendi,  (verbali, repliche,
+   multe, contestazioni)          premi, catalogo,        conto polizia)
+          │                        tariffario)                 │
+          │ transazioni firmate         │                       │
+          ▼                             ▼                       ▼
+     ┌──────────────────────────────────────────────────────────────┐
+     │  banca (server): riceve, valida contro le regole, accoda     │
+     └──────────────────────────────┬───────────────────────────────┘
+                                    │ ledger.jsonl (catena di hash)
+              ┌─────────────────────┼─────────────────────┐
+              ▼                     ▼                     ▼
+     motore giornaliero        giudice (IA)          chiunque
+     verifica, calcola,        legge i fascicoli,    scarica e
+     genera il sito,           firma sentenze        verifica
+     committa
 ```
-
-Quattro componenti, ciascuno con un compito solo:
 
 | Componente | Compito | Regole |
 |---|---|---|
-| **Portafoglio** | Custodisce la chiave privata, firma transazioni, mostra saldo e catalogo | 3, 8, 11.2 |
-| **Banca** | Riceve transazioni firmate, le valida contro le regole, le accoda al registro. È l'unico che scrive | 11 |
-| **Registro** | Un file append-only, una transazione per riga, ogni riga concatenata alla precedente con hash | 11.3 |
-| **Motore giornaliero** | Rilegge tutto il registro da zero, verifica catena e firme, calcola lo stato, genera il sito, committa | 11 pubblicazione |
+| **App del correntista** | Custodisce le chiavi, genera indirizzi usa e getta, riconosce i propri movimenti nel registro, firma pagamenti, bonifici, conversioni, contestazioni | 8, 12, 15 |
+| **Pannello azienda** | Firma versamenti, stipendi e premi a fine mese, catalogo, tariffario, nomina della polizia, trattenute | 4, 5, 9, 10 |
+| **Pannello polizia** | Firma verbali e repliche; è anche l'app del conto polizia | 10 |
+| **Banca** | Unico scrittore del registro. Valida ogni transazione, la accoda, esegue le conversioni, tiene l'anagrafica | 3, 7, 14 |
+| **Registro** | File append-only, una transazione per riga, catena di hash | 14.3 |
+| **Giudice** | Servizio che riceve i fascicoli delle contestazioni, interroga un modello di intelligenza artificiale con istruzioni pubbliche, firma la sentenza | 11 |
+| **Motore giornaliero** | Rilegge il registro da zero, verifica, calcola lo stato, genera il sito, committa | 14 |
 
-La banca e il motore sono due programmi separati sullo stesso codice. La banca gira sempre e accoda. Il motore gira una volta al giorno e non scrive mai nel registro, salvo un caso deterministico (sezione 10): legge, verifica, pubblica. Se la banca fosse compromessa e accodasse qualcosa di invalido, il motore lo rifiuta e il sito mostra l'errore invece dei numeri.
+Banca, giudice e motore sono programmi separati sullo stesso codice. Il motore non scrive mai nel registro. Se la banca accodasse qualcosa di invalido, il motore lo rifiuta e il sito mostra l'errore.
 
 ## 2. Fasi di sviluppo
 
-La stessa architettura, costruita in ordine di rischio.
-
 | Fase | Cosa esiste | Cosa manca |
 |---|---|---|
-| **A. Nucleo** | Registro, transazioni, firme, motore da riga di comando, test | Server, sito, interfaccia |
-| **B. Pubblicazione** | Il motore gira su GitHub Actions ogni giorno e pubblica su GitHub Pages | Server, interfaccia |
-| **C. Banca** | Piccolo server che accetta transazioni firmate via HTTP | Interfaccia |
-| **D. Portafoglio** | Interfaccia web per dipendenti: chiave nel browser, saldo, invio, conversione | |
+| **A. Nucleo** | Chiavi, indirizzi usa e getta, registro, tutte le transazioni, motore da riga di comando, test | Server, sito, app, giudice |
+| **B. Pubblicazione** | Motore su GitHub Actions ogni giorno, sito su GitHub Pages | Server, app, giudice |
+| **C. Banca e giudice** | Server che accetta transazioni firmate via HTTP; servizio giudice | App |
+| **D. App e pannelli** | App del correntista nel browser del telefono con QR; pannelli azienda e polizia | |
 
-Nella fase A il registro è un file nel repository e le transazioni si creano da riga di comando. È sufficiente per collaudare tutte le regole con dati veri prima di esporre qualcosa ai colleghi.
+Nella fase A tutto si prova da riga di comando con chiavi finte, per un mese intero simulato, prima di coinvolgere chiunque.
 
 ## 3. Tecnologia
 
-- **Node.js** (già installato, versione 26). Nessun framework nella fase A. Librerie di sistema per tutto: `node:crypto` per Ed25519 e SHA-256, `node:test` per i test, `node:fs` per il registro.
-- **Nessuna dipendenza esterna nella fase A.** Meno codice di terzi da fidarsi, meno cose che cambiano sotto i piedi. Se una dipendenza diventa necessaria, va motivata nel commit.
-- **JavaScript con controllo dei tipi via JSDoc**, non TypeScript. Evita un passo di compilazione e resta leggibile a chiunque apra il repository.
-- **Formato dati JSON**, una transazione per riga (JSONL). Leggibile con qualunque strumento, diffabile in git.
+- **Node.js** (versione 26 installata). Librerie di sistema: `node:crypto` per hash, casualità e cifratura simmetrica, `node:test` per i test, `node:fs` per il registro.
+- **Una sola dipendenza esterna: `@noble/curves`** (con `@noble/hashes`), per l'aritmetica sulla curva Ed25519 che serve agli indirizzi usa e getta. `node:crypto` firma e verifica con Ed25519 ma non espone le operazioni sui punti della curva. Noble è piccola, senza dipendenze a sua volta, con audit pubblici, ed è la scelta standard nell'ecosistema. Nessun'altra dipendenza nella fase A; ogni aggiunta va motivata nel commit.
+- **JavaScript con JSDoc**, non TypeScript. Nessun passo di compilazione.
+- **JSONL** per il registro. Una riga per transazione, leggibile con qualsiasi strumento, diffabile in git.
+- **Giudice**: un modello linguistico interrogato via API dal servizio giudice. Il modello e la versione sono un parametro pubblico; le istruzioni sono un file nel repository.
 
 ## 4. Unità di misura
 
-Nessun numero decimale nel sistema. Tutte le quantità sono interi.
+Nessun decimale. Tutte le quantità sono interi.
 
-| Grandezza | Unità | Esempio |
-|---|---|---|
-| Gettoni | centesimi di gettone | 1 gettone = 100 |
-| Euro | centesimi di euro | 1 € = 100 |
-| Tempo | ISO 8601 in UTC | `2026-10-01T00:00:00Z` |
-| Mese di gioco | intero da 1 | il mese 1 è il mese della genesi |
+| Grandezza | Unità |
+|---|---|
+| Manti | centesimi di manto (1 manto = 100) |
+| Euro | centesimi di euro |
+| Tempo | ISO 8601 in UTC |
+| Mese di gioco | intero da 1; il mese 1 è quello della genesi |
 
-Il valore del gettone non viene mai memorizzato: si calcola al bisogno come rapporto tra due interi. Quando serve convertire in euro, il risultato si arrotonda per difetto al centesimo. Il resto resta in riserva.
+Il valore del manto non viene mai memorizzato: è il rapporto tra due interi. Le conversioni arrotondano per difetto al centesimo di euro; il resto rimane in riserva.
 
-L'emissione del mese *m* in centesimi di gettone: `floor(50000 × 0.98^(m−1))`. Mese 1: 50.000 (500 gettoni). Mese 12: 40.043 (400,43 gettoni).
+Emissione del mese *m*: `floor(50000 × 0.98^(m−1))` centesimi di manto. Stipendio base del mese: `floor(emissione / 2 / dipendenti attivi)` per ciascuno; il resto della divisione non si emette. Premi: al massimo `emissione − stipendio base totale`.
 
-## 5. Identità e chiavi
+## 5. Chiavi, coordinate e indirizzi usa e getta
 
-- Ogni partecipante (banca, azienda, dipendente) ha una coppia di chiavi **Ed25519**.
-- L'identificatore di un conto è l'hash SHA-256 della chiave pubblica, in esadecimale. Non è un nome scelto: deriva dalla chiave.
-- La chiave privata non lascia mai il dispositivo del titolare. Nella fase A è un file locale. Nella fase D è nel browser (WebCrypto o IndexedDB cifrato).
-- Il nome leggibile ("Marco Rossi") è un dato dell'anagrafica, firmato dall'azienda alla registrazione. Non fa parte dell'identità crittografica.
+Questa è la parte che rende i saldi segreti su un registro pubblico (regola 12). Usa la tecnica degli indirizzi stealth: crittografia standard su Ed25519, nessuna invenzione.
 
-**Tre ruoli, tre tipi di chiave**
+**Ogni correntista ha:**
 
-| Ruolo | Chi la custodisce | Cosa firma |
-|---|---|---|
-| Banca | Il titolare del progetto, su un dispositivo dedicato | Genesi, registrazione aziende, conversioni, correzioni, recuperi |
-| Azienda | L'azienda, su un dispositivo del titolare o dell'amministrazione | Registrazione dipendenti, versamenti, emissioni, catalogo, recuperi |
-| Dipendente | Il dipendente, sul proprio telefono | Trasferimenti, richieste di conversione |
+- una **frase di recupero** di dodici parole, generata al primo avvio e mai trasmessa;
+- da questa, due chiavi private: la **chiave di spesa** `s` e la **chiave di vista** `v`, con le rispettive pubbliche `S = s·G` e `V = v·G`;
+- le **coordinate bancarie**: la coppia `(S, V)` codificata in una stringa con prefisso e checksum, per esempio `MNT1…`. Sono l'equivalente dell'IBAN: si danno a chi deve inviarci qualcosa, e non rivelano nulla del saldo.
 
-Nella fase di test la chiave banca e la chiave azienda sono entrambe tue. Restano separate comunque: quando arriverà una seconda azienda, il ruolo è già distinto.
+**Quando qualcuno paga a delle coordinate `(S, V)`:**
 
-## 6. Il registro
+1. genera un numero casuale `r` e calcola `R = r·G`;
+2. calcola il segreto condiviso `k = H(r·V)`;
+3. calcola l'**indirizzo usa e getta** `P = S + k·G`;
+4. scrive nel registro un'uscita con `P`, `R` e l'importo.
 
-Un file `ledger.jsonl`. Ogni riga è una transazione:
+**Il destinatario riconosce le proprie entrate** scorrendo il registro: per ogni uscita calcola `k' = H(v·R)` e controlla se `S + k'·G = P`. Solo chi ha `v` ci riesce. Per spendere da `P` usa la chiave privata `p = s + k'`, che solo chi ha `s` può calcolare.
+
+Il registro mostra `P`, `R` e l'importo. Nessuno, nemmeno la banca, può collegare due indirizzi alla stessa persona o sommarne il saldo.
+
+**Il QR "ricevi"** contiene le coordinate `(S, V)` e, se voluto, l'importo. Chi inquadra fa i passi 1–4. Il **bonifico** è la stessa cosa con le coordinate prese dalla rubrica invece che dal QR.
+
+**Ruoli di sistema** (banca, azienda, polizia, giudice) hanno una chiave Ed25519 semplice per firmare, più coordinate come tutti per ricevere manti quando serve (la banca per le commissioni, la polizia per le multe).
+
+**Le causali** e ogni altro testo destinato a una sola persona sono cifrati con una chiave derivata dallo stesso segreto `k`, così solo il destinatario li legge.
+
+## 6. Uscite ed entrate
+
+Il registro non ha conti con un saldo. Ha **uscite**: ognuna è una somma di manti ferma su un indirizzo usa e getta, finché qualcuno la spende. Un pagamento **consuma** una o più uscite proprie per intero e ne **crea** di nuove: una per il destinatario e, se avanza, una per sé stessi a un indirizzo nuovo (il resto). È il modello di Bitcoin, senza la parte di mining.
+
+```
+uscita = { addr: P, eph: R, amount: 1500, memo: "…cifrato…", tag: "premio:recensione" }
+```
+
+Il campo `tag` c'è solo sulle uscite create dall'azienda a fine mese (stipendio base, premio e quale voce, trattenuta) e sulla commissione della banca. Serve al motore per controllare i limiti dell'emissione. Sui pagamenti tra correntisti non c'è.
+
+Il saldo di un correntista è la somma delle proprie uscite non ancora spese. Lo calcola l'app, nessun altro.
+
+## 7. Il registro
+
+Un file `ledger.jsonl`. Ogni riga:
 
 ```json
 {
-  "seq": 42,
-  "ts": "2026-10-03T14:22:10Z",
+  "seq": 412,
+  "ts": "2026-12-14T17:32:10Z",
   "type": "transfer",
-  "signer": "a1b2c3…",
-  "body": { "to": "d4e5f6…", "amount": 1500, "memo": "grazie per il turno" },
+  "body": { "in": ["3a1f…:0", "b902…:1"], "out": [ …uscite… ], "ref": null },
   "prev": "9f8e7d…",
   "hash": "0c1d2e…",
-  "sig": "base64…"
+  "sigs": [ { "by": "P1", "sig": "…" }, { "by": "P2", "sig": "…" } ]
 }
 ```
 
 | Campo | Significato |
 |---|---|
-| `seq` | Numero progressivo, da 0 (genesi). Senza buchi |
-| `ts` | Quando la banca ha accodato la transazione |
-| `type` | Tipo, vedi sezione 7 |
-| `signer` | Id del conto che ha firmato |
-| `body` | Il contenuto, dipende dal tipo |
-| `prev` | Hash della transazione precedente. Nella genesi è una stringa di zeri |
-| `hash` | SHA-256 della serializzazione canonica di `seq`, `ts`, `type`, `signer`, `body`, `prev` |
-| `sig` | Firma Ed25519 di `hash` con la chiave privata del firmatario |
+| `seq` | Progressivo da 0, senza buchi |
+| `ts` | Quando la banca ha accodato |
+| `type` | Tipo, sezione 8 |
+| `body` | Contenuto, dipende dal tipo |
+| `prev` | Hash della riga precedente; zeri nella genesi |
+| `hash` | SHA-256 della serializzazione canonica di `seq`, `ts`, `type`, `body`, `prev` |
+| `sigs` | Una firma Ed25519 dell'`hash` per ogni chiave che deve autorizzare la riga: le chiavi usa e getta delle entrate consumate, oppure la chiave del ruolo |
 
-**Serializzazione canonica:** JSON con chiavi ordinate alfabeticamente, senza spazi, UTF-8. Serve perché due programmi diversi producano lo stesso hash dallo stesso contenuto.
+**Serializzazione canonica**: JSON con chiavi in ordine alfabetico, senza spazi, UTF-8.
 
-**Verifica di una riga:** ricalcolare l'hash e confrontarlo; verificare la firma con la chiave pubblica del `signer`; controllare che `prev` sia l'hash della riga precedente; controllare che la transazione rispetti le regole del suo tipo dato lo stato del registro fino a quel punto.
+**Chi firma cosa.** Chi chiede il movimento riceve dalla banca `seq`, `ts` e `prev` proposti, firma la riga completa, la rimanda. Se nel frattempo è entrata un'altra riga, la banca rifiuta e l'app ritenta. Ogni firma è legata a una posizione precisa della catena: non si può riutilizzare altrove.
 
-**Verifica del registro:** dalla riga 0 all'ultima, in ordine. Se una riga fallisce, tutto ciò che segue è invalido. Il motore lo fa ogni giorno da zero, senza cache.
+**Verifica di una riga**: hash ricalcolato uguale; ogni firma valida per la chiave indicata; `prev` uguale all'hash della riga precedente; regole del tipo rispettate dato lo stato fino a quel punto. **Verifica del registro**: dalla riga 0 all'ultima. Il motore la fa ogni giorno da capo.
 
-**Chi firma cosa.** Il partecipante firma la riga completa, quindi `seq`, `ts` e `prev` devono essere noti al momento della firma. La banca li propone al portafoglio, il portafoglio firma, la banca accoda. Se nel frattempo un'altra transazione è entrata, la banca rifiuta e il portafoglio ritenta con i valori nuovi. Nella fase A, con un solo scrittore, il conflitto non si presenta. Questo lega ogni firma a una posizione precisa nella catena: una transazione firmata non può essere riutilizzata altrove.
-
-## 7. I tipi di transazione
-
-Ogni tipo ha un firmatario ammesso e regole di validità. Le regole citano la sezione delle [regole](REGOLE_MONETA.md).
+## 8. I tipi di transazione
 
 | Tipo | Firma | Contenuto | Validità |
 |---|---|---|---|
-| `genesis` | banca | Parametri: emissione iniziale, riduzione mensile, commissione, mese di partenza, chiave pubblica della banca | Solo a `seq` 0. Immutabile |
-| `company.register` | banca | Chiave pubblica e nome dell'azienda | L'azienda non esiste già |
-| `employee.register` | azienda | Chiave pubblica e nome del dipendente | Il dipendente non esiste già. L'azienda è registrata |
-| `reserve.deposit` | azienda | Importo in centesimi di euro, mese di riferimento | Importo positivo. Un versamento per mese per azienda |
-| `catalog.set` | azienda | Catalogo completo: lista di voci con id, descrizione, quota dell'emissione in millesimi | Sostituisce il catalogo precedente per intero (regola 9) |
-| `emission` | azienda | Conto destinatario, voce del catalogo, data del comportamento premiato | Il dipendente esiste. La voce esiste nel catalogo in vigore. L'importo è quota × emissione del mese. Somma delle emissioni del mese ≤ emissione del mese (regole 5, 11.1) |
-| `transfer` | dipendente | Destinatario, importo, memo facoltativo | Saldo sufficiente. Destinatario esistente e non chiuso. Nessuna commissione (regola 8) |
-| `conversion.request` | dipendente | Importo in gettoni | Saldo sufficiente. I gettoni restano bloccati fino all'esecuzione |
-| `conversion.execute` | banca | Riferimento alla richiesta, commissione trattenuta, euro riconosciuti, mese di busta paga | La richiesta esiste e non è già eseguita. Commissione = 2% dell'importo. Euro = (importo − commissione) × valore del giorno, per difetto. Riserva sufficiente (regole 7, 11.4) |
-| `account.close` | azienda | Conto da chiudere | Il dipendente non ha conversioni pendenti. I gettoni residui vengono distrutti (regola 12) |
-| `account.recover` | banca + azienda | Conto vecchio, chiave pubblica nuova | Vedi sezione 9. Due firme richieste |
-| `correction` | banca | Riferimento alla transazione errata, movimento inverso, motivazione | Solo per transazioni che il motore ha segnalato invalide. Motivazione obbligatoria, pubblicata (regola 12) |
+| `genesis` | banca | Parametri delle regole, chiave pubblica della banca, sue coordinate | Solo a `seq` 0 |
+| `company.register` | banca | Chiave pubblica e coordinate dell'azienda, nome pubblico | Una volta per azienda |
+| `police.appoint` | azienda | Chiave pubblica e coordinate della polizia | Sostituisce la precedente |
+| `judge.register` | banca | Chiave pubblica del giudice, versione delle istruzioni | Sostituisce la precedente |
+| `reserve.deposit` | azienda | Centesimi di euro, mese | Positivo. Uno per mese |
+| `catalog.set` | azienda | Catalogo completo | Sostituisce il precedente |
+| `tariff.set` | azienda | Tariffario completo | Sostituisce il precedente |
+| `payout` | azienda | Uscite con `tag` stipendio o premio, numero di dipendenti attivi, trattenute con riferimento ai verbali | Ultimo giorno del mese. Somma stipendi = base × attivi. Somma premi ≤ quota premi. Ogni trattenuta riferisce un verbale definitivo e crea un'uscita alla polizia |
+| `transfer` | chiavi usa e getta delle entrate | Entrate consumate, uscite create, `ref` facoltativo a un verbale | Entrate esistenti e non spese. Somma entrate = somma uscite |
+| `conversion.request` | chiavi usa e getta delle entrate | Entrate consumate, importo, dati di pagamento cifrati per la banca | Entrate non spese. Nessun verbale definitivo non saldato per il richiedente (lo controlla la banca sull'anagrafica) |
+| `conversion.execute` | banca | Riferimento alla richiesta, manti distrutti, commissione (uscita alla banca), euro dovuti | Commissione = 2%. Euro = resto × valore, per difetto. Riserva sufficiente |
+| `conversion.paid` | banca | Riferimento, data del pagamento in euro | Una per esecuzione |
+| `fine.issue` | polizia | Numero verbale, voce del tariffario, importo, data, descrizione cifrata per il multato, indirizzo usa e getta di consegna | Voce esistente, importo uguale al tariffario |
+| `fine.contest` | chiave usa e getta dell'indirizzo di consegna | Verbale, testo cifrato per giudice e polizia | Entro 15 giorni. Prova di essere il destinatario |
+| `fine.reply` | polizia | Verbale, testo cifrato per il giudice | Una per contestazione |
+| `verdict` | giudice | Verbale, esito (confermato, annullato, ridotto a voce), motivazione pubblica, hash del fascicolo | Contestazione aperta |
+| `correction` | banca | Riferimento alla riga errata, movimento inverso, motivazione | Solo per righe segnalate invalide dal motore |
 
-La banca non ha un tipo per creare gettoni dal nulla, per togliere gettoni a qualcuno, o per cambiare i parametri della genesi. Non sono tipi con regole severe: non esistono, e il codice del motore non li riconosce.
+Il pagamento di una multa è un `transfer` con `ref` al verbale, verso l'indirizzo che il verbale indica. Non esiste un tipo per creare manti fuori da `payout`, né per consumare un'entrata senza la sua chiave. Il codice non li riconosce.
 
-## 8. Lo stato
+## 9. Lo stato
 
-Il registro è la verità. Lo stato è una vista calcolata rileggendo tutto:
+Calcolato rileggendo tutto, mai memorizzato:
 
-- **Conti**: per ogni id, ruolo, nome, chiave pubblica, saldo in centesimi di gettone, aperto o chiuso.
-- **Riserva**: somma dei versamenti meno gli euro riconosciuti nelle conversioni.
-- **Gettoni in circolazione**: somma delle emissioni meno i gettoni distrutti (conversioni e chiusure). I gettoni di commissione non si distruggono: passano al conto della banca.
-- **Valore**: riserva / circolazione. Se la circolazione è zero, il valore non è definito e il sito lo dice.
-- **Budget residuo del mese**: emissione del mese meno la somma delle emissioni già fatte nel mese.
-- **Catalogo in vigore**: l'ultimo `catalog.set`, con il valore in gettoni di ogni voce calcolato sull'emissione del mese corrente.
-- **Conversioni pendenti**: richieste senza esecuzione.
+- **Uscite non spese**: l'insieme da cui si può pagare. La circolazione è la loro somma.
+- **Emessi**: somma dei `payout`. **Distrutti**: somma delle conversioni eseguite. Circolazione = emessi − distrutti, che deve coincidere con la somma delle uscite non spese.
+- **Riserva**: versamenti − euro dovuti.
+- **Valore**: riserva / circolazione.
+- **Verbali**: aperti, pagati (un `transfer` con `ref`), contestati, decisi, definitivi non pagati (da trattenere).
+- **Catalogo, tariffario, polizia, giudice** in vigore.
 
-Nessuno di questi numeri è memorizzato. Se il codice che li calcola cambia, cambiano retroattivamente per tutta la storia, e questo è voluto: la storia è nel registro, l'interpretazione è nel codice, e il codice è pubblico.
+L'**anagrafica** (nome ↔ coordinate ↔ verbali a carico) è fuori dal registro, in un file cifrato della banca condiviso con l'azienda. Serve per stipendi, multe, conversioni e trattenute. Non è pubblica e non è necessaria per verificare il registro.
 
-## 9. Chiave persa
+## 10. Il giudice
 
-È l'unico caso in cui gettoni si spostano senza la firma del titolare, quindi va reso lento e visibile.
+Un servizio con la propria chiave. Quando una contestazione riceve l'eventuale replica o scadono 3 giorni senza replica:
 
-1. Il dipendente genera una chiave nuova e la comunica all'azienda di persona.
-2. L'azienda firma un `account.recover` con il conto vecchio e la chiave nuova. La banca aggiunge la propria firma.
-3. La transazione entra nel registro ma **non ha effetto per 7 giorni**. Il sito la mostra in evidenza: "richiesto recupero del conto di Marco Rossi, effettivo il [data]".
-4. Se nei 7 giorni il titolare della chiave vecchia firma un qualsiasi movimento, il recupero decade: la chiave non era persa.
-5. Passati i 7 giorni, il motore sposta il saldo sul conto nuovo e chiude il vecchio.
+1. costruisce il **fascicolo**: verbale, voce del tariffario in vigore alla data, contestazione decifrata, replica decifrata, e nient'altro. Nessun nome, nessun saldo, nessuna storia della persona;
+2. interroga il modello con le **istruzioni** in `giudice/istruzioni.md` e il fascicolo;
+3. ottiene un esito tra confermato, annullato, ridotto a una voce del tariffario, con motivazione;
+4. firma un `verdict` con esito, motivazione e hash del fascicolo, e lo invia alla banca.
 
-Due firme e sette giorni pubblici rendono impossibile a una persona sola, anche a te, svuotare un conto altrui di nascosto. Costa una settimana di attesa a chi ha perso davvero il telefono. È il prezzo giusto.
+Il fascicolo completo (decifrato) viene conservato dalla banca e mostrato solo alle parti. La motivazione è pubblica. Le istruzioni sono versionate: il `verdict` riporta la versione usata.
 
-Non esiste backup della chiave presso la banca. Se ci fosse, la regola 11.2 sarebbe una finzione.
+Se il modello non risponde, non risponde in modo interpretabile, o risponde con un esito non ammesso, nessuna sentenza viene emessa e la contestazione resta aperta. Nessun termine corre.
 
-## 10. Il motore giornaliero
+## 11. Il motore giornaliero
 
-Un comando: `node motore/pubblica.js`. Ogni giorno, a un'ora fissa:
+`node motore/pubblica.js`, ogni giorno alle 06:00:
 
-1. Legge `ledger.jsonl` da capo.
-2. Verifica ogni riga (sezione 6). Al primo errore si ferma, scrive una pagina di errore con `seq` e motivo, e committa quella.
-3. Calcola lo stato (sezione 8).
-4. Applica i recuperi maturati (sezione 9) generando le righe corrispondenti. È l'unico caso in cui il motore scrive nel registro, ed è deterministico: chiunque riesegua il motore sullo stesso registro ottiene le stesse righe.
-5. Genera il sito: pagina principale con valore, riserva, circolazione, budget residuo, catalogo in vigore con valori in gettoni; pagina del registro completo; pagina dei recuperi in attesa; una riga in fondo con data, ora, `seq` dell'ultima transazione e il suo hash.
-6. Committa registro e sito con messaggio `Pubblicazione YYYY-MM-DD, seq N, hash H`.
+1. legge `ledger.jsonl` da capo e verifica ogni riga. Al primo errore scrive una pagina di errore con `seq` e motivo, la committa, e si ferma;
+2. calcola lo stato;
+3. genera il sito: valore, riserva, circolazione, emessi e distrutti, mese in corso con dipendenti attivi ed emissione prevista, catalogo, tariffario, sentenze, registro completo con uscite anonime, riga di firma con data, `seq` e hash;
+4. committa sito e registro con messaggio `Pubblicazione YYYY-MM-DD, seq N, hash H`.
 
-Nella fase B il comando gira su GitHub Actions con un cron. Il repository stesso è la prova di indipendenza: ogni pubblicazione è un commit, e la cronologia mostra se qualcuno ha toccato il registro fuori dal motore.
+Non scrive mai nel registro. Il sito è statico. Chiunque può scaricare registro e motore e ottenere la stessa pagina.
 
-Il sito è statico: HTML generato, nessun database, nessun server da bucare. Chi lo legge può scaricare il registro e rifare i conti con il motore.
+## 12. Cosa può fare la banca e cosa no
 
-## 11. Cosa può fare la banca e cosa no
-
-Vale la pena essere espliciti, perché la banca sei tu.
-
-| La banca può | La banca non può |
+| Può | Non può |
 |---|---|
-| Rifiutare una transazione invalida | Accettarne una invalida: il motore la rileverebbe e il sito mostrerebbe l'errore |
-| Eseguire le conversioni | Cambiare la commissione o il valore: sono calcolati |
-| Registrare aziende | Registrare dipendenti: lo fa l'azienda |
-| Firmare correzioni motivate | Cancellare o modificare righe: la catena si romperebbe |
-| Partecipare a un recupero | Fare un recupero da sola: servono due firme e sette giorni |
+| Rifiutare una transazione invalida | Accettarne una invalida senza che il motore lo mostri |
+| Eseguire e segnare pagate le conversioni | Cambiare valore o commissione: sono calcolati |
+| Registrare l'azienda, il giudice | Nominare la polizia: lo fa l'azienda |
+| Sapere chi sono i correntisti | Sapere i loro saldi o collegare i loro indirizzi |
+| Bloccare le conversioni di chi ha multe definitive non pagate | Prelevare da un indirizzo |
+| Firmare correzioni motivate | Cancellare o modificare righe |
 | Spegnere il server | Nasconderlo: il motore pubblica l'assenza di aggiornamenti |
 
-## 12. Cosa questo documento lascia aperto
+## 13. Lasciato aperto
 
-Da decidere nei passi successivi, non ora.
-
-- L'ora della pubblicazione giornaliera e il fuso orario di riferimento per il "mese di gioco".
-- Il formato esatto del catalogo e se una voce può avere un limite mensile per persona.
-- Come i dipendenti ricevono la chiave nella fase D: generata nel browser al primo accesso, con un codice di invito firmato dall'azienda.
-- Se il memo dei trasferimenti è pubblico (nel registro) o cifrato per il destinatario. Nella fase A è pubblico.
+- Codifica esatta delle coordinate bancarie (prefisso, checksum) e formato del QR.
+- Formato del catalogo e del tariffario; se una voce ha un limite mensile per persona.
+- Come l'app scorre il registro in modo efficiente quando cresce (indice delle uscite per `R`).
+- Come i correntisti ricevono le coordinate dell'azienda e della polizia per pagare le multe: dal verbale stesso, ma la prima volta va verificato di persona.
 - Backup del registro fuori dal repository.
+- Modello e versione per il giudice, e formato esatto delle istruzioni.
 
-## 13. Piano dei passi
-
-Ognuno un commit o pochi, ognuno autorizzato.
+## 14. Piano dei passi
 
 | Passo | Contenuto | Fase |
 |---|---|---|
-| 3 | Serializzazione canonica, hash, chiavi Ed25519, firma e verifica. Test | A |
-| 4 | Registro: genesi, accodamento, verifica della catena. Test | A |
-| 5 | Registrazione aziende e dipendenti, versamenti, stato dei conti. Test | A |
-| 6 | Emissione con budget mensile, catalogo, trasferimenti. Test | A |
-| 7 | Conversione con commissione e valore. Test | A |
-| 8 | Chiusura conti, recupero chiave, correzioni. Test | A |
-| 9 | Generatore del sito statico | A |
-| 10 | GitHub Actions con cron giornaliero e Pages | B |
-| 11 | Server banca via HTTP | C |
-| 12 | Portafoglio web | D |
-
-Dopo il passo 9 il sistema è già collaudabile da riga di comando con dati finti per un mese intero, prima di coinvolgere chiunque.
+| 4 | Serializzazione canonica, hash, chiavi Ed25519, firma e verifica. Test | A |
+| 5 | Frase di recupero, chiavi di spesa e di vista, coordinate, indirizzi usa e getta, riconoscimento delle entrate. Test | A |
+| 6 | Registro: genesi, accodamento, verifica della catena. Test | A |
+| 7 | Uscite ed entrate, `transfer` con resto, cifratura delle causali. Test | A |
+| 8 | Azienda, polizia, giudice: registrazioni, versamenti, catalogo, tariffario. Test | A |
+| 9 | `payout` di fine mese con stipendi, premi e trattenute. Test | A |
+| 10 | Conversioni con commissione e blocco per multe. Test | A |
+| 11 | Verbali, contestazioni, repliche, sentenze (giudice finto), esecuzione forzata. Test | A |
+| 12 | Motore giornaliero e generatore del sito statico | A |
+| 13 | Simulazione di tre mesi con dati finti da riga di comando | A |
+| 14 | GitHub Actions con cron e Pages | B |
+| 15 | Server banca via HTTP | C |
+| 16 | Servizio giudice con modello reale e istruzioni pubbliche | C |
+| 17 | App del correntista con QR | D |
+| 18 | Pannelli azienda e polizia | D |

@@ -35,11 +35,7 @@
 
 * { box-sizing: border-box; }
 html { height: 100%; }
-body {
-  margin: 0; background: var(--ground); color: var(--ink);
-  font-family: var(--body); font-size: 15px; line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-}
+body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
 a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; }
 h1, h2, h3, h4 { margin: 0; text-wrap: balance; }
@@ -56,25 +52,16 @@ button { font: inherit; cursor: pointer; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 
-/* ---------- barra di commutazione del mockup ---------- */
-.mock-bar {
-  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10;
-  background: var(--ink); color: var(--ground);
-  padding-block: 10px; padding-inline: 16px;
-}
+.mock-bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10; background: var(--ink); color: var(--ground); padding-block: 10px; padding-inline: 16px; }
 .mock-bar .in { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
 .mock-bar .nome { font-family: var(--display); font-size: 1.1rem; font-weight: 500; }
 .mock-bar .nome span { font-family: var(--body); font-size: .72rem; opacity: .6; margin-left: 8px; letter-spacing: .06em; text-transform: uppercase; }
-.switch { display: flex; gap: 4px; margin-left: auto; background: rgba(255,255,255,.08); padding: 4px; border-radius: 10px; }
-.switch button {
-  background: transparent; border: 0; color: inherit; opacity: .7;
-  padding: 6px 12px; border-radius: 7px; font-size: .86rem; font-weight: 500;
-}
+.switch { display: flex; gap: 4px; margin-left: auto; background: rgba(255,255,255,.08); padding: 4px; border-radius: 10px; flex-wrap: wrap; }
+.switch button { background: transparent; border: 0; color: inherit; opacity: .7; padding: 6px 12px; border-radius: 7px; font-size: .86rem; font-weight: 500; }
 .switch button[aria-selected="true"] { background: var(--ground); color: var(--ink); opacity: 1; }
 
 .vista { max-width: 1100px; margin: 0 auto; padding-block: 28px 60px; padding-inline: 16px; }
 
-/* ---------- pezzi comuni ---------- */
 .pannello { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
 .pannello.pad { padding: 18px 20px; }
 .griglia { display: grid; gap: 14px; }
@@ -85,7 +72,6 @@ button { font: inherit; cursor: pointer; }
 @media (max-width: 520px) { .g2, .g3, .g4 { grid-template-columns: 1fr; } }
 .sezione { margin-top: 32px; }
 .sezione > .testa { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
-
 .scroll { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; font-size: .9rem; }
 th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
@@ -93,34 +79,33 @@ th { font-size: .72rem; text-transform: uppercase; letter-spacing: .07em; color:
 th.r, td.r { text-align: right; font-variant-numeric: tabular-nums; }
 tbody tr:last-child td { border-bottom: 0; }
 tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weight: 600; }
-
 .pill { display: inline-block; font-size: .7rem; font-weight: 600; letter-spacing: .04em; padding: 2px 8px; border-radius: 999px; background: var(--surface-2); color: var(--ink-2); white-space: nowrap; }
 .pill.ok { background: var(--ok-soft); color: var(--ok); }
 .pill.warn { background: var(--warn-soft); color: var(--warn); }
 .pill.bad { background: var(--bad-soft); color: var(--bad); }
 .pill.brass { background: var(--brass-soft); color: var(--brass); }
-
+.pill.acc { background: var(--accent-soft); color: var(--accent); }
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 9px 14px; border-radius: 8px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); font-weight: 500; font-size: .9rem; }
 .btn.primario { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.pericolo { background: var(--bad); border-color: var(--bad); color: #fff; }
 .btn.largo { width: 100%; }
 .btn.mini { padding: 5px 10px; font-size: .8rem; }
 .btn[disabled] { opacity: .5; cursor: default; }
-
 .campo { display: grid; gap: 5px; }
 .campo label { font-size: .78rem; font-weight: 600; color: var(--ink-2); }
-.campo input, .campo select { width: 100%; padding: 9px 11px; border: 1px solid var(--line-strong); border-radius: 8px; font: inherit; background: var(--surface); color: var(--ink); }
+.campo input, .campo select, .campo textarea { width: 100%; padding: 9px 11px; border: 1px solid var(--line-strong); border-radius: 8px; font: inherit; background: var(--surface); color: var(--ink); }
+.campo textarea { min-height: 90px; resize: vertical; }
 .form { display: grid; gap: 14px; }
-
 .conto { background: var(--surface-2); border-radius: 8px; padding: 10px 12px; font-size: .88rem; display: grid; gap: 4px; }
 .conto div { display: flex; justify-content: space-between; gap: 12px; }
 .conto .tot { border-top: 1px solid var(--line-strong); margin-top: 4px; padding-top: 6px; font-weight: 600; }
-
 .nota { border-left: 3px solid var(--warn); background: var(--warn-soft); padding: 10px 14px; border-radius: 0 8px 8px 0; font-size: .88rem; }
 .nota.ok { border-color: var(--ok); background: var(--ok-soft); }
 .nota.bad { border-color: var(--bad); background: var(--bad-soft); }
+.nota.info { border-color: var(--accent); background: var(--accent-soft); }
 
-/* ---------- SITO PUBBLICO ---------- */
-.bollettino { display: grid; grid-template-columns: minmax(0,1.4fr) minmax(0,1fr); gap: 14px; align-items: stretch; }
+/* sito */
+.bollettino { display: grid; grid-template-columns: minmax(0,1.4fr) minmax(0,1fr); gap: 14px; }
 @media (max-width: 820px) { .bollettino { grid-template-columns: 1fr; } }
 .tasso { padding: 26px 28px; display: flex; flex-direction: column; gap: 10px; border-color: var(--line-strong); }
 .tasso .eyebrow { display: flex; gap: 10px; align-items: center; font-size: .78rem; color: var(--ink-2); }
@@ -140,15 +125,19 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
 .grafico .area { fill: var(--accent); opacity: .12; }
 .grafico .punto { fill: var(--accent); }
 .grafico .punto-fine { fill: var(--surface); stroke: var(--accent); stroke-width: 3; }
-.garanzie { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 0; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--surface); }
+.garanzie { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--surface); }
 .garanzie > div { padding: 16px 18px; border-right: 1px solid var(--line); }
 .garanzie > div:last-child { border-right: 0; }
 .garanzie strong { display: block; margin-bottom: 4px; font-family: var(--display); font-weight: 500; font-size: 1.05rem; }
 @media (max-width: 700px) { .garanzie { grid-template-columns: 1fr; } .garanzie > div { border-right: 0; border-bottom: 1px solid var(--line); } .garanzie > div:last-child { border-bottom: 0; } }
 .firma { margin-top: 36px; padding-top: 14px; border-top: 1px solid var(--line-strong); font-size: .8rem; color: var(--ink-2); display: flex; flex-wrap: wrap; gap: 6px 18px; }
 .firma code { font-family: var(--mono); color: var(--ink); }
+.sentenza { display: grid; gap: 6px; padding: 14px 16px; border-bottom: 1px solid var(--line); }
+.sentenza:last-child { border-bottom: 0; }
+.sentenza .cap { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; font-size: .84rem; color: var(--ink-2); }
+.sentenza .mot { font-size: .9rem; }
 
-/* ---------- APP ---------- */
+/* app */
 .telefoni { display: flex; gap: 28px; flex-wrap: wrap; justify-content: center; align-items: flex-start; margin-top: 24px; }
 .telefono-wrap { display: grid; gap: 10px; justify-items: center; }
 .telefono-wrap .did { font-size: .82rem; color: var(--ink-2); }
@@ -161,17 +150,23 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
 .tabbar i { display: block; width: 22px; height: 22px; border-radius: 6px; background: var(--line); margin: 0 auto 4px; }
 .tabbar .on { color: var(--accent); font-weight: 600; }
 .tabbar .on i { background: var(--accent); }
+.tabbar .badge { position: relative; }
+.tabbar .badge::after { content: "1"; position: absolute; top: -4px; right: 10px; background: var(--bad); color: #fff; font-size: .6rem; font-weight: 600; width: 16px; height: 16px; border-radius: 50%; display: grid; place-items: center; }
 .saldo { text-align: center; padding: 20px 0 12px; }
 .saldo .m { font-family: var(--display); font-size: 2.7rem; line-height: 1; font-weight: 500; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
 .saldo .m small { font-size: .4em; color: var(--brass); font-weight: 500; letter-spacing: 0; }
 .saldo .e { color: var(--ink-2); font-size: .9rem; margin-top: 8px; }
-.azioni { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0 18px; }
+.azioni { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 14px 0 18px; }
+.azioni .btn { flex-direction: column; gap: 4px; padding: 10px 6px; font-size: .78rem; }
+.azioni .btn i { display: block; width: 22px; height: 22px; border-radius: 6px; background: var(--accent-soft); }
+.azioni .btn.primario i { background: rgba(255,255,255,.3); }
 .lista { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
 .voce { display: flex; align-items: center; gap: 12px; padding: 11px 13px; border-bottom: 1px solid var(--line); }
 .voce:last-child { border-bottom: 0; }
 .av { width: 36px; height: 36px; border-radius: 50%; background: var(--surface-2); color: var(--ink-2); display: grid; place-items: center; font-weight: 600; font-size: .78rem; flex-shrink: 0; }
 .av.premio { background: var(--brass-soft); color: var(--brass); }
 .av.me { background: var(--accent-soft); color: var(--accent); }
+.av.multa { background: var(--bad-soft); color: var(--bad); }
 .voce .t { flex: 1; min-width: 0; }
 .voce .t b { display: block; font-weight: 500; font-size: .9rem; }
 .voce .t span { display: block; font-size: .76rem; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -182,19 +177,22 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
 .titolo-schermo h2 { font-size: 1.25rem; }
 .importo-in { font-family: var(--display); font-size: 1.9rem; text-align: center; padding: 12px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--surface); font-variant-numeric: tabular-nums; }
 .blocco { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px; display: grid; gap: 8px; }
+.qr { width: 200px; height: 200px; margin: 0 auto; background: #fff; padding: 10px; border-radius: 10px; border: 1px solid var(--line); }
+.qr svg { width: 100%; height: 100%; display: block; }
+.coord { font-family: var(--mono); font-size: .72rem; word-break: break-all; text-align: center; color: var(--ink-2); }
 
-/* ---------- AZIENDA ---------- */
-.azienda { display: grid; grid-template-columns: 210px minmax(0,1fr); gap: 24px; }
-@media (max-width: 820px) { .azienda { grid-template-columns: 1fr; } }
+/* pannelli */
+.pann { display: grid; grid-template-columns: 210px minmax(0,1fr); gap: 24px; }
+@media (max-width: 820px) { .pann { grid-template-columns: 1fr; } }
 .menu { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 64px); align-self: start; display: grid; gap: 2px; }
 @media (max-width: 820px) { .menu { position: static; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); } }
 .menu .cap { font-size: .68rem; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-3); padding: 12px 10px 4px; }
 .menu a { display: flex; justify-content: space-between; align-items: center; padding: 7px 10px; border-radius: 7px; color: var(--ink-2); font-size: .9rem; }
 .menu a.on { background: var(--surface); color: var(--ink); font-weight: 500; border: 1px solid var(--line); }
 .budget-barra { height: 8px; background: var(--line); border-radius: 999px; overflow: hidden; margin: 8px 0 4px; }
-.budget-barra i { display: block; height: 100%; width: 48%; background: var(--accent); }
+.budget-barra i { display: block; height: 100%; background: var(--accent); }
 .cat-in { width: 100%; border: 0; border-bottom: 1px dashed var(--line-strong); background: transparent; font: inherit; font-weight: 500; color: var(--ink); padding: 2px 0; }
-.cat-q { width: 48px; text-align: right; border: 1px solid var(--line-strong); border-radius: 6px; padding: 3px 6px; font: inherit; background: var(--surface); color: var(--ink); }
+.cat-q { width: 52px; text-align: right; border: 1px solid var(--line-strong); border-radius: 6px; padding: 3px 6px; font: inherit; background: var(--surface); color: var(--ink); }
 </style>
 
 <div class="mock-bar">
@@ -202,8 +200,9 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
     <div class="nome">Manti <span>mockup · 15 dicembre 2026 · mese 3</span></div>
     <div class="switch" role="tablist">
       <button role="tab" id="tab-sito" aria-selected="true" data-vista="sito">Sito pubblico</button>
-      <button role="tab" id="tab-app" aria-selected="false" data-vista="app">App dipendente</button>
+      <button role="tab" id="tab-app" aria-selected="false" data-vista="app">App della banca</button>
       <button role="tab" id="tab-azienda" aria-selected="false" data-vista="azienda">Pannello azienda</button>
+      <button role="tab" id="tab-polizia" aria-selected="false" data-vista="polizia">Pannello polizia</button>
     </div>
   </div>
 </div>
@@ -213,16 +212,16 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
 
   <div class="bollettino">
     <div class="pannello tasso">
-      <div class="eyebrow"><span class="dot"></span> Pubblicato oggi alle 06:00 · registro verificato, 187 righe su 187</div>
-      <div class="grande">1,021<small>€ per manto</small></div>
-      <div class="delta">▲ 1,1% da fine novembre · 2,1% dalla partenza</div>
-      <p class="come">Il valore non lo decide nessuno. È la riserva in euro divisa per i manti in circolazione, compreso il budget di dicembre non ancora assegnato. Chiunque può rifare il conto dal registro qui sotto.</p>
+      <div class="eyebrow"><span class="dot"></span> Pubblicato oggi alle 06:00 · registro verificato, 412 righe su 412</div>
+      <div class="grande">1,037<small>€ per manto</small></div>
+      <div class="delta">▲ 0,5% da fine ottobre · 3,7% dalla partenza</div>
+      <p class="come">Il valore non lo decide nessuno: è la riserva in euro divisa per i manti in circolazione. Cambia solo a fine mese, quando entrano gli euro del fatturato ed escono stipendi e premi. Sale ogni volta che un premio non viene assegnato.</p>
     </div>
     <div class="griglia" style="grid-template-columns: 1fr 1fr; gap: 14px">
-      <div class="pannello stat"><h3>Riserva</h3><div class="v">1.440,60<small> €</small></div><div class="s">1.500 versati, 59,40 pagati</div></div>
-      <div class="pannello stat"><h3>In circolazione</h3><div class="v">1.161,20</div><div class="s">manti, di cui 1,20 della banca</div></div>
-      <div class="pannello stat"><h3>Budget dicembre</h3><div class="v">250<small> / 480</small></div><div class="s">manti da assegnare in 16 giorni</div></div>
-      <div class="pannello stat"><h3>Correntisti</h3><div class="v">10</div><div class="s">1 azienda · 1 recupero in attesa</div></div>
+      <div class="pannello stat"><h3>Riserva</h3><div class="v">939,28<small> €</small></div><div class="s">1.000 versati, 60,72 pagati</div></div>
+      <div class="pannello stat"><h3>In circolazione</h3><div class="v">906,20</div><div class="s">manti, di cui 1,20 della banca</div></div>
+      <div class="pannello stat"><h3>Emessi</h3><div class="v">965<small> / 990</small></div><div class="s">25 manti di premi non assegnati, mai emessi</div></div>
+      <div class="pannello stat"><h3>Dicembre</h3><div class="v">480</div><div class="s">manti in arrivo il 31: 240 di stipendi, fino a 240 di premi</div></div>
     </div>
   </div>
 
@@ -230,74 +229,105 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
     <div class="pannello pad">
       <h3>Andamento del valore</h3>
       <svg class="grafico" viewBox="0 0 460 200" aria-label="Valore del manto da ottobre a oggi">
-        <g class="griglia-l">
-          <line x1="50" y1="20" x2="440" y2="20"/><line x1="50" y1="55" x2="440" y2="55"/><line x1="50" y1="90" x2="440" y2="90"/><line x1="50" y1="125" x2="440" y2="125"/><line x1="50" y1="160" x2="440" y2="160"/>
-        </g>
-        <text x="8" y="24">1,03</text><text x="8" y="59">1,02</text><text x="8" y="94">1,01</text><text x="8" y="129">1,00</text><text x="8" y="164">0,99</text>
-        <path class="area" d="M70,125 L180,125 L300,90 L410,51.5 L410,160 L70,160 Z"/>
-        <polyline class="linea" points="70,125 180,125 300,90 410,51.5"/>
-        <circle class="punto" cx="70" cy="125" r="3.5"/><circle class="punto" cx="180" cy="125" r="3.5"/><circle class="punto" cx="300" cy="90" r="3.5"/>
-        <circle class="punto-fine" cx="410" cy="51.5" r="5"/>
+        <g class="griglia-l"><line x1="50" y1="20" x2="440" y2="20"/><line x1="50" y1="55" x2="440" y2="55"/><line x1="50" y1="90" x2="440" y2="90"/><line x1="50" y1="125" x2="440" y2="125"/><line x1="50" y1="160" x2="440" y2="160"/></g>
+        <text x="8" y="24">1,04</text><text x="8" y="59">1,03</text><text x="8" y="94">1,02</text><text x="8" y="129">1,01</text><text x="8" y="164">1,00</text>
+        <path class="area" d="M70,160 L180,52 L300,33 L410,31 L410,160 Z"/>
+        <polyline class="linea" points="70,160 180,52 300,33 410,31"/>
+        <circle class="punto" cx="70" cy="160" r="3.5"/><circle class="punto" cx="180" cy="52" r="3.5"/><circle class="punto" cx="300" cy="33" r="3.5"/>
+        <circle class="punto-fine" cx="410" cy="31" r="5"/>
         <text x="58" y="186">1 ott</text><text x="165" y="186">31 ott</text><text x="283" y="186">30 nov</text><text x="397" y="186">oggi</text>
       </svg>
-      <p class="piccolo muto" style="margin-top:6px">1,000 alla partenza · 1,000 a fine ottobre · 1,010 a fine novembre · 1,021 oggi. Sale perché ogni mese entrano 500 € e escono meno manti del mese prima.</p>
+      <p class="piccolo muto" style="margin-top:6px">1,000 alla partenza · 1,031 il 31 ottobre (15 manti di premi non emessi) · 1,036 il 30 novembre (10 non emessi) · 1,037 oggi.</p>
     </div>
     <div class="pannello pad">
       <h3>Il conto di oggi</h3>
       <div class="conto" style="margin-top:8px">
-        <div><span>Riserva in euro</span><span class="num">1.440,60</span></div>
-        <div><span>Manti in circolazione</span><span class="num">1.161,20</span></div>
-        <div><span>Budget di dicembre non assegnato</span><span class="num">+ 250,00</span></div>
-        <div class="tot"><span>1.440,60 ÷ 1.411,20</span><span class="num">1,0208 €</span></div>
+        <div><span>Versato in riserva (ottobre + novembre)</span><span class="num">1.000,00 €</span></div>
+        <div><span>Pagato per conversioni</span><span class="num">− 60,72 €</span></div>
+        <div><span>Riserva</span><span class="num">939,28 €</span></div>
+        <div><span>Manti emessi</span><span class="num">965,00</span></div>
+        <div><span>Manti distrutti in conversione</span><span class="num">− 58,80</span></div>
+        <div class="tot"><span>939,28 ÷ 906,20</span><span class="num">1,0365 €</span></div>
       </div>
-      <p class="piccolo muto" style="margin-top:10px">Il budget del mese si conta come già in circolazione. Così il valore non salta al versamento del primo del mese e non scende a ogni premio. Il 31, quello che l'azienda non ha assegnato esce dal conto e il valore sale.</p>
+      <p class="piccolo muto" style="margin-top:10px">Multe, pagamenti e bonifici spostano manti tra indirizzi e non toccano il totale. Le conversioni tolgono euro e manti nella stessa proporzione. Solo la fine del mese muove il valore.</p>
+    </div>
+  </div>
+
+  <div class="sezione griglia g2">
+    <div>
+      <div class="testa" style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px"><h2>Catalogo dei premi</h2><span class="piccolo muto">v3 · dal 1 dic · <a href="#">storia</a></span></div>
+      <div class="pannello scroll">
+        <table>
+          <thead><tr><th>Comportamento</th><th class="r">Quota</th><th class="r">A dicembre</th></tr></thead>
+          <tbody>
+            <tr><td><b>Giornata senza parolacce</b><br><span class="muto piccolo">una al giorno, conferma del responsabile</span></td><td class="r">1%</td><td class="r">4,80</td></tr>
+            <tr><td><b>Settimana puntuale</b><br><span class="muto piccolo">cinque giorni di fila in orario</span></td><td class="r">3%</td><td class="r">14,40</td></tr>
+            <tr><td><b>Recensione positiva di un cliente</b><br><span class="muto piccolo">pubblica, che nomina il dipendente</span></td><td class="r">4%</td><td class="r">19,20</td></tr>
+            <tr><td><b>Problema segnalato e risolto</b><br><span class="muto piccolo">segnalazione scritta, risolta in settimana</span></td><td class="r">2%</td><td class="r">9,60</td></tr>
+            <tr><td><b>Aiuto a un collega</b><br><span class="muto piccolo">lo segnala il collega aiutato</span></td><td class="r">2%</td><td class="r">9,60</td></tr>
+            <tr><td><b>Mese senza errori</b><br><span class="muto piccolo">nessun errore registrato nel mese</span></td><td class="r">10%</td><td class="r">48,00</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="piccolo muto" style="margin-top:8px">Quote dell'emissione del mese. Assegnati il 31, fino a 240 manti in tutto. Il resto non si emette.</p>
+    </div>
+    <div>
+      <div class="testa" style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px"><h2>Tariffario delle multe</h2><span class="piccolo muto">v2 · dal 15 nov · <a href="#">storia</a></span></div>
+      <div class="pannello scroll">
+        <table>
+          <thead><tr><th>Infrazione</th><th class="r">Manti</th><th class="r">In euro</th></tr></thead>
+          <tbody>
+            <tr><td><b>Parolaccia in sala</b><br><span class="muto piccolo">davanti a clienti o colleghi</span></td><td class="r">2,00</td><td class="r">2,07</td></tr>
+            <tr><td><b>Ritardo oltre 10 minuti</b><br><span class="muto piccolo">sull'orario di turno</span></td><td class="r">5,00</td><td class="r">5,18</td></tr>
+            <tr><td><b>Telefono personale in servizio</b><br><span class="muto piccolo">fuori dalle pause</span></td><td class="r">3,00</td><td class="r">3,11</td></tr>
+            <tr><td><b>Postazione in disordine</b><br><span class="muto piccolo">a fine turno</span></td><td class="r">3,00</td><td class="r">3,11</td></tr>
+            <tr><td><b>Cliente lasciato senza risposta</b><br><span class="muto piccolo">oltre 5 minuti</span></td><td class="r">8,00</td><td class="r">8,29</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="piccolo muto" style="margin-top:8px">Importi fissi in manti. La polizia non può multare fuori da questa lista. Si paga entro 15 giorni o si contesta.</p>
     </div>
   </div>
 
   <div class="sezione">
-    <div class="testa"><h2>Catalogo dei premi</h2><span class="piccolo muto">In vigore dal 1 dicembre · firmato dall'azienda · <a href="#">3 versioni</a></span></div>
+    <div class="testa"><h2>Sentenze del giudice</h2><span class="piccolo muto">Istruzioni del giudice <a href="#">v1.2</a>, pubbliche · modello e versione nel registro</span></div>
+    <div class="pannello">
+      <div class="sentenza">
+        <div class="cap"><span class="pill ok">annullata</span><b>S-004</b> · verbale V-019 · Ritardo oltre 10 minuti · 5,00 manti · 11 dic · istruzioni v1.2</div>
+        <div class="mot"><b>Contestazione:</b> il ricorrente documenta uno sciopero dei mezzi pubblici il giorno del verbale, con orario di arrivo compatibile con il primo mezzo disponibile. <b>Replica della polizia:</b> nessuna. <b>Decisione:</b> il tariffario punisce il ritardo evitabile; uno sciopero proclamato è causa esterna e documentata. Il verbale è annullato.</div>
+      </div>
+      <div class="sentenza">
+        <div class="cap"><span class="pill bad">confermata</span><b>S-003</b> · verbale V-012 · Telefono personale in servizio · 3,00 manti · 2 dic · istruzioni v1.2</div>
+        <div class="mot"><b>Contestazione:</b> il ricorrente afferma di aver chiamato un fornitore. <b>Replica della polizia:</b> lo schermo mostrava una chat personale, visto da vicino. <b>Decisione:</b> il ricorrente non porta elementi a sostegno della chiamata di lavoro; la replica è specifica e circostanziata. Il verbale è confermato.</div>
+      </div>
+      <div class="sentenza">
+        <div class="cap"><span class="pill warn">ridotta</span><b>S-002</b> · verbale V-008 · Cliente lasciato senza risposta · da 8,00 a 3,00 manti · 22 nov · istruzioni v1.1</div>
+        <div class="mot"><b>Contestazione:</b> il ricorrente era al telefono con un altro cliente. <b>Replica:</b> il secondo cliente ha aspettato 7 minuti senza un cenno. <b>Decisione:</b> l'attesa c'è stata ma l'omissione è il mancato cenno, non l'abbandono. Ridotta alla voce "Postazione in disordine" come infrazione minore più vicina, secondo le istruzioni §4.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sezione">
+    <div class="testa"><h2>Registro</h2><span class="piccolo muto">412 righe · <a href="#">scarica ledger.jsonl</a> · <a href="#">come verificarlo</a></span></div>
     <div class="pannello scroll">
       <table>
-        <thead><tr><th>Comportamento</th><th>Regola</th><th class="r">Quota</th><th class="r">Vale oggi</th><th class="r">In euro</th></tr></thead>
+        <thead><tr><th class="r">#</th><th>Quando</th><th>Tipo</th><th>Dettaglio</th><th>Hash</th></tr></thead>
         <tbody>
-          <tr><td><b>Giornata senza parolacce</b></td><td class="muto">Una al giorno, la conferma il responsabile a fine turno</td><td class="r">1%</td><td class="r">4,80</td><td class="r">4,90</td></tr>
-          <tr><td><b>Settimana puntuale</b></td><td class="muto">Cinque giorni di fila in orario</td><td class="r">3%</td><td class="r">14,40</td><td class="r">14,70</td></tr>
-          <tr><td><b>Recensione positiva di un cliente</b></td><td class="muto">Recensione pubblica che nomina il dipendente</td><td class="r">4%</td><td class="r">19,20</td><td class="r">19,60</td></tr>
-          <tr><td><b>Problema segnalato e risolto</b></td><td class="muto">Segnalazione scritta, risolta entro la settimana</td><td class="r">2%</td><td class="r">9,60</td><td class="r">9,80</td></tr>
-          <tr><td><b>Aiuto a un collega</b></td><td class="muto">Lo segnala il collega aiutato, non chi aiuta</td><td class="r">2%</td><td class="r">9,60</td><td class="r">9,80</td></tr>
-          <tr><td><b>Mese senza errori</b></td><td class="muto">Nessun errore registrato nel mese, assegnato il primo del mese dopo</td><td class="r">10%</td><td class="r">48,00</td><td class="r">49,00</td></tr>
+          <tr><td class="r">412</td><td>14 dic 17:32</td><td><span class="pill">pagamento</span></td><td>1 entrata → 2 uscite · 3,00 + 68,30 · indirizzi <span class="mono">7e1c…</span> <span class="mono">a90f…</span></td><td class="mono">3f9c…a71e</td></tr>
+          <tr><td class="r">411</td><td>14 dic 12:05</td><td><span class="pill">pagamento</span></td><td>rif. verbale V-028 · 1 entrata → 2 uscite · 5,00 + 12,40</td><td class="mono">b81d…04c2</td></tr>
+          <tr><td class="r">410</td><td>13 dic 12:40</td><td><span class="pill acc">conversione</span></td><td>eseguita #409 · distrutti 19,60 · commissione 0,40 → banca · 20,31 € dovuti</td><td class="mono">e2a0…7f19</td></tr>
+          <tr><td class="r">409</td><td>13 dic 09:15</td><td><span class="pill acc">richiesta</span></td><td>conversione · 1 entrata da 20,00 · dati di pagamento cifrati per la banca</td><td class="mono">91cc…2b6d</td></tr>
+          <tr><td class="r">408</td><td>12 dic 10:00</td><td><span class="pill bad">verbale</span></td><td>V-031 · Parolaccia in sala · 2,00 · scade 27 dic · consegna <span class="mono">c40b…</span></td><td class="mono">5d7e…c308</td></tr>
+          <tr><td class="r">407</td><td>11 dic 17:02</td><td><span class="pill ok">sentenza</span></td><td>S-004 · V-019 annullata · istruzioni v1.2 · fascicolo <span class="mono">88a1…</span></td><td class="mono">a4f3…d1e0</td></tr>
+          <tr><td class="r">406</td><td>10 dic 09:40</td><td><span class="pill">bonifico</span></td><td>2 entrate → 2 uscite · 9,80 + 41,00 · causale cifrata</td><td class="mono">0c9b…55a8</td></tr>
+          <tr><td class="r">…</td><td colspan="4" class="muto">righe da 3 a 405</td></tr>
+          <tr><td class="r">2</td><td>31 ott 23:59</td><td><span class="pill brass">fine mese</span></td><td>stipendi 10 × 25,00 · premi 235,00 in 21 uscite · non emessi 15,00 · attivi 10</td><td class="mono">c3d2…8e7b</td></tr>
+          <tr><td class="r">1</td><td>1 ott 00:00</td><td><span class="pill">azienda</span></td><td>registrata "Cibotari S.r.l." · chiave <span class="mono">4a91…0e2c</span></td><td class="mono">6e30…b19f</td></tr>
+          <tr><td class="r">0</td><td>1 ott 00:00</td><td><span class="pill">genesi</span></td><td>500 manti il primo mese · −2% al mese · 50% stipendi · commissione 2% · 15 giorni</td><td class="mono">9a1c…e4d8</td></tr>
         </tbody>
       </table>
     </div>
-    <p class="piccolo muto" style="margin-top:8px">Le quote sono fisse, i manti cambiano: l'emissione di dicembre è 480, a gennaio sarà 471. Un premio vale quello che il catalogo diceva il giorno in cui è stato assegnato.</p>
-  </div>
-
-  <div class="sezione">
-    <div class="testa"><h2>Recuperi in attesa</h2></div>
-    <div class="nota"><b>Davide Moretti</b> ha chiesto il recupero del conto <span class="mono">7c2e…91af</span> verso la chiave nuova <span class="mono">b04d…e3c7</span>. Firmato da azienda e banca il 12 dicembre. <b>Effettivo il 19 dicembre alle 06:00</b>, se la chiave vecchia non firma nulla prima. Saldo: 62,40 manti.</div>
-  </div>
-
-  <div class="sezione">
-    <div class="testa"><h2>Registro</h2><span class="piccolo muto">187 transazioni · <a href="#">scarica ledger.jsonl</a> · <a href="#">come verificarlo</a></span></div>
-    <div class="pannello scroll">
-      <table>
-        <thead><tr><th class="r">#</th><th>Quando</th><th>Tipo</th><th>Firmato da</th><th>Dettaglio</th><th>Hash</th></tr></thead>
-        <tbody>
-          <tr><td class="r">187</td><td>15 dic 06:00</td><td><span class="pill">controllo</span></td><td>motore</td><td class="muto">Recupero 7c2e…91af ancora in attesa, mancano 4 giorni</td><td class="mono">3f9c…a71e</td></tr>
-          <tr><td class="r">186</td><td>14 dic 18:32</td><td><span class="pill">trasferimento</span></td><td>Giulia B.</td><td>→ Luca F. · 5,00 · "grazie per il cambio turno"</td><td class="mono">b81d…04c2</td></tr>
-          <tr><td class="r">185</td><td>14 dic 17:05</td><td><span class="pill brass">premio</span></td><td>azienda</td><td>→ Sara C. · Giornata senza parolacce · 4,80</td><td class="mono">e2a0…7f19</td></tr>
-          <tr><td class="r">184</td><td>14 dic 17:05</td><td><span class="pill brass">premio</span></td><td>azienda</td><td>→ Marco R. · Giornata senza parolacce · 4,80</td><td class="mono">91cc…2b6d</td></tr>
-          <tr><td class="r">183</td><td>14 dic 17:04</td><td><span class="pill brass">premio</span></td><td>azienda</td><td>→ Elena R. · Problema segnalato e risolto · 9,60</td><td class="mono">5d7e…c308</td></tr>
-          <tr><td class="r">182</td><td>13 dic 12:40</td><td><span class="pill ok">conversione</span></td><td>banca</td><td>Eseguita #181 · 20,00 manti · commissione 0,40 · 19,99 € dovuti</td><td class="mono">a4f3…d1e0</td></tr>
-          <tr><td class="r">181</td><td>13 dic 09:15</td><td><span class="pill warn">richiesta</span></td><td>Matteo F.</td><td>Conversione di 20,00 manti</td><td class="mono">0c9b…55a8</td></tr>
-          <tr><td class="r">180</td><td>12 dic 10:00</td><td><span class="pill bad">recupero</span></td><td>azienda + banca</td><td>Conto 7c2e…91af → chiave b04d…e3c7 · effettivo 19 dic</td><td class="mono">77e1…9a04</td></tr>
-          <tr><td class="r">179</td><td>11 dic 17:02</td><td><span class="pill brass">premio</span></td><td>azienda</td><td>→ Chiara G. · Settimana puntuale · 14,40</td><td class="mono">c3d2…8e7b</td></tr>
-          <tr><td class="r">…</td><td colspan="5" class="muto">177 righe precedenti</td></tr>
-          <tr><td class="r">1</td><td>1 ott 00:00</td><td><span class="pill">azienda</span></td><td>banca</td><td>Registrata "Cibotari S.r.l." · chiave 4a91…0e2c</td><td class="mono">6e30…b19f</td></tr>
-          <tr><td class="r">0</td><td>1 ott 00:00</td><td><span class="pill">genesi</span></td><td>banca</td><td>500 manti il primo mese · −2% al mese · commissione 2% · chiave banca 0d5f…77a3</td><td class="mono">9a1c…e4d8</td></tr>
-        </tbody>
-      </table>
-    </div>
+    <p class="piccolo muto" style="margin-top:8px">Nessun nome, mai. Ogni uscita va a un indirizzo usato una volta sola, che solo il destinatario riconosce. Non si può sapere di chi è un indirizzo né sommare il saldo di qualcuno.</p>
   </div>
 
   <div class="sezione">
@@ -309,18 +339,14 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
   </div>
 
   <div class="firma">
-    <span>Generato il 15 dicembre 2026, 06:00 UTC</span>
-    <span>motore <code>1.0.0</code></span>
-    <span>ultima riga <code>seq 187</code></span>
-    <span>hash <code>3f9c4e1b…a71e</code></span>
-    <span>commit <code>a3f9e02</code></span>
+    <span>Generato il 15 dicembre 2026, 06:00 UTC</span><span>motore <code>1.0.0</code></span><span>giudice <code>istruzioni v1.2</code></span><span>ultima riga <code>seq 412</code></span><span>hash <code>3f9c4e1b…a71e</code></span><span>commit <code>a3f9e02</code></span>
   </div>
 </section>
 
-<!-- ================= APP DIPENDENTE ================= -->
+<!-- ================= APP DELLA BANCA ================= -->
 <section class="vista" id="vista-app" role="tabpanel" hidden>
-  <h1>App del dipendente</h1>
-  <p class="muto" style="margin-top:6px; max-width: 62ch">Un conto solo, in manti. L'euro è il controvalore al valore del giorno, non un secondo saldo. Utente di esempio: Marco Rossi.</p>
+  <h1>App della banca</h1>
+  <p class="muto" style="margin-top:6px; max-width: 62ch">L'unica app che il correntista vede. Un conto in manti, l'euro come controvalore. Nessun nome di altri correntisti, nessun saldo altrui. Si paga con QR o con bonifico alle coordinate.</p>
 
   <div class="telefoni">
 
@@ -329,28 +355,32 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
         <div class="statusbar"><span>9:41</span><span>●●● ᯤ ▮</span></div>
         <div class="corpo">
           <div style="display:flex;justify-content:space-between;align-items:center;padding-top:4px">
-            <div><div class="piccolo muto">Buongiorno</div><b style="font-size:1.05rem">Marco Rossi</b></div>
-            <div class="av me">MR</div>
+            <div><div class="piccolo muto">Il tuo conto</div><b style="font-size:1.05rem">Manti</b></div>
+            <div class="av me">tu</div>
           </div>
           <div class="saldo">
             <div class="piccolo muto">Saldo</div>
-            <div class="m">87,50 <small>manti</small></div>
-            <div class="e">≈ 89,32 € · oggi 1 manto = 1,021 € <span class="piu">▲</span></div>
+            <div class="m">71,30 <small>manti</small></div>
+            <div class="e">≈ 73,94 € · oggi 1 manto = 1,037 € <span class="piu">▲</span></div>
           </div>
-          <div class="azioni"><button class="btn primario">Invia</button><button class="btn">Converti in euro</button></div>
-          <div class="nota ok piccolo" style="margin-bottom:14px"><b>250 manti</b> ancora da assegnare in azienda questo mese. <a href="#">Vedi il catalogo</a></div>
+          <div class="azioni">
+            <button class="btn primario"><i></i>Ricevi</button>
+            <button class="btn"><i></i>Inquadra</button>
+            <button class="btn"><i></i>Bonifico</button>
+          </div>
+          <div class="nota bad piccolo" style="margin-bottom:14px"><b>1 multa da pagare</b> · V-031 · 2,00 manti · scade il 27 dicembre. <a href="#">Apri</a></div>
           <h3 style="margin-bottom:8px">Movimenti</h3>
           <div class="lista">
-            <div class="voce"><div class="av premio">★</div><div class="t"><b>Premio · Giornata senza parolacce</b><span>14 dic · dall'azienda · #184</span></div><div class="imp piu">+4,80<small>4,90 €</small></div></div>
-            <div class="voce"><div class="av">LF</div><div class="t"><b>A Luca Ferrari</b><span>10 dic · "caffè della settimana" · #171</span></div><div class="imp">−3,00<small>3,06 €</small></div></div>
-            <div class="voce"><div class="av premio">★</div><div class="t"><b>Premio · Settimana puntuale</b><span>4 dic · dall'azienda · #158</span></div><div class="imp piu">+14,40<small>14,70 €</small></div></div>
-            <div class="voce"><div class="av premio">★</div><div class="t"><b>Premio · Mese senza errori</b><span>1 dic · dall'azienda · #149</span></div><div class="imp piu">+48,00<small>49,00 €</small></div></div>
-            <div class="voce"><div class="av">GB</div><div class="t"><b>Da Giulia Bianchi</b><span>28 nov · "grazie per l'aiuto" · #140</span></div><div class="imp piu">+9,80<small>10,00 €</small></div></div>
-            <div class="voce"><div class="av">€</div><div class="t"><b>Convertiti in euro</b><span>20 nov · 30,00 manti, commissione 0,60 · #128</span></div><div class="imp">−30,00<small>29,69 €</small></div></div>
+            <div class="voce"><div class="av">→</div><div class="t"><b>Pagamento con QR</b><span>14 dic · "caffè" · riga 412</span></div><div class="imp">−3,00<small>3,11 €</small></div></div>
+            <div class="voce"><div class="av">←</div><div class="t"><b>Bonifico ricevuto</b><span>10 dic · "grazie per l'aiuto" · riga 406</span></div><div class="imp piu">+9,80<small>10,16 €</small></div></div>
+            <div class="voce"><div class="av premio">★</div><div class="t"><b>Premio · Settimana puntuale</b><span>30 nov · fine mese · 3% di 490</span></div><div class="imp piu">+14,70<small>15,24 €</small></div></div>
+            <div class="voce"><div class="av premio">€</div><div class="t"><b>Stipendio di novembre</b><span>30 nov · 245 ÷ 10 dipendenti</span></div><div class="imp piu">+24,50<small>25,40 €</small></div></div>
+            <div class="voce"><div class="av">€</div><div class="t"><b>Convertiti in euro</b><span>20 nov · 30,00 manti, commissione 0,60 · pagata</span></div><div class="imp">−30,00<small>30,31 €</small></div></div>
+            <div class="voce"><div class="av multa">!</div><div class="t"><b>Multa pagata · V-014</b><span>8 nov · Postazione in disordine</span></div><div class="imp">−3,00<small>3,09 €</small></div></div>
+            <div class="voce"><div class="av premio">€</div><div class="t"><b>Stipendio di ottobre</b><span>31 ott · 250 ÷ 10 dipendenti</span></div><div class="imp piu">+25,00<small>25,77 €</small></div></div>
           </div>
-          <p class="piccolo" style="text-align:center;margin-top:12px"><a href="#">Tutti i 41 movimenti</a></p>
         </div>
-        <div class="tabbar"><div class="on"><i></i>Conto</div><div><i></i>Catalogo</div><div><i></i>Colleghi</div><div><i></i>Sicurezza</div></div>
+        <div class="tabbar"><div class="on"><i></i>Conto</div><div class="badge"><i></i>Multe</div><div><i></i>Rubrica</div><div><i></i>Sicurezza</div></div>
       </div></div>
       <div class="did">Conto</div>
     </div>
@@ -359,57 +389,98 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
       <div class="telefono"><div class="schermo">
         <div class="statusbar"><span>9:41</span><span>●●● ᯤ ▮</span></div>
         <div class="corpo">
-          <div class="titolo-schermo"><a href="#" class="piccolo">‹ Conto</a><h2>Invia manti</h2></div>
+          <div class="titolo-schermo"><a href="#" class="piccolo">‹ Conto</a><h2>Ricevi</h2></div>
           <div class="form">
-            <div class="campo"><label>A chi</label>
-              <div class="lista"><div class="voce"><div class="av">LF</div><div class="t"><b>Luca Ferrari</b><span class="mono">c9e2…4b10</span></div><a href="#" class="piccolo">cambia</a></div></div>
+            <div class="blocco" style="gap:12px">
+              <div class="qr"><svg id="qr1" viewBox="0 0 25 25" shape-rendering="crispEdges"></svg></div>
+              <div class="coord">MNT1 q8f3 k2ma 9x7d hv4t ...<br>indirizzo nuovo, valido per un pagamento</div>
+              <div class="piccolo muto" style="text-align:center">Chi inquadra paga a questo indirizzo. Nessun altro potrà collegarlo a te.</div>
             </div>
-            <div class="campo"><label>Quanti manti</label><div class="importo-in">10,00</div><div class="piccolo muto" style="text-align:center">≈ 10,21 € · ne hai 87,50</div></div>
-            <div class="campo"><label for="causale">Causale, facoltativa e visibile nel registro</label><input id="causale" type="text" value="turno di sabato"></div>
-            <div class="conto">
-              <div><span>Invii</span><span class="num">10,00</span></div>
-              <div><span>Commissione</span><span class="num">0,00</span></div>
-              <div><span>Luca riceve</span><span class="num">10,00</span></div>
-              <div class="tot"><span>Il tuo saldo dopo</span><span class="num">77,50</span></div>
-            </div>
-            <div class="nota piccolo">Il trasferimento è definitivo. Se sbagli persona, devi chiederle di restituire.</div>
-            <button class="btn primario largo">Firma con Face ID e invia</button>
+            <div class="campo"><label for="ric-imp">Importo richiesto, facoltativo</label><div class="importo-in">12,00</div><div class="piccolo muto" style="text-align:center">≈ 12,44 €</div></div>
+            <div class="campo"><label for="ric-cau">Causale, facoltativa, la legge solo chi paga</label><input id="ric-cau" type="text" value="pranzo di ieri"></div>
+            <button class="btn largo">Condividi le mie coordinate per un bonifico</button>
+            <p class="piccolo muto" style="text-align:center">Le coordinate sono come un IBAN: chi le ha può inviarti manti, non può vedere il tuo saldo.</p>
           </div>
         </div>
-        <div class="tabbar"><div class="on"><i></i>Conto</div><div><i></i>Catalogo</div><div><i></i>Colleghi</div><div><i></i>Sicurezza</div></div>
+        <div class="tabbar"><div class="on"><i></i>Conto</div><div class="badge"><i></i>Multe</div><div><i></i>Rubrica</div><div><i></i>Sicurezza</div></div>
       </div></div>
-      <div class="did">Invia a un collega</div>
+      <div class="did">Ricevi con QR</div>
     </div>
 
     <div class="telefono-wrap">
       <div class="telefono"><div class="schermo">
         <div class="statusbar"><span>9:41</span><span>●●● ᯤ ▮</span></div>
         <div class="corpo">
-          <div class="titolo-schermo"><a href="#" class="piccolo">‹ Conto</a><h2>Converti in euro</h2></div>
+          <div class="titolo-schermo"><a href="#" class="piccolo">‹ Conto</a><h2>Bonifico</h2></div>
           <div class="form">
-            <div class="blocco" style="text-align:center">
-              <span class="piccolo muto">Valore di oggi</span>
-              <span class="cifra" style="font-size:1.4rem">1 manto = 1,021 €</span>
-              <span class="piccolo muto">aggiornato alle 06:00 · <a href="#">come si calcola</a></span>
+            <div class="campo"><label>A chi</label>
+              <div class="lista"><div class="voce"><div class="av">LF</div><div class="t"><b>Luca</b><span class="mono">MNT1 3ka9 …  (dalla rubrica)</span></div><a href="#" class="piccolo">cambia</a></div></div>
             </div>
-            <div class="campo"><label>Quanti manti converti</label><div class="importo-in">50,00</div>
-              <div style="display:flex;gap:6px;justify-content:center;margin-top:4px"><button class="btn mini">25%</button><button class="btn mini">50%</button><button class="btn mini">Tutti</button></div>
-            </div>
+            <div class="campo"><label>Quanti manti</label><div class="importo-in">10,00</div><div class="piccolo muto" style="text-align:center">≈ 10,37 € · ne hai 71,30</div></div>
+            <div class="campo"><label for="bon-cau">Causale, facoltativa, la legge solo Luca</label><input id="bon-cau" type="text" value="turno di sabato"></div>
             <div class="conto">
-              <div><span>Converti</span><span class="num">50,00 manti</span></div>
-              <div><span>Commissione 2%</span><span class="num">− 1,00</span></div>
-              <div><span>49,00 × 1,021 €</span><span class="num"></span></div>
-              <div class="tot"><span>Ti spettano</span><span class="num">50,02 €</span></div>
-              <div class="muto piccolo"><span>Saldo dopo</span><span class="num">37,50 manti</span></div>
+              <div><span>Invii</span><span class="num">10,00</span></div>
+              <div><span>Commissione</span><span class="num">0,00</span></div>
+              <div class="tot"><span>Saldo dopo</span><span class="num">61,30</span></div>
             </div>
-            <div class="nota piccolo">I manti convertiti escono dal sistema. Gli euro te li paga l'azienda fuori dall'app. Qui resta registrato l'importo dovuto.</div>
-            <button class="btn primario largo">Firma con Face ID e richiedi</button>
-            <p class="piccolo muto" style="text-align:center">La banca esegue entro 2 giorni. Fino ad allora i 50 manti restano bloccati.</p>
+            <div class="nota piccolo">Definitivo. Se sbagli destinatario, devi chiedergli di restituire.</div>
+            <button class="btn primario largo">Firma con Face ID e invia</button>
           </div>
         </div>
-        <div class="tabbar"><div class="on"><i></i>Conto</div><div><i></i>Catalogo</div><div><i></i>Colleghi</div><div><i></i>Sicurezza</div></div>
+        <div class="tabbar"><div class="on"><i></i>Conto</div><div class="badge"><i></i>Multe</div><div><i></i>Rubrica</div><div><i></i>Sicurezza</div></div>
       </div></div>
-      <div class="did">Converti in euro</div>
+      <div class="did">Bonifico</div>
+    </div>
+
+    <div class="telefono-wrap">
+      <div class="telefono"><div class="schermo">
+        <div class="statusbar"><span>9:41</span><span>●●● ᯤ ▮</span></div>
+        <div class="corpo">
+          <div class="titolo-schermo"><h2>Multe</h2></div>
+          <div class="form">
+            <div class="blocco" style="border-color: var(--bad)">
+              <div style="display:flex;justify-content:space-between;align-items:center"><span class="pill bad">da pagare</span><span class="piccolo muto">scade il 27 dic · 12 giorni</span></div>
+              <div><b style="font-family:var(--display);font-size:1.2rem">V-031 · Parolaccia in sala</b></div>
+              <div class="piccolo muto">12 dicembre, 10:00 · polizia · "In sala, davanti al tavolo 4, verso le 9:50."</div>
+              <div class="cifra" style="font-size:1.6rem">2,00 manti <span class="muto" style="font-size:.9rem;font-family:var(--body)">≈ 2,07 €</span></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <button class="btn primario">Paga ora</button>
+                <button class="btn">Contesta</button>
+              </div>
+              <p class="piccolo muto">Pagare significa inquadrare il QR della polizia contenuto nel verbale. Se non fai nulla entro il 27, la multa viene trattenuta dal prossimo stipendio e non puoi convertire finché non è saldata.</p>
+            </div>
+            <h3>Chiuse</h3>
+            <div class="lista">
+              <div class="voce"><div class="av">✓</div><div class="t"><b>V-019 · Ritardo oltre 10 minuti</b><span>contestata il 3 dic · <b style="color:var(--ok)">annullata</b> dal giudice, S-004</span></div><div class="imp muto">5,00</div></div>
+              <div class="voce"><div class="av">✓</div><div class="t"><b>V-014 · Postazione in disordine</b><span>pagata l'8 nov</span></div><div class="imp muto">3,00</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="tabbar"><div><i></i>Conto</div><div class="on badge"><i></i>Multe</div><div><i></i>Rubrica</div><div><i></i>Sicurezza</div></div>
+      </div></div>
+      <div class="did">Multe</div>
+    </div>
+
+    <div class="telefono-wrap">
+      <div class="telefono"><div class="schermo">
+        <div class="statusbar"><span>9:41</span><span>●●● ᯤ ▮</span></div>
+        <div class="corpo">
+          <div class="titolo-schermo"><a href="#" class="piccolo">‹ Multe</a><h2>Contesta V-031</h2></div>
+          <div class="form">
+            <div class="conto">
+              <div><span>Infrazione</span><span>Parolaccia in sala</span></div>
+              <div><span>Importo</span><span class="num">2,00 manti</span></div>
+              <div><span>Data</span><span>12 dic, 10:00</span></div>
+            </div>
+            <div class="campo"><label for="con-txt">Le tue ragioni</label><textarea id="con-txt">Alle 9:50 ero in magazzino a scaricare, non in sala. In sala c'era Andrea. Il turno lo conferma.</textarea></div>
+            <div class="campo"><label>Allegati, facoltativi</label><button class="btn">+ Foto o documento</button></div>
+            <div class="nota info piccolo">Decide il giudice, un'intelligenza artificiale con istruzioni pubbliche. Legge il verbale, il tariffario, le tue ragioni e l'eventuale replica della polizia. Non sa chi sei. La sentenza è definitiva e viene pubblicata senza il tuo nome. Finché è aperta, nessun termine corre.</div>
+            <button class="btn primario largo">Firma e invia la contestazione</button>
+          </div>
+        </div>
+        <div class="tabbar"><div><i></i>Conto</div><div class="on badge"><i></i>Multe</div><div><i></i>Rubrica</div><div><i></i>Sicurezza</div></div>
+      </div></div>
+      <div class="did">Contestazione</div>
     </div>
 
     <div class="telefono-wrap">
@@ -419,25 +490,23 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
           <div class="titolo-schermo"><h2>Sicurezza</h2></div>
           <div class="form">
             <div class="blocco">
-              <h3>La tua chiave</h3>
-              <p class="piccolo muto">Il conto è tuo perché solo questo telefono ha la chiave che lo firma. Nessuno, nemmeno l'azienda o la banca, può muovere i tuoi manti senza.</p>
-              <span class="piccolo muto">Identificativo del conto</span>
-              <span class="mono" style="word-break:break-all">a1b2c3d4 e5f60718 293a4b5c 6d7e8f90 1a2b3c4d</span>
-              <span class="piccolo muto">Chiave creata il 1 ottobre 2026 su questo iPhone</span>
+              <h3>La tua frase di recupero</h3>
+              <p class="piccolo muto">Dodici parole scritte al primo avvio. Sono l'unico modo per ritrovare il conto su un altro telefono. Non esiste una copia presso la banca.</p>
+              <button class="btn largo">Mostra la frase, con Face ID</button>
             </div>
             <div class="blocco">
-              <h3>Se perdi il telefono</h3>
-              <p class="piccolo muto">Non esiste una copia della chiave. Crei una chiave nuova su un altro telefono, la comunichi di persona all'azienda, azienda e banca firmano, e dopo <b>7 giorni pubblici</b> il saldo passa al conto nuovo. In quei 7 giorni chi avesse il tuo vecchio telefono può bloccare il recupero, ma non può portare via nulla senza il tuo Face ID.</p>
-              <button class="btn largo">Come funziona il recupero</button>
+              <h3>Le tue coordinate</h3>
+              <span class="mono" style="word-break:break-all">MNT1 q8f3 k2ma 9x7d hv4t 2rrp 6c0e lz3n 8yq1</span>
+              <p class="piccolo muto">Dalle a chi deve farti un bonifico. Non rivelano il saldo. Ogni pagamento che ricevi va comunque a un indirizzo diverso.</p>
             </div>
             <div class="blocco">
-              <h3>Verifica</h3>
-              <p class="piccolo muto">Il tuo saldo è la somma di 41 righe del registro pubblico, tutte firmate. Puoi controllarle una per una.</p>
-              <button class="btn largo">Le mie righe nel registro</button>
+              <h3>Chi sa cosa</h3>
+              <p class="piccolo muto">Nessun altro correntista sa che esisti. Nessuno, nemmeno la banca, sa il tuo saldo: lo calcola solo questa app dalle tue entrate. L'azienda sa quanto ti ha pagato di stipendio e premi. La polizia sa le multe che ti ha fatto.</p>
+              <button class="btn largo">Verifica le mie righe nel registro</button>
             </div>
           </div>
         </div>
-        <div class="tabbar"><div><i></i>Conto</div><div><i></i>Catalogo</div><div><i></i>Colleghi</div><div class="on"><i></i>Sicurezza</div></div>
+        <div class="tabbar"><div><i></i>Conto</div><div class="badge"><i></i>Multe</div><div><i></i>Rubrica</div><div class="on"><i></i>Sicurezza</div></div>
       </div></div>
       <div class="did">Sicurezza</div>
     </div>
@@ -447,93 +516,66 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
 
 <!-- ================= PANNELLO AZIENDA ================= -->
 <section class="vista" id="vista-azienda" role="tabpanel" hidden>
-  <div class="azienda">
+  <div class="pann">
     <nav class="menu">
-      <div class="cap">Ogni giorno</div>
-      <a class="on" href="#az-panoramica">Panoramica</a>
-      <a href="#az-premia">Assegna un premio</a>
-      <a href="#az-conversioni">Conversioni <span class="pill warn">1</span></a>
-      <div class="cap">Ogni mese</div>
+      <div class="cap">Fine mese</div>
+      <a class="on" href="#az-mese">Dicembre</a>
+      <a href="#az-premi">Premi da assegnare</a>
       <a href="#az-riserva">Versamento in riserva</a>
+      <div class="cap">Quando serve</div>
+      <a href="#az-conv">Conversioni <span class="pill warn">1</span></a>
       <a href="#az-catalogo">Catalogo</a>
+      <a href="#az-tariffario">Tariffario</a>
       <div class="cap">Raramente</div>
-      <a href="#az-dipendenti">Dipendenti</a>
-      <a href="#az-recupero">Recupero chiave</a>
+      <a href="#az-dip">Dipendenti</a>
+      <a href="#az-polizia">Polizia</a>
     </nav>
-
     <main>
-      <div id="az-panoramica">
+      <div id="az-mese">
         <div class="piccolo muto">Cibotari S.r.l. · chiave azienda <span class="mono">4a91…0e2c</span></div>
-        <h1 style="margin-top:4px">Dicembre 2026</h1>
+        <h1 style="margin-top:4px">Fine mese di dicembre</h1>
+        <p class="muto" style="margin-top:6px">Il 31 alle 23:59 firmi una sola transazione: versamento in riserva, stipendi, premi e trattenute insieme. Fino ad allora prepari.</p>
         <div class="griglia g3" style="margin-top:16px">
-          <div class="pannello stat" style="border-color: var(--line-strong)">
-            <h3>Budget del mese</h3>
-            <div class="v">250<small> / 480 manti</small></div>
-            <div class="budget-barra"><i></i></div>
-            <div class="s">230 assegnati in 31 premi. Restano 16 giorni. Il non assegnato non si recupera.</div>
-          </div>
-          <div class="pannello stat"><h3>Da fare</h3><div class="v">1<small> conversione</small></div><div class="s">Matteo Fontana · 20 manti · 19,99 € · <a href="#az-conversioni">esegui</a></div></div>
-          <div class="pannello stat"><h3>In corso</h3><div class="v">1<small> recupero</small></div><div class="s">Davide Moretti · effettivo il 19 dicembre</div></div>
-          <div class="pannello stat"><h3>Valore del manto</h3><div class="v">1,021<small> €</small></div><div class="s">pubblicato oggi alle 06:00</div></div>
-          <div class="pannello stat"><h3>Riserva</h3><div class="v">1.440,60<small> €</small></div><div class="s">copre 1.411,20 manti a 1,021 €</div></div>
-          <div class="pannello stat"><h3>Prossimo versamento</h3><div class="v">1 gen</div><div class="s">1% del fatturato di dicembre, netto IVA</div></div>
+          <div class="pannello stat" style="border-color: var(--line-strong)"><h3>Emissione di dicembre</h3><div class="v">480<small> manti</small></div><div class="s">mese 3 · 500 × 0,98²</div></div>
+          <div class="pannello stat"><h3>Stipendi</h3><div class="v">240<small> = 10 × 24,00</small></div><div class="s">metà dell'emissione, 10 dipendenti attivi</div></div>
+          <div class="pannello stat"><h3>Premi preparati</h3><div class="v">187,20<small> / 240</small></div><div class="budget-barra"><i style="width:78%"></i></div><div class="s">52,80 ancora assegnabili. Il non assegnato non si emette</div></div>
+          <div class="pannello stat"><h3>Trattenute</h3><div class="v">0</div><div class="s">nessuna multa definitiva non pagata</div></div>
+          <div class="pannello stat"><h3>Valore atteso il 31</h3><div class="v">≈ 1,040<small> €</small></div><div class="s">se i premi restano 187,20 e il fatturato è 50.000</div></div>
+          <div class="pannello stat"><h3>Conto azienda</h3><div class="v">0,00</div><div class="s">l'azienda non tiene manti: emette e basta</div></div>
         </div>
       </div>
 
-      <div class="sezione" id="az-premia">
-        <div class="testa"><h2>Assegna un premio</h2></div>
+      <div class="sezione" id="az-premi">
+        <div class="testa"><h2>Premi da assegnare</h2><span class="piccolo muto">catalogo v3 · quote sull'emissione di 480</span></div>
         <div class="griglia g2">
           <div class="pannello pad form">
             <div class="campo"><label for="p-dip">Dipendente</label><select id="p-dip"><option>Sara Conti</option><option>Marco Rossi</option><option>Giulia Bianchi</option><option>Luca Ferrari</option><option>Andrea Greco</option><option>Elena Ricci</option><option>Davide Moretti</option><option>Chiara Gallo</option><option>Matteo Fontana</option><option>Francesca Serra</option></select></div>
-            <div class="campo"><label for="p-voce">Comportamento, dal catalogo in vigore</label><select id="p-voce"><option>Giornata senza parolacce · 1% · 4,80</option><option>Settimana puntuale · 3% · 14,40</option><option>Recensione positiva di un cliente · 4% · 19,20</option><option>Problema segnalato e risolto · 2% · 9,60</option><option>Aiuto a un collega · 2% · 9,60</option><option>Mese senza errori · 10% · 48,00</option></select></div>
-            <div class="campo"><label for="p-data">Giorno del comportamento</label><input id="p-data" type="date" value="2026-12-15"></div>
-            <div class="campo"><label for="p-nota">Nota, facoltativa e visibile nel registro</label><input id="p-nota" type="text" placeholder="es. turno serale"></div>
+            <div class="campo"><label for="p-voce">Comportamento</label><select id="p-voce"><option>Giornata senza parolacce · 1% · 4,80</option><option>Settimana puntuale · 3% · 14,40</option><option>Recensione positiva di un cliente · 4% · 19,20</option><option>Problema segnalato e risolto · 2% · 9,60</option><option>Aiuto a un collega · 2% · 9,60</option><option>Mese senza errori · 10% · 48,00</option></select></div>
+            <div class="campo"><label for="p-n">Quante volte nel mese</label><input id="p-n" type="number" value="1" min="1"></div>
             <div class="conto">
-              <div><span>Sara Conti riceve</span><span class="num">4,80 manti</span></div>
-              <div><span>Controvalore oggi</span><span class="num">4,90 €</span></div>
-              <div class="tot"><span>Budget dopo</span><span class="num">245,20 / 480</span></div>
+              <div><span>Sara Conti riceve il 31</span><span class="num">4,80 manti</span></div>
+              <div class="tot"><span>Premi preparati dopo</span><span class="num">192,00 / 240</span></div>
             </div>
-            <div><button class="btn primario">Firma e assegna</button> <span class="piccolo muto" style="margin-left:8px">con la chiave azienda</span></div>
+            <div><button class="btn">Aggiungi alla lista del 31</button></div>
+            <p class="piccolo muto">Le assegnazioni restano in bozza fino alla firma di fine mese. Più avanti si compileranno da sole dai dati del mese.</p>
           </div>
           <div class="pannello pad">
-            <h3>Assegnati ieri e oggi</h3>
+            <h3>Lista preparata per il 31</h3>
             <div class="scroll" style="margin-top:8px">
               <table>
-                <thead><tr><th>Quando</th><th>A chi</th><th>Cosa</th><th class="r">Manti</th></tr></thead>
+                <thead><tr><th>Dipendente</th><th>Premi</th><th class="r">Manti</th></tr></thead>
                 <tbody>
-                  <tr><td>14 dic 17:05</td><td>Sara Conti</td><td class="muto">Giornata senza parolacce</td><td class="r">4,80</td></tr>
-                  <tr><td>14 dic 17:05</td><td>Marco Rossi</td><td class="muto">Giornata senza parolacce</td><td class="r">4,80</td></tr>
-                  <tr><td>14 dic 17:04</td><td>Elena Ricci</td><td class="muto">Problema segnalato e risolto</td><td class="r">9,60</td></tr>
-                  <tr><td>13 dic 17:10</td><td>Francesca Serra</td><td class="muto">Giornata senza parolacce</td><td class="r">4,80</td></tr>
-                  <tr><td>13 dic 17:10</td><td>Luca Ferrari</td><td class="muto">Giornata senza parolacce</td><td class="r">4,80</td></tr>
-                  <tr><td>13 dic 17:09</td><td>Giulia Bianchi</td><td class="muto">Aiuto a un collega</td><td class="r">9,60</td></tr>
+                  <tr><td>Giulia Bianchi</td><td class="muto piccolo">Mese senza errori · 4 giornate senza parolacce</td><td class="r">67,20</td></tr>
+                  <tr><td>Luca Ferrari</td><td class="muto piccolo">Settimana puntuale × 2 · Aiuto a un collega</td><td class="r">38,40</td></tr>
+                  <tr><td>Andrea Greco</td><td class="muto piccolo">Recensione positiva · Settimana puntuale</td><td class="r">33,60</td></tr>
+                  <tr><td>Elena Ricci</td><td class="muto piccolo">Problema risolto × 2</td><td class="r">19,20</td></tr>
+                  <tr><td>Chiara Gallo</td><td class="muto piccolo">Settimana puntuale</td><td class="r">14,40</td></tr>
+                  <tr><td>Marco Rossi</td><td class="muto piccolo">2 giornate senza parolacce</td><td class="r">9,60</td></tr>
+                  <tr><td>Francesca Serra</td><td class="muto piccolo">1 giornata senza parolacce</td><td class="r">4,80</td></tr>
                 </tbody>
+                <tfoot><tr><td colspan="2">7 dipendenti · 3 senza premi</td><td class="r">187,20</td></tr></tfoot>
               </table>
             </div>
-            <p class="piccolo muto" style="margin-top:10px">Un premio assegnato non si annulla. Se sbagli, il dipendente può restituirlo con un trasferimento, oppure resta.</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="sezione" id="az-conversioni">
-        <div class="testa"><h2>Conversioni da eseguire</h2></div>
-        <div class="pannello pad">
-          <div class="scroll">
-            <table>
-              <thead><tr><th>Richiesta</th><th>Dipendente</th><th class="r">Manti</th><th class="r">Commissione</th><th class="r">Valore</th><th class="r">Euro dovuti</th><th></th></tr></thead>
-              <tbody><tr><td>#181 · 13 dic 09:15</td><td>Matteo Fontana</td><td class="r">20,00</td><td class="r">0,40</td><td class="r">1,020</td><td class="r"><b>19,99</b></td><td><button class="btn primario mini">Esegui e firma</button></td></tr></tbody>
-            </table>
-          </div>
-          <div class="nota piccolo" style="margin-top:14px">Eseguire significa: i 20 manti escono dalla circolazione, 0,40 vanno al conto commissioni della banca, la riserva scende di 19,99 €. <b>I 19,99 € a Matteo li paghi tu, fuori dal sistema.</b> Qui resta la traccia dell'importo dovuto.</div>
-          <h3 style="margin-top:20px">Eseguite negli ultimi 30 giorni</h3>
-          <div class="scroll" style="margin-top:8px">
-            <table>
-              <thead><tr><th>Eseguita</th><th>Dipendente</th><th class="r">Manti</th><th class="r">Euro</th><th>Stato</th></tr></thead>
-              <tbody>
-                <tr><td>20 nov</td><td>Marco Rossi</td><td class="r">30,00</td><td class="r">29,69</td><td><span class="pill ok">pagata</span></td></tr>
-                <tr><td>6 nov</td><td>Chiara Gallo</td><td class="r">10,00</td><td class="r">9,72</td><td><span class="pill ok">pagata</span></td></tr>
-              </tbody>
-            </table>
           </div>
         </div>
       </div>
@@ -542,98 +584,230 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
         <div class="testa"><h2>Versamento in riserva</h2></div>
         <div class="griglia g2">
           <div class="pannello pad form">
-            <div class="campo"><label for="r-mese">Mese di riferimento</label><input id="r-mese" type="text" value="Dicembre 2026" disabled></div>
-            <div class="campo"><label for="r-fatt">Fatturato del mese, netto IVA</label><input id="r-fatt" type="text" placeholder="es. 50.000,00"></div>
+            <div class="campo"><label for="r-fatt">Fatturato di dicembre, netto IVA</label><input id="r-fatt" type="text" placeholder="si compila il 31"></div>
             <div class="conto">
-              <div><span>Quota 1%</span><span class="num">500,00 €</span></div>
-              <div><span>Riserva dopo</span><span class="num">1.940,60 €</span></div>
-              <div class="tot"><span>Manto a fine dicembre, stimato</span><span class="num">1,024 €</span></div>
+              <div><span>Quota 1%, stimata</span><span class="num">500,00 €</span></div>
+              <div><span>Riserva dopo</span><span class="num">1.439,28 €</span></div>
+              <div class="tot"><span>Firmato insieme a stipendi e premi</span><span>31 dic, 23:59</span></div>
             </div>
-            <div><button class="btn primario" disabled>Disponibile dal 1 gennaio</button></div>
-            <p class="piccolo muto">Un versamento per mese. Va fatto davvero sul conto bancario separato: qui lo registri, e il registro lo mostra a tutti.</p>
+            <p class="piccolo muto">Il versamento va fatto davvero sul conto separato. Qui lo registri, e il registro lo mostra a tutti.</p>
           </div>
           <div class="pannello pad">
-            <h3>Versamenti fatti</h3>
+            <h3>Fine mese passati</h3>
             <table style="margin-top:8px">
-              <thead><tr><th>Mese</th><th>Registrato</th><th class="r">Importo</th></tr></thead>
+              <thead><tr><th>Mese</th><th class="r">Versato</th><th class="r">Stipendi</th><th class="r">Premi</th><th class="r">Non emessi</th></tr></thead>
               <tbody>
-                <tr><td>Dicembre 2026</td><td>1 dic</td><td class="r">500,00 €</td></tr>
-                <tr><td>Novembre 2026</td><td>1 nov</td><td class="r">500,00 €</td></tr>
-                <tr><td>Ottobre 2026</td><td>1 ott</td><td class="r">500,00 €</td></tr>
+                <tr><td>Novembre</td><td class="r">500,00 €</td><td class="r">245,00</td><td class="r">235,00</td><td class="r">10,00</td></tr>
+                <tr><td>Ottobre</td><td class="r">500,00 €</td><td class="r">250,00</td><td class="r">235,00</td><td class="r">15,00</td></tr>
               </tbody>
-              <tfoot><tr><td colspan="2">Totale versato</td><td class="r">1.500,00 €</td></tr></tfoot>
             </table>
           </div>
         </div>
       </div>
 
-      <div class="sezione" id="az-catalogo">
-        <div class="testa"><h2>Catalogo</h2><span class="piccolo muto">In vigore dal 1 dicembre · versione 3 · <a href="#">storia</a></span></div>
+      <div class="sezione" id="az-conv">
+        <div class="testa"><h2>Conversioni</h2><span class="piccolo muto">le esegue la banca; qui vedi cosa devi pagare in euro</span></div>
         <div class="pannello pad">
           <div class="scroll">
             <table>
-              <thead><tr><th>Comportamento</th><th>Regola</th><th class="r">Quota</th><th class="r">Vale ora</th><th class="r">A dic.</th><th></th></tr></thead>
+              <thead><tr><th>Eseguita</th><th>Dipendente</th><th class="r">Manti</th><th class="r">Euro dovuti</th><th>Stato</th><th></th></tr></thead>
               <tbody>
-                <tr><td><input class="cat-in" id="c1" value="Giornata senza parolacce"></td><td class="muto piccolo">Una al giorno, conferma del responsabile</td><td class="r"><input class="cat-q" id="q1" value="1"> %</td><td class="r">4,80</td><td class="r">18</td><td><a href="#" class="piccolo">togli</a></td></tr>
-                <tr><td><input class="cat-in" id="c2" value="Settimana puntuale"></td><td class="muto piccolo">Cinque giorni di fila in orario</td><td class="r"><input class="cat-q" id="q2" value="3"> %</td><td class="r">14,40</td><td class="r">6</td><td><a href="#" class="piccolo">togli</a></td></tr>
-                <tr><td><input class="cat-in" id="c3" value="Recensione positiva di un cliente"></td><td class="muto piccolo">Recensione pubblica che nomina il dipendente</td><td class="r"><input class="cat-q" id="q3" value="4"> %</td><td class="r">19,20</td><td class="r">2</td><td><a href="#" class="piccolo">togli</a></td></tr>
-                <tr><td><input class="cat-in" id="c4" value="Problema segnalato e risolto"></td><td class="muto piccolo">Segnalazione scritta, risolta entro la settimana</td><td class="r"><input class="cat-q" id="q4" value="2"> %</td><td class="r">9,60</td><td class="r">3</td><td><a href="#" class="piccolo">togli</a></td></tr>
-                <tr><td><input class="cat-in" id="c5" value="Aiuto a un collega"></td><td class="muto piccolo">Lo segnala il collega aiutato</td><td class="r"><input class="cat-q" id="q5" value="2"> %</td><td class="r">9,60</td><td class="r">2</td><td><a href="#" class="piccolo">togli</a></td></tr>
-                <tr><td><input class="cat-in" id="c6" value="Mese senza errori"></td><td class="muto piccolo">Assegnato il primo del mese dopo</td><td class="r"><input class="cat-q" id="q6" value="10"> %</td><td class="r">48,00</td><td class="r">0</td><td><a href="#" class="piccolo">togli</a></td></tr>
+                <tr><td>13 dic · #410</td><td>Matteo Fontana</td><td class="r">20,00</td><td class="r"><b>20,31</b></td><td><span class="pill warn">da pagare</span></td><td><button class="btn mini">Segna pagata</button></td></tr>
+                <tr><td>20 nov · #298</td><td>Marco Rossi</td><td class="r">30,00</td><td class="r">30,31</td><td><span class="pill ok">pagata 25 nov</span></td><td></td></tr>
+                <tr><td>6 nov · #201</td><td>Chiara Gallo</td><td class="r">10,00</td><td class="r">10,10</td><td><span class="pill ok">pagata 10 nov</span></td><td></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="nota piccolo" style="margin-top:14px">Il nome lo vedi perché la banca ha decifrato i dati di pagamento della richiesta. Nel registro pubblico c'è solo l'importo. <b>Gli euro li paghi tu, fuori dal sistema.</b></div>
+        </div>
+      </div>
+
+      <div class="sezione" id="az-catalogo">
+        <div class="testa"><h2>Catalogo dei premi</h2><span class="piccolo muto">v3 · dal 1 dic · <a href="#">storia</a></span></div>
+        <div class="pannello pad">
+          <div class="scroll">
+            <table>
+              <thead><tr><th>Comportamento</th><th>Regola</th><th class="r">Quota</th><th class="r">A dic.</th><th></th></tr></thead>
+              <tbody>
+                <tr><td><input class="cat-in" id="c1" value="Giornata senza parolacce"></td><td class="muto piccolo">una al giorno, conferma del responsabile</td><td class="r"><input class="cat-q" id="q1" value="1"> %</td><td class="r">4,80</td><td><a href="#" class="piccolo">togli</a></td></tr>
+                <tr><td><input class="cat-in" id="c2" value="Settimana puntuale"></td><td class="muto piccolo">cinque giorni di fila in orario</td><td class="r"><input class="cat-q" id="q2" value="3"> %</td><td class="r">14,40</td><td><a href="#" class="piccolo">togli</a></td></tr>
+                <tr><td><input class="cat-in" id="c3" value="Recensione positiva di un cliente"></td><td class="muto piccolo">pubblica, che nomina il dipendente</td><td class="r"><input class="cat-q" id="q3" value="4"> %</td><td class="r">19,20</td><td><a href="#" class="piccolo">togli</a></td></tr>
+                <tr><td><input class="cat-in" id="c4" value="Problema segnalato e risolto"></td><td class="muto piccolo">segnalazione scritta, risolta in settimana</td><td class="r"><input class="cat-q" id="q4" value="2"> %</td><td class="r">9,60</td><td><a href="#" class="piccolo">togli</a></td></tr>
+                <tr><td><input class="cat-in" id="c5" value="Aiuto a un collega"></td><td class="muto piccolo">lo segnala il collega aiutato</td><td class="r"><input class="cat-q" id="q5" value="2"> %</td><td class="r">9,60</td><td><a href="#" class="piccolo">togli</a></td></tr>
+                <tr><td><input class="cat-in" id="c6" value="Mese senza errori"></td><td class="muto piccolo">nessun errore registrato nel mese</td><td class="r"><input class="cat-q" id="q6" value="10"> %</td><td class="r">48,00</td><td><a href="#" class="piccolo">togli</a></td></tr>
               </tbody>
             </table>
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px">
             <button class="btn">+ Aggiungi comportamento</button>
-            <div><button class="btn primario">Firma e pubblica</button> <span class="piccolo muto" style="margin-left:8px">vale da subito, i premi già assegnati non cambiano</span></div>
+            <div><button class="btn primario">Firma e pubblica</button> <span class="piccolo muto" style="margin-left:8px">vale dal prossimo fine mese</span></div>
           </div>
         </div>
       </div>
 
-      <div class="sezione" id="az-dipendenti">
-        <div class="testa"><h2>Dipendenti</h2><button class="btn mini">+ Invita un dipendente</button></div>
+      <div class="sezione" id="az-tariffario">
+        <div class="testa"><h2>Tariffario delle multe</h2><span class="piccolo muto">v2 · dal 15 nov · <a href="#">storia</a></span></div>
+        <div class="pannello pad">
+          <div class="scroll">
+            <table>
+              <thead><tr><th>Infrazione</th><th>Quando</th><th class="r">Manti</th><th class="r">Verbali a dic.</th><th></th></tr></thead>
+              <tbody>
+                <tr><td><input class="cat-in" id="t1" value="Parolaccia in sala"></td><td class="muto piccolo">davanti a clienti o colleghi</td><td class="r"><input class="cat-q" id="tq1" value="2,00"></td><td class="r">4</td><td><a href="#" class="piccolo">togli</a></td></tr>
+                <tr><td><input class="cat-in" id="t2" value="Ritardo oltre 10 minuti"></td><td class="muto piccolo">sull'orario di turno</td><td class="r"><input class="cat-q" id="tq2" value="5,00"></td><td class="r">2</td><td><a href="#" class="piccolo">togli</a></td></tr>
+                <tr><td><input class="cat-in" id="t3" value="Telefono personale in servizio"></td><td class="muto piccolo">fuori dalle pause</td><td class="r"><input class="cat-q" id="tq3" value="3,00"></td><td class="r">2</td><td><a href="#" class="piccolo">togli</a></td></tr>
+                <tr><td><input class="cat-in" id="t4" value="Postazione in disordine"></td><td class="muto piccolo">a fine turno</td><td class="r"><input class="cat-q" id="tq4" value="3,00"></td><td class="r">1</td><td><a href="#" class="piccolo">togli</a></td></tr>
+                <tr><td><input class="cat-in" id="t5" value="Cliente lasciato senza risposta"></td><td class="muto piccolo">oltre 5 minuti</td><td class="r"><input class="cat-q" id="tq5" value="8,00"></td><td class="r">0</td><td><a href="#" class="piccolo">togli</a></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px">
+            <button class="btn">+ Aggiungi infrazione</button>
+            <div><button class="btn primario">Firma e pubblica</button> <span class="piccolo muto" style="margin-left:8px">vale da subito; i verbali già emessi non cambiano</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sezione" id="az-dip">
+        <div class="testa"><h2>Dipendenti</h2><button class="btn mini">+ Registra un dipendente</button></div>
         <div class="pannello scroll">
           <table>
-            <thead><tr><th>Nome</th><th>Conto</th><th>Dal</th><th class="r">Manti</th><th class="r">≈ €</th><th class="r">Premi a dic.</th><th>Stato</th></tr></thead>
+            <thead><tr><th>Nome</th><th>Coordinate</th><th>Dal</th><th class="r">Stipendi ricevuti</th><th class="r">Premi ricevuti</th><th>Multe definitive</th><th>Stato</th></tr></thead>
             <tbody>
-              <tr><td>Marco Rossi</td><td class="mono">a1b2…3c4d</td><td>1 ott</td><td class="r">87,50</td><td class="r">89,32</td><td class="r">3</td><td><span class="pill ok">attivo</span></td></tr>
-              <tr><td>Giulia Bianchi</td><td class="mono">f7e6…21b0</td><td>1 ott</td><td class="r">142,30</td><td class="r">145,29</td><td class="r">4</td><td><span class="pill ok">attivo</span></td></tr>
-              <tr><td>Luca Ferrari</td><td class="mono">c9e2…4b10</td><td>1 ott</td><td class="r">118,00</td><td class="r">120,48</td><td class="r">5</td><td><span class="pill ok">attivo</span></td></tr>
-              <tr><td>Sara Conti</td><td class="mono">33ab…d7e9</td><td>1 ott</td><td class="r">96,80</td><td class="r">98,83</td><td class="r">4</td><td><span class="pill ok">attivo</span></td></tr>
-              <tr><td>Andrea Greco</td><td class="mono">5b0c…88f1</td><td>1 ott</td><td class="r">131,60</td><td class="r">134,36</td><td class="r">3</td><td><span class="pill ok">attivo</span></td></tr>
-              <tr><td>Elena Ricci</td><td class="mono">e1d0…6a5c</td><td>1 ott</td><td class="r">104,40</td><td class="r">106,59</td><td class="r">4</td><td><span class="pill ok">attivo</span></td></tr>
-              <tr><td>Davide Moretti</td><td class="mono">7c2e…91af</td><td>1 ott</td><td class="r">62,40</td><td class="r">63,71</td><td class="r">0</td><td><span class="pill warn">recupero in corso</span></td></tr>
-              <tr><td>Chiara Gallo</td><td class="mono">9d4f…0b3e</td><td>1 ott</td><td class="r">115,20</td><td class="r">117,62</td><td class="r">3</td><td><span class="pill ok">attivo</span></td></tr>
-              <tr><td>Matteo Fontana</td><td class="mono">2a8b…c5d6</td><td>15 ott</td><td class="r">78,00 <span class="muto piccolo">(20 bloccati)</span></td><td class="r">79,64</td><td class="r">2</td><td><span class="pill ok">attivo</span></td></tr>
-              <tr><td>Francesca Serra</td><td class="mono">b6c7…e8f9</td><td>1 nov</td><td class="r">54,00</td><td class="r">55,13</td><td class="r">3</td><td><span class="pill ok">attivo</span></td></tr>
+              <tr><td>Marco Rossi</td><td class="mono">MNT1 q8f3…</td><td>1 ott</td><td class="r">49,50</td><td class="r">24,50</td><td class="muto">nessuna</td><td><span class="pill ok">attivo</span></td></tr>
+              <tr><td>Giulia Bianchi</td><td class="mono">MNT1 7hh2…</td><td>1 ott</td><td class="r">49,50</td><td class="r">96,40</td><td class="muto">nessuna</td><td><span class="pill ok">attivo</span></td></tr>
+              <tr><td>Luca Ferrari</td><td class="mono">MNT1 3ka9…</td><td>1 ott</td><td class="r">49,50</td><td class="r">63,70</td><td class="muto">nessuna</td><td><span class="pill ok">attivo</span></td></tr>
+              <tr><td>Sara Conti</td><td class="mono">MNT1 pp0d…</td><td>1 ott</td><td class="r">49,50</td><td class="r">44,10</td><td class="muto">nessuna</td><td><span class="pill ok">attivo</span></td></tr>
+              <tr><td>Andrea Greco</td><td class="mono">MNT1 zz41…</td><td>1 ott</td><td class="r">49,50</td><td class="r">58,80</td><td class="muto">nessuna</td><td><span class="pill ok">attivo</span></td></tr>
+              <tr><td>Elena Ricci</td><td class="mono">MNT1 e2mm…</td><td>1 ott</td><td class="r">49,50</td><td class="r">34,30</td><td class="muto">nessuna</td><td><span class="pill ok">attivo</span></td></tr>
+              <tr><td>Davide Moretti</td><td class="mono">MNT1 4rr8…</td><td>1 ott</td><td class="r">49,50</td><td class="r">19,60</td><td><span class="pill warn">V-022 · 5,00 · scade 20 dic</span></td><td><span class="pill ok">attivo</span></td></tr>
+              <tr><td>Chiara Gallo</td><td class="mono">MNT1 c9x1…</td><td>1 ott</td><td class="r">49,50</td><td class="r">63,70</td><td class="muto">nessuna</td><td><span class="pill ok">attivo</span></td></tr>
+              <tr><td>Matteo Fontana</td><td class="mono">MNT1 8dd3…</td><td>1 ott</td><td class="r">49,50</td><td class="r">39,20</td><td class="muto">nessuna</td><td><span class="pill ok">attivo</span></td></tr>
+              <tr><td>Francesca Serra</td><td class="mono">MNT1 n5k7…</td><td>1 ott</td><td class="r">49,50</td><td class="r">25,60</td><td class="muto">nessuna</td><td><span class="pill ok">attivo</span></td></tr>
             </tbody>
-            <tfoot>
-              <tr><td colspan="3">Totale dipendenti</td><td class="r">990,20</td><td class="r">1.011,00</td><td class="r">31</td><td></td></tr>
-              <tr><td colspan="3" class="muto" style="font-weight:400">Conto commissioni della banca</td><td class="r muto" style="font-weight:400">1,20</td><td class="r muto" style="font-weight:400">1,23</td><td></td><td></td></tr>
-            </tfoot>
           </table>
         </div>
-        <p class="piccolo muto" style="margin-top:8px">Da qui non si toglie nulla a nessuno: i saldi sono di chi ha la chiave. Un conto si chiude solo quando il dipendente lascia l'azienda, dopo che ha convertito.</p>
+        <p class="piccolo muto" style="margin-top:8px">Vedi quanto hai pagato a ciascuno. <b>Non vedi il saldo</b>: dopo che i manti sono arrivati, cosa ne hanno fatto non lo sa nessuno. Da qui non si toglie nulla a nessuno.</p>
       </div>
 
-      <div class="sezione" id="az-recupero">
-        <div class="testa"><h2>Recupero chiave</h2></div>
-        <div class="griglia g2">
+      <div class="sezione" id="az-polizia">
+        <div class="testa"><h2>Polizia</h2></div>
+        <div class="pannello pad form" style="max-width:520px">
+          <div class="conto">
+            <div><span>In carica</span><span>Andrea Greco</span></div>
+            <div><span>Dal</span><span>1 ottobre 2026</span></div>
+            <div><span>Chiave</span><span class="mono">0f3e…b71c</span></div>
+          </div>
+          <div class="campo"><label for="pol-new">Nomina una nuova polizia</label><select id="pol-new"><option>Scegli…</option></select></div>
+          <div><button class="btn">Firma la nomina</button></div>
+          <p class="piccolo muto">La polizia in carica smette di poter emettere verbali dal momento della nomina. Il suo conto resta il conto della polizia.</p>
+        </div>
+      </div>
+
+      <div class="firma"><span>Pannello dell'azienda · ogni azione qui è una transazione firmata con la chiave azienda e finisce nel registro pubblico, senza nomi.</span></div>
+    </main>
+  </div>
+</section>
+
+<!-- ================= PANNELLO POLIZIA ================= -->
+<section class="vista" id="vista-polizia" role="tabpanel" hidden>
+  <div class="pann">
+    <nav class="menu">
+      <div class="cap">Ogni giorno</div>
+      <a class="on" href="#po-nuovo">Nuovo verbale</a>
+      <a href="#po-verbali">Verbali</a>
+      <a href="#po-cont">Contestazioni <span class="pill warn">1</span></a>
+      <div class="cap">Il conto</div>
+      <a href="#po-conto">Conto polizia</a>
+    </nav>
+    <main>
+      <div id="po-nuovo">
+        <div class="piccolo muto">Polizia in carica: Andrea Greco · chiave <span class="mono">0f3e…b71c</span></div>
+        <h1 style="margin-top:4px">Nuovo verbale</h1>
+        <div class="griglia g2" style="margin-top:16px">
           <div class="pannello pad form">
-            <div class="nota"><b>In corso: Davide Moretti.</b> Chiave nuova <span class="mono">b04d…e3c7</span>. Firmato da te e dalla banca il 12 dicembre. Effettivo il <b>19 dicembre alle 06:00</b>. È sul sito pubblico. Se il vecchio telefono firma qualcosa, decade.</div>
-            <h3>Nuovo recupero</h3>
-            <div class="campo"><label for="rc-dip">Dipendente</label><select id="rc-dip"><option>Scegli…</option></select></div>
-            <div class="campo"><label for="rc-key">Identificativo della chiave nuova, letto di persona dal telefono nuovo</label><input id="rc-key" type="text" placeholder="40 caratteri esadecimali"></div>
-            <div><button class="btn primario">Firma la richiesta</button> <span class="piccolo muto" style="margin-left:8px">poi serve la firma della banca</span></div>
+            <div class="campo"><label for="v-dip">Dipendente</label><select id="v-dip"><option>Davide Moretti</option><option>Marco Rossi</option><option>Giulia Bianchi</option><option>Luca Ferrari</option><option>Sara Conti</option><option>Elena Ricci</option><option>Chiara Gallo</option><option>Matteo Fontana</option><option>Francesca Serra</option></select></div>
+            <div class="campo"><label for="v-voce">Infrazione, dal tariffario</label><select id="v-voce"><option>Parolaccia in sala · 2,00</option><option>Ritardo oltre 10 minuti · 5,00</option><option>Telefono personale in servizio · 3,00</option><option>Postazione in disordine · 3,00</option><option>Cliente lasciato senza risposta · 8,00</option></select></div>
+            <div class="campo"><label for="v-quando">Quando</label><input id="v-quando" type="datetime-local" value="2026-12-15T09:50"></div>
+            <div class="campo"><label for="v-desc">Descrizione, la legge il multato e, se contesta, il giudice</label><textarea id="v-desc">In sala, davanti al tavolo 4, verso le 9:50.</textarea></div>
+            <div class="conto">
+              <div><span>Importo</span><span class="num">2,00 manti</span></div>
+              <div><span>Scadenza per pagare o contestare</span><span>30 dicembre</span></div>
+              <div class="tot"><span>Da pagare a</span><span>conto polizia</span></div>
+            </div>
+            <button class="btn pericolo">Firma ed emetti il verbale</button>
+            <p class="piccolo muto">Il multato lo riceve subito nell'app, con il QR per pagare. Nel registro pubblico compare numero, infrazione e importo, non il nome. Non puoi cambiare l'importo: lo fissa il tariffario.</p>
           </div>
           <div class="pannello pad">
-            <h3>Perché è lento</h3>
-            <p class="piccolo muto" style="margin-top:8px">Il recupero è l'unico modo per spostare manti senza la firma del titolare. Per questo servono due firme e sette giorni pubblici: nessuna persona da sola, nemmeno tu, può svuotare un conto altrui di nascosto. Chi ha perso davvero il telefono aspetta una settimana. Chi ha ancora il telefono, e trova un recupero che non ha chiesto, ha sette giorni per accorgersene sul sito.</p>
+            <h3>Dicembre finora</h3>
+            <div class="griglia g2" style="margin-top:10px">
+              <div class="stat" style="padding:0"><div class="v">9</div><div class="s">verbali emessi</div></div>
+              <div class="stat" style="padding:0"><div class="v">26,00</div><div class="s">manti multati</div></div>
+              <div class="stat" style="padding:0"><div class="v">6</div><div class="s">pagati</div></div>
+              <div class="stat" style="padding:0"><div class="v">1 · 1 · 1</div><div class="s">in attesa · contestato · annullato</div></div>
+            </div>
+            <div class="nota piccolo" style="margin-top:14px">Puoi multare solo da tariffario. Ogni verbale è pubblico e contestabile. Se il giudice ti annulla troppi verbali, l'azienda può nominare un'altra polizia.</div>
           </div>
         </div>
       </div>
 
-      <div class="firma"><span>Pannello dell'azienda · ogni azione qui è una transazione firmata con la chiave azienda e finisce nel registro pubblico.</span></div>
+      <div class="sezione" id="po-verbali">
+        <div class="testa"><h2>Verbali</h2></div>
+        <div class="pannello scroll">
+          <table>
+            <thead><tr><th>N.</th><th>Quando</th><th>Dipendente</th><th>Infrazione</th><th class="r">Manti</th><th>Scade</th><th>Stato</th></tr></thead>
+            <tbody>
+              <tr><td>V-031</td><td>12 dic</td><td>Marco Rossi</td><td>Parolaccia in sala</td><td class="r">2,00</td><td>27 dic</td><td><span class="pill warn">in attesa</span></td></tr>
+              <tr><td>V-030</td><td>11 dic</td><td>Sara Conti</td><td>Telefono personale in servizio</td><td class="r">3,00</td><td>26 dic</td><td><span class="pill ok">pagato 12 dic</span></td></tr>
+              <tr><td>V-029</td><td>9 dic</td><td>Luca Ferrari</td><td>Parolaccia in sala</td><td class="r">2,00</td><td>24 dic</td><td><span class="pill ok">pagato 9 dic</span></td></tr>
+              <tr><td>V-028</td><td>8 dic</td><td>Elena Ricci</td><td>Ritardo oltre 10 minuti</td><td class="r">5,00</td><td>23 dic</td><td><span class="pill ok">pagato 14 dic</span></td></tr>
+              <tr><td>V-027</td><td>5 dic</td><td>Francesca Serra</td><td>Parolaccia in sala</td><td class="r">2,00</td><td>20 dic</td><td><span class="pill acc">contestato</span></td></tr>
+              <tr><td>V-022</td><td>28 nov</td><td>Davide Moretti</td><td>Ritardo oltre 10 minuti</td><td class="r">5,00</td><td>13 dic</td><td><span class="pill bad">definitivo, non pagato</span></td></tr>
+              <tr><td>V-019</td><td>26 nov</td><td>Marco Rossi</td><td>Ritardo oltre 10 minuti</td><td class="r">5,00</td><td>—</td><td><span class="pill">annullato · S-004</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="piccolo muto" style="margin-top:8px">V-022 è scaduto senza pagamento né contestazione: il 31 l'azienda trattiene 5,00 dallo stipendio di Davide e li versa al conto polizia. Le sue conversioni sono bloccate fino ad allora.</p>
+      </div>
+
+      <div class="sezione" id="po-cont">
+        <div class="testa"><h2>Contestazioni aperte</h2></div>
+        <div class="pannello pad form">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px"><b style="font-family:var(--display);font-size:1.15rem">V-027 · Parolaccia in sala · 2,00 manti</b><span class="piccolo muto">contestato il 7 dic · replica entro il 10 dic</span></div>
+          <div class="conto">
+            <div><span>Il tuo verbale</span><span style="text-align:right;max-width:60%">"Al banco, con un collega, ore 16:20."</span></div>
+            <div><span>La contestazione</span><span style="text-align:right;max-width:60%">"Stavo citando il cliente che l'aveva appena detta, tra virgolette. Il collega può confermare."</span></div>
+          </div>
+          <div class="campo"><label for="rep">La tua replica, facoltativa. La legge solo il giudice</label><textarea id="rep">Confermo che il cliente l'aveva detta prima. La ripetizione è avvenuta a voce alta con altri clienti al banco.</textarea></div>
+          <div><button class="btn primario">Firma e invia la replica</button> <button class="btn">Non replicare</button></div>
+          <div class="nota info piccolo">Il giudice decide dopo la replica o dopo 3 giorni senza. Non sa chi è il multato né chi sei tu: legge solo verbale, tariffario, contestazione e replica.</div>
+        </div>
+      </div>
+
+      <div class="sezione" id="po-conto">
+        <div class="testa"><h2>Conto polizia</h2></div>
+        <div class="griglia g2">
+          <div class="pannello pad">
+            <div class="saldo" style="padding-top:6px">
+              <div class="piccolo muto">Saldo</div>
+              <div class="m">47,00 <small>manti</small></div>
+              <div class="e">≈ 48,72 € · raccolti dalle multe</div>
+            </div>
+            <div class="azioni" style="grid-template-columns:1fr 1fr"><button class="btn">Bonifico</button><button class="btn">Converti in euro</button></div>
+            <p class="piccolo muto">È un conto come gli altri. Quello che ci fate, cene o altro, lo decidete voi. Anche qui, nessuno vede il saldo dal registro.</p>
+          </div>
+          <div class="pannello pad">
+            <h3>Ultime entrate</h3>
+            <div class="lista" style="margin-top:8px">
+              <div class="voce"><div class="av multa">!</div><div class="t"><b>V-028 pagato</b><span>14 dic · riga 411</span></div><div class="imp piu">+5,00</div></div>
+              <div class="voce"><div class="av multa">!</div><div class="t"><b>V-030 pagato</b><span>12 dic · riga 402</span></div><div class="imp piu">+3,00</div></div>
+              <div class="voce"><div class="av multa">!</div><div class="t"><b>V-029 pagato</b><span>9 dic · riga 388</span></div><div class="imp piu">+2,00</div></div>
+              <div class="voce"><div class="av">→</div><div class="t"><b>Bonifico · pizzeria (Luca ha anticipato)</b><span>29 nov · cena di novembre</span></div><div class="imp">−38,00</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="firma"><span>Pannello della polizia · verbali e repliche sono firmati con la chiave polizia. Il conto è un conto normale.</span></div>
     </main>
   </div>
 </section>
@@ -641,7 +815,7 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
 <script>
 (function () {
   var tabs = document.querySelectorAll('.switch [role=tab]');
-  var viste = { sito: document.getElementById('vista-sito'), app: document.getElementById('vista-app'), azienda: document.getElementById('vista-azienda') };
+  var viste = { sito: document.getElementById('vista-sito'), app: document.getElementById('vista-app'), azienda: document.getElementById('vista-azienda'), polizia: document.getElementById('vista-polizia') };
   function mostra(nome) {
     Object.keys(viste).forEach(function (k) { viste[k].hidden = k !== nome; });
     tabs.forEach(function (t) { t.setAttribute('aria-selected', String(t.dataset.vista === nome)); });
@@ -653,5 +827,24 @@ tfoot td { border-top: 1px solid var(--line-strong); border-bottom: 0; font-weig
   try { iniziale = localStorage.getItem('manti-vista') || 'sito'; } catch (e) {}
   if (!viste[iniziale]) iniziale = 'sito';
   mostra(iniziale);
+
+  // QR finto ma dall'aspetto credibile: pattern di ricerca veri, moduli pseudocasuali deterministici
+  var svg = document.getElementById('qr1');
+  if (svg) {
+    var n = 25, seed = 7, out = '';
+    function rnd() { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; }
+    function finder(x, y) {
+      for (var i = 0; i < 7; i++) for (var j = 0; j < 7; j++) {
+        var b = i === 0 || i === 6 || j === 0 || j === 6 || (i >= 2 && i <= 4 && j >= 2 && j <= 4);
+        if (b) out += '<rect x="' + (x + j) + '" y="' + (y + i) + '" width="1" height="1" fill="#111"/>';
+      }
+    }
+    for (var y = 0; y < n; y++) for (var x = 0; x < n; x++) {
+      var inF = (x < 8 && y < 8) || (x >= n - 8 && y < 8) || (x < 8 && y >= n - 8);
+      if (!inF && rnd() < 0.45) out += '<rect x="' + x + '" y="' + y + '" width="1" height="1" fill="#111"/>';
+    }
+    finder(0, 0); finder(n - 7, 0); finder(0, n - 7);
+    svg.innerHTML = out;
+  }
 })();
 </script>
