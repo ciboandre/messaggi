@@ -6,13 +6,13 @@
 // e poi su git; con il server (fase C) andranno via HTTP.
 
 import { generaFrase, fraseValida } from '../nucleo/frase.js';
-import { portafoglioDaFrase, decodificaCoordinate } from '../nucleo/portafoglio.js';
+import { portafoglioDaFrase } from '../nucleo/portafoglio.js';
 import { preparaRiga, firmaRiga } from '../nucleo/registro.js';
 import { apriRegistro, accodaSuFile } from '../nucleo/registro-file.js';
 import { tipi } from '../nucleo/tipi.js';
 import { mieEntrate, saldo as sommaSaldo, costruisciPagamentoRiservato, costruisciRichiestaConversione } from '../nucleo/pagamento.js';
 import { valore, prezzoConversione, euroPerManti } from '../nucleo/banca.js';
-import { centesimiDa } from '../banca/comandi.js';
+import { centesimiDa, controllaCoordinate } from '../banca/comandi.js';
 
 const adesso = () => new Date().toISOString().replace(/\.\d{3}Z$/, 'Z');
 
@@ -52,7 +52,7 @@ export function saldo(percorso, frase) {
  */
 export function paga(percorso, frase, importo, destinazione, causale) {
   const p = portafoglio(frase);
-  decodificaCoordinate(destinazione);
+  controllaCoordinate(destinazione);
   const amount = centesimiDa(importo);
   const reg = apriRegistro(percorso, { tipi });
   const disponibili = mieEntrate(reg, p);

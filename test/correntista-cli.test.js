@@ -33,7 +33,7 @@ test('conto di prova: nuovo, coordinate, vendita dalla banca, pagamento riservat
   assert.equal(s.entrate[0].causale, 'pizza');
   assert.equal(s.entrate[0].chiaro, false);
   assert.throws(() => cc.paga(ledger, bruno.frase, '20', anna.coordinate), /saldo insufficiente/);
-  assert.throws(() => cc.paga(ledger, bruno.frase, '1', 'mnt1zzz'), /bech32|checksum|Invalid/i);
+  assert.throws(() => cc.paga(ledger, bruno.frase, '1', 'mnt1…'), /coordinate non valide: servono quelle intere/);
 
   const r = cc.converti(ledger, bruno.frase, '10', 'Bruno Neri, IT11A0000000000000000000000');
   assert.equal(r.riga.type, 'conversion.request');

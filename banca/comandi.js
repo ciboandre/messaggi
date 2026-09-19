@@ -102,9 +102,19 @@ export function giorno(percorso, frase, data = oggiUtc()) {
 }
 
 /** Vende manti: euro ricevuti fuori dal sistema, al prezzo del giorno, a delle coordinate. */
+/** Coordinate valide o un messaggio chiaro. */
+export function controllaCoordinate(coordinate) {
+  try {
+    decodificaCoordinate(coordinate);
+  } catch {
+    throw new Error(`coordinate non valide: servono quelle intere, "mnt1…" seguito da circa 110 caratteri (ricevuto: ${String(coordinate ?? '').slice(0, 12)}…)`);
+  }
+}
+
 export function vendita(percorso, frase, euro, coordinate, pagamento) {
   const euroCent = centesimiDa(euro);
-  decodificaCoordinate(coordinate);
+  controllaCoordinate(coordinate);
+  if (typeof pagamento !== 'string' || !pagamento.trim()) throw new Error('serve il riferimento al pagamento in euro, tra virgolette');
   const reg = apriRegistro(percorso, { tipi });
   const prezzo = prezzoAcquisto(reg.stato);
   const manti = mantiPerEuro(BigInt(euroCent), prezzo);
@@ -134,7 +144,7 @@ export function correzione(percorso, frase, ref, euro, motivazione) {
 
 export function azienda(percorso, frase, chiave, coordinate, nome) {
   if (!RE_HEX64.test(chiave)) throw new Error('chiave dell\'azienda: 64 esadecimali');
-  decodificaCoordinate(coordinate);
+  controllaCoordinate(coordinate);
   return accodaBanca(percorso, frase, 'company.register', { chiave, coordinate, nome });
 }
 
