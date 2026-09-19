@@ -229,6 +229,7 @@ tfoot td { border-top: 1px solid var(--surface-3); border-bottom: 0; font-weight
       <button role="tab" id="tab-app" aria-selected="false" data-vista="app">App</button>
       <button role="tab" id="tab-azienda" aria-selected="false" data-vista="azienda">Azienda</button>
       <button role="tab" id="tab-polizia" aria-selected="false" data-vista="polizia">Polizia</button>
+      <button role="tab" id="tab-banca" aria-selected="false" data-vista="banca">Banca</button>
     </div>
   </div>
 </div>
@@ -239,15 +240,19 @@ tfoot td { border-top: 1px solid var(--surface-3); border-bottom: 0; font-weight
   <div class="hero">
     <div>
       <div class="ey"><i></i> Pubblicato oggi alle 06:00 · registro verificato, 412 righe su 412</div>
-      <div class="big">1,037<small>€ per manto</small></div>
-      <div class="delta">▲ 0,5% da fine ottobre · 3,7% dalla partenza</div>
-      <p class="come">Il valore non lo decide nessuno: è la riserva in euro divisa per i manti in circolazione. Cambia solo a fine mese, quando entrano gli euro del fatturato ed escono stipendi e premi. Sale ogni volta che un premio non viene assegnato.</p>
+      <div class="big">1,021<small>€ per manto</small></div>
+      <div class="delta">▲ 2,1% dalla partenza · non è mai sceso</div>
+      <p class="come">Il valore non lo decide nessuno: è la riserva in euro divisa per i manti in circolazione. Sale a ogni vendita con sovrapprezzo, a ogni conversione, con gli interessi della riserva e con la metà di ogni multa che viene bruciata. Non esiste un'operazione che lo faccia scendere.</p>
+      <div style="display:flex;gap:10px;margin-top:18px;flex-wrap:wrap">
+        <div class="kpi" style="flex:1;min-width:140px"><h3>Compri dalla banca a</h3><div class="v">1,072<small> €</small></div><div class="s">valore + 5%</div></div>
+        <div class="kpi" style="flex:1;min-width:140px"><h3>Converti in euro a</h3><div class="v">1,000<small> €</small></div><div class="s">valore − 2%</div></div>
+      </div>
     </div>
     <div class="kpis">
-      <div class="kpi"><h3>Riserva</h3><div class="v">939,28<small> €</small></div><div class="s">1.000 versati, 60,72 pagati</div></div>
-      <div class="kpi"><h3>In circolazione</h3><div class="v">906,20</div><div class="s">manti, di cui 1,20 della banca</div></div>
-      <div class="kpi"><h3>Emessi</h3><div class="v">965<small> / 990</small></div><div class="s">25 di premi mai emessi</div></div>
-      <div class="kpi"><h3>Dicembre</h3><div class="v">480</div><div class="s">in arrivo il 31: 240 stipendi, fino a 240 premi</div></div>
+      <div class="kpi"><h3>Riserva</h3><div class="v">3.454,44<small> €</small></div><div class="s">tetto 4.000 · spazio per 545,56 €</div></div>
+      <div class="kpi"><h3>In circolazione</h3><div class="v">3.384,85</div><div class="s">manti</div></div>
+      <div class="kpi"><h3>Bruciati</h3><div class="v">86,00</div><div class="s">60 in conversioni, 26 da multe</div></div>
+      <div class="kpi"><h3>Interessi in riserva</h3><div class="v">13,35<small> €</small></div><div class="s">conto remunerato, 2,5%</div></div>
     </div>
   </div>
 
@@ -256,26 +261,27 @@ tfoot td { border-top: 1px solid var(--surface-3); border-bottom: 0; font-weight
       <h3>Andamento del valore</h3>
       <svg class="grafico" viewBox="0 0 460 200" aria-label="Valore del manto da ottobre a oggi">
         <g class="griglia-l"><line x1="50" y1="20" x2="440" y2="20"/><line x1="50" y1="55" x2="440" y2="55"/><line x1="50" y1="90" x2="440" y2="90"/><line x1="50" y1="125" x2="440" y2="125"/><line x1="50" y1="160" x2="440" y2="160"/></g>
-        <text x="8" y="24">1,04</text><text x="8" y="59">1,03</text><text x="8" y="94">1,02</text><text x="8" y="129">1,01</text><text x="8" y="164">1,00</text>
-        <path class="area" d="M70,160 L180,52 L300,33 L410,31 L410,160 Z"/>
-        <polyline class="linea" points="70,160 180,52 300,33 410,31"/>
-        <circle class="punto" cx="70" cy="160" r="4"/><circle class="punto" cx="180" cy="52" r="4"/><circle class="punto" cx="300" cy="33" r="4"/>
-        <circle class="punto-fine" cx="410" cy="31" r="6"/>
-        <text x="58" y="186">1 ott</text><text x="165" y="186">31 ott</text><text x="283" y="186">30 nov</text><text x="397" y="186">oggi</text>
+        <text x="8" y="24">1,03</text><text x="8" y="59">1,02</text><text x="8" y="94">1,01</text><text x="8" y="129">1,00</text><text x="8" y="164">0,99</text>
+        <path class="area" d="M70,125 L160,118 L250,85 L320,55 L410,53 L410,160 L70,160 Z"/>
+        <polyline class="linea" points="70,125 160,118 250,85 320,55 410,53"/>
+        <circle class="punto" cx="70" cy="125" r="4"/><circle class="punto" cx="160" cy="118" r="4"/><circle class="punto" cx="250" cy="85" r="4"/><circle class="punto" cx="320" cy="55" r="4"/>
+        <circle class="punto-fine" cx="410" cy="53" r="6"/>
+        <text x="58" y="186">1 ott</text><text x="145" y="186">31 ott</text><text x="228" y="186">multe</text><text x="300" y="186">20 nov</text><text x="397" y="186">oggi</text>
       </svg>
-      <p class="piccolo muto" style="margin-top:6px">1,000 alla partenza · 1,031 il 31 ottobre (15 manti di premi non emessi) · 1,036 il 30 novembre (10 non emessi) · 1,037 oggi.</p>
+      <p class="piccolo muto" style="margin-top:6px">1,000 alla prima vendita · 1,002 con gli interessi di ottobre · 1,011 dopo le conversioni e le multe bruciate · 1,018 con la seconda vendita a 1,062 · 1,021 oggi.</p>
     </div>
     <div class="card pad">
       <h3>Il conto di oggi</h3>
       <div class="conto" style="margin-top:8px">
-        <div><span>Versato in riserva (ottobre + novembre)</span><span class="num">1.000,00 €</span></div>
-        <div><span>Pagato per conversioni</span><span class="num">− 60,72 €</span></div>
-        <div><span>Riserva</span><span class="num">939,28 €</span></div>
-        <div><span>Manti emessi</span><span class="num">965,00</span></div>
-        <div><span>Manti distrutti in conversione</span><span class="num">− 58,80</span></div>
-        <div class="tot"><span>939,28 ÷ 906,20</span><span class="num">1,0365 €</span></div>
+        <div><span>Euro ricevuti dalle vendite</span><span class="num">3.500,00 €</span></div>
+        <div><span>Interessi del conto di riserva</span><span class="num">+ 13,35 €</span></div>
+        <div><span>Pagato per conversioni</span><span class="num">− 58,91 €</span></div>
+        <div><span>Riserva</span><span class="num">3.454,44 €</span></div>
+        <div><span>Manti venduti</span><span class="num">3.470,85</span></div>
+        <div><span>Manti bruciati</span><span class="num">− 86,00</span></div>
+        <div class="tot"><span>3.454,44 ÷ 3.384,85</span><span class="num">1,0205 €</span></div>
       </div>
-      <p class="piccolo muto" style="margin-top:10px">Multe, pagamenti e bonifici spostano manti tra indirizzi e non toccano il totale. Le conversioni tolgono euro e manti nella stessa proporzione. Solo la fine del mese muove il valore.</p>
+      <p class="piccolo muto" style="margin-top:10px">Pagamenti, bonifici e stipendi spostano manti tra indirizzi e non toccano il totale. L'estratto conto della riserva di novembre è <a href="#">pubblicato qui</a>: 3.454,44 €, coincide con il registro.</p>
     </div>
   </div>
 
@@ -284,34 +290,34 @@ tfoot td { border-top: 1px solid var(--surface-3); border-bottom: 0; font-weight
       <div class="testa" style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px"><h2>Catalogo dei premi</h2><span class="piccolo muto">v3 · dal 1 dic · <a href="#">storia</a></span></div>
       <div class="card scroll">
         <table>
-          <thead><tr><th>Comportamento</th><th class="r">Quota</th><th class="r">A dicembre</th></tr></thead>
+          <thead><tr><th>Comportamento · Cibotari S.r.l.</th><th class="r">Manti</th><th class="r">In euro</th></tr></thead>
           <tbody>
-            <tr><td><b>Giornata senza parolacce</b><br><span class="muto piccolo">una al giorno, conferma del responsabile</span></td><td class="r">1%</td><td class="r">4,80</td></tr>
-            <tr><td><b>Settimana puntuale</b><br><span class="muto piccolo">cinque giorni di fila in orario</span></td><td class="r">3%</td><td class="r">14,40</td></tr>
-            <tr><td><b>Recensione positiva di un cliente</b><br><span class="muto piccolo">pubblica, che nomina il dipendente</span></td><td class="r">4%</td><td class="r">19,20</td></tr>
-            <tr><td><b>Problema segnalato e risolto</b><br><span class="muto piccolo">segnalazione scritta, risolta in settimana</span></td><td class="r">2%</td><td class="r">9,60</td></tr>
-            <tr><td><b>Aiuto a un collega</b><br><span class="muto piccolo">lo segnala il collega aiutato</span></td><td class="r">2%</td><td class="r">9,60</td></tr>
-            <tr><td><b>Mese senza errori</b><br><span class="muto piccolo">nessun errore registrato nel mese</span></td><td class="r">10%</td><td class="r">48,00</td></tr>
+            <tr><td><b>Giornata senza parolacce</b><br><span class="muto piccolo">una al giorno, conferma del responsabile</span></td><td class="r">5,00</td><td class="r">5,10</td></tr>
+            <tr><td><b>Settimana puntuale</b><br><span class="muto piccolo">cinque giorni di fila in orario</span></td><td class="r">15,00</td><td class="r">15,31</td></tr>
+            <tr><td><b>Recensione positiva di un cliente</b><br><span class="muto piccolo">pubblica, che nomina il dipendente</span></td><td class="r">20,00</td><td class="r">20,41</td></tr>
+            <tr><td><b>Problema segnalato e risolto</b><br><span class="muto piccolo">segnalazione scritta, risolta in settimana</span></td><td class="r">10,00</td><td class="r">10,21</td></tr>
+            <tr><td><b>Aiuto a un collega</b><br><span class="muto piccolo">lo segnala il collega aiutato</span></td><td class="r">10,00</td><td class="r">10,21</td></tr>
+            <tr><td><b>Mese senza errori</b><br><span class="muto piccolo">nessun errore registrato nel mese</span></td><td class="r">50,00</td><td class="r">51,03</td></tr>
           </tbody>
         </table>
       </div>
-      <p class="piccolo muto" style="margin-top:8px">Quote dell'emissione del mese. Assegnati il 31, fino a 240 manti in tutto. Il resto non si emette.</p>
+      <p class="piccolo muto" style="margin-top:8px">Importi fissi decisi dall'azienda, pagati dal suo conto a fine mese insieme allo stipendio base di 25 manti. Ogni azienda ha il suo catalogo.</p>
     </div>
     <div>
       <div class="testa" style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px"><h2>Tariffario delle multe</h2><span class="piccolo muto">v2 · dal 15 nov · <a href="#">storia</a></span></div>
       <div class="card scroll">
         <table>
-          <thead><tr><th>Infrazione</th><th class="r">Manti</th><th class="r">In euro</th></tr></thead>
+          <thead><tr><th>Infrazione · Cibotari S.r.l.</th><th class="r">Manti</th><th class="r">In euro</th></tr></thead>
           <tbody>
-            <tr><td><b>Parolaccia in sala</b><br><span class="muto piccolo">davanti a clienti o colleghi</span></td><td class="r">2,00</td><td class="r">2,07</td></tr>
-            <tr><td><b>Ritardo oltre 10 minuti</b><br><span class="muto piccolo">sull'orario di turno</span></td><td class="r">5,00</td><td class="r">5,18</td></tr>
-            <tr><td><b>Telefono personale in servizio</b><br><span class="muto piccolo">fuori dalle pause</span></td><td class="r">3,00</td><td class="r">3,11</td></tr>
-            <tr><td><b>Postazione in disordine</b><br><span class="muto piccolo">a fine turno</span></td><td class="r">3,00</td><td class="r">3,11</td></tr>
-            <tr><td><b>Cliente lasciato senza risposta</b><br><span class="muto piccolo">oltre 5 minuti</span></td><td class="r">8,00</td><td class="r">8,29</td></tr>
+            <tr><td><b>Parolaccia in sala</b><br><span class="muto piccolo">davanti a clienti o colleghi</span></td><td class="r">2,00</td><td class="r">2,04</td></tr>
+            <tr><td><b>Ritardo oltre 10 minuti</b><br><span class="muto piccolo">sull'orario di turno</span></td><td class="r">5,00</td><td class="r">5,10</td></tr>
+            <tr><td><b>Telefono personale in servizio</b><br><span class="muto piccolo">fuori dalle pause</span></td><td class="r">3,00</td><td class="r">3,06</td></tr>
+            <tr><td><b>Postazione in disordine</b><br><span class="muto piccolo">a fine turno</span></td><td class="r">3,00</td><td class="r">3,06</td></tr>
+            <tr><td><b>Cliente lasciato senza risposta</b><br><span class="muto piccolo">oltre 5 minuti</span></td><td class="r">8,00</td><td class="r">8,16</td></tr>
           </tbody>
         </table>
       </div>
-      <p class="piccolo muto" style="margin-top:8px">Importi fissi in manti. La polizia non può multare fuori da questa lista. Si paga entro 15 giorni o si contesta.</p>
+      <p class="piccolo muto" style="margin-top:8px">La polizia non può multare fuori da questa lista. Si paga entro 15 giorni o si contesta. Di ogni multa pagata, metà va alla polizia e metà viene bruciata: alza il valore per tutti.</p>
     </div>
   </div>
 
@@ -340,16 +346,20 @@ tfoot td { border-top: 1px solid var(--surface-3); border-bottom: 0; font-weight
         <thead><tr><th class="r">#</th><th>Quando</th><th>Tipo</th><th>Dettaglio</th><th>Hash</th></tr></thead>
         <tbody>
           <tr><td class="r">412</td><td>14 dic 17:32</td><td><span class="pill">pagamento</span></td><td>1 entrata → 2 uscite · 3,00 + 68,30 · indirizzi <span class="mono">7e1c…</span> <span class="mono">a90f…</span></td><td class="mono">3f9c…a71e</td></tr>
-          <tr><td class="r">411</td><td>14 dic 12:05</td><td><span class="pill">pagamento</span></td><td>rif. verbale V-028 · 1 entrata → 2 uscite · 5,00 + 12,40</td><td class="mono">b81d…04c2</td></tr>
-          <tr><td class="r">410</td><td>13 dic 12:40</td><td><span class="pill acc">conversione</span></td><td>eseguita #409 · distrutti 19,60 · commissione 0,40 → banca · 20,31 € dovuti</td><td class="mono">e2a0…7f19</td></tr>
+          <tr><td class="r">411</td><td>14 dic 12:05</td><td><span class="pill">multa pagata</span></td><td>rif. V-028 · 1 entrata → 2,50 alla polizia · 2,50 bruciati · 12,40 resto</td><td class="mono">b81d…04c2</td></tr>
+          <tr><td class="r">410</td><td>13 dic 12:40</td><td><span class="pill acc">conversione</span></td><td>eseguita #409 · bruciati 20,00 · prezzo 1,0000 · 20,00 € dovuti</td><td class="mono">e2a0…7f19</td></tr>
           <tr><td class="r">409</td><td>13 dic 09:15</td><td><span class="pill acc">richiesta</span></td><td>conversione · 1 entrata da 20,00 · dati di pagamento cifrati per la banca</td><td class="mono">91cc…2b6d</td></tr>
           <tr><td class="r">408</td><td>12 dic 10:00</td><td><span class="pill bad">verbale</span></td><td>V-031 · Parolaccia in sala · 2,00 · scade 27 dic · consegna <span class="mono">c40b…</span></td><td class="mono">5d7e…c308</td></tr>
           <tr><td class="r">407</td><td>11 dic 17:02</td><td><span class="pill ok">sentenza</span></td><td>S-004 · V-019 annullata · istruzioni v1.2 · fascicolo <span class="mono">88a1…</span></td><td class="mono">a4f3…d1e0</td></tr>
           <tr><td class="r">406</td><td>10 dic 09:40</td><td><span class="pill">bonifico</span></td><td>2 entrate → 2 uscite · 9,80 + 41,00 · causale cifrata</td><td class="mono">0c9b…55a8</td></tr>
-          <tr><td class="r">…</td><td colspan="4" class="muto">righe da 3 a 405</td></tr>
-          <tr><td class="r">2</td><td>31 ott 23:59</td><td><span class="pill warn">fine mese</span></td><td>stipendi 10 × 25,00 · premi 235,00 in 21 uscite · non emessi 15,00 · attivi 10</td><td class="mono">c3d2…8e7b</td></tr>
+          <tr><td class="r">…</td><td colspan="4" class="muto">righe da 6 a 405</td></tr>
+          <tr><td class="r">…</td><td>30 nov 23:59</td><td><span class="pill ok">interessi</span></td><td>novembre · +7,10 € in riserva</td><td class="mono">1a7e…90cd</td></tr>
+          <tr><td class="r">…</td><td>20 nov 11:20</td><td><span class="pill warn">vendita</span></td><td>500,00 € a 1,0619 → 470,85 manti · 1 uscita</td><td class="mono">d04b…3e12</td></tr>
+          <tr><td class="r">…</td><td>31 ott 23:59</td><td><span class="pill">fine mese</span></td><td>Cibotari S.r.l. · stipendi 10 × 25,00 · premi 250,00 in 19 uscite</td><td class="mono">c3d2…8e7b</td></tr>
+          <tr><td class="r">…</td><td>31 ott 23:59</td><td><span class="pill ok">interessi</span></td><td>ottobre · +6,25 € in riserva</td><td class="mono">7b1c…44aa</td></tr>
+          <tr><td class="r">2</td><td>1 ott 09:00</td><td><span class="pill warn">vendita</span></td><td>3.000,00 € a 1,0000 → 3.000,00 manti · 1 uscita · prima vendita</td><td class="mono">5e9a…0f31</td></tr>
           <tr><td class="r">1</td><td>1 ott 00:00</td><td><span class="pill">azienda</span></td><td>registrata "Cibotari S.r.l." · chiave <span class="mono">4a91…0e2c</span></td><td class="mono">6e30…b19f</td></tr>
-          <tr><td class="r">0</td><td>1 ott 00:00</td><td><span class="pill">genesi</span></td><td>500 manti il primo mese · −2% al mese · 50% stipendi · commissione 2% · 15 giorni</td><td class="mono">9a1c…e4d8</td></tr>
+          <tr><td class="r">0</td><td>1 ott 00:00</td><td><span class="pill">genesi</span></td><td>sovrapprezzo 5% · commissione 2% · multe bruciate 50% · tetto 4.000 € · 15 giorni</td><td class="mono">9a1c…e4d8</td></tr>
         </tbody>
       </table>
     </div>
@@ -363,7 +373,7 @@ tfoot td { border-top: 1px solid var(--surface-3); border-bottom: 0; font-weight
   </div>
 
   <div class="firma">
-    <span>Generato il 15 dicembre 2026, 06:00 UTC</span><span>motore <code>1.0.0</code></span><span>giudice <code>istruzioni v1.2</code></span><span>ultima riga <code>seq 412</code></span><span>hash <code>3f9c4e1b…a71e</code></span><span>commit <code>a3f9e02</code></span>
+    <span>Generato il 15 dicembre 2026, 06:00 UTC</span><span>motore <code>1.0.0</code></span><span>giudice <code>istruzioni v1.2</code></span><span>tetto <code>4.000 €</code></span><span>ultima riga <code>seq 412</code></span><span>hash <code>3f9c4e1b…a71e</code></span><span>commit <code>a3f9e02</code></span>
   </div>
 </section>
 
@@ -409,27 +419,27 @@ tfoot td { border-top: 1px solid var(--surface-3); border-bottom: 0; font-weight
             <div class="av">⚙</div>
           </div>
           <div class="saldo-card">
-            <div class="tasso">1 manto = 1,037 € ▲</div>
+            <div class="tasso">1 manto = 1,021 € ▲</div>
             <div class="l">Saldo</div>
             <div class="m">71,30<small>manti</small></div>
-            <div class="e">≈ 73,94 € · aggiornato alle 06:00</div>
+            <div class="e">≈ 71,30 € se converti oggi · aggiornato alle 06:00</div>
           </div>
           <div class="azioni">
             <button class="p"><i>＋</i>Ricevi</button>
             <button><i>▣</i>Inquadra</button>
             <button><i>→</i>Bonifico</button>
-            <button><i>€</i>Converti</button>
+            <button><i>€</i>Compra</button>
           </div>
           <div class="nota bad piccolo" style="margin-bottom:14px;display:flex;justify-content:space-between;align-items:center"><span><b>1 multa da pagare</b> · V-031 · 2,00 manti · scade il 27 dic</span><a href="#">Apri</a></div>
           <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px"><h3>Movimenti</h3><a href="#" class="piccolo">Tutti</a></div>
           <div class="lista">
-            <div class="voce"><div class="av">☕</div><div class="t"><b>Pagamento con QR</b><span>14 dic · "caffè" · riga 412</span></div><div class="imp">−3,00<small>3,11 €</small></div></div>
-            <div class="voce"><div class="av ok">↓</div><div class="t"><b>Bonifico ricevuto</b><span>10 dic · "grazie per l'aiuto" · riga 406</span></div><div class="imp piu">+9,80<small>10,16 €</small></div></div>
-            <div class="voce"><div class="av premio">★</div><div class="t"><b>Premio · Settimana puntuale</b><span>30 nov · fine mese · 3% di 490</span></div><div class="imp piu">+14,70<small>15,24 €</small></div></div>
-            <div class="voce"><div class="av premio">€</div><div class="t"><b>Stipendio di novembre</b><span>30 nov · 245 ÷ 10 dipendenti</span></div><div class="imp piu">+24,50<small>25,40 €</small></div></div>
-            <div class="voce"><div class="av">€</div><div class="t"><b>Convertiti in euro</b><span>20 nov · 30,00 manti, commissione 0,60 · pagata</span></div><div class="imp">−30,00<small>30,31 €</small></div></div>
-            <div class="voce"><div class="av multa">!</div><div class="t"><b>Multa pagata · V-014</b><span>8 nov · Postazione in disordine</span></div><div class="imp">−3,00<small>3,09 €</small></div></div>
-            <div class="voce"><div class="av premio">€</div><div class="t"><b>Stipendio di ottobre</b><span>31 ott · 250 ÷ 10 dipendenti</span></div><div class="imp piu">+25,00<small>25,77 €</small></div></div>
+            <div class="voce"><div class="av">☕</div><div class="t"><b>Pagamento con QR</b><span>14 dic · "caffè" · riga 412</span></div><div class="imp">−3,00<small>3,06 €</small></div></div>
+            <div class="voce"><div class="av ok">↓</div><div class="t"><b>Bonifico ricevuto</b><span>10 dic · "grazie per l'aiuto" · riga 406</span></div><div class="imp piu">+9,80<small>10,00 €</small></div></div>
+            <div class="voce"><div class="av premio">★</div><div class="t"><b>Premio · Settimana puntuale</b><span>30 nov · da Cibotari S.r.l.</span></div><div class="imp piu">+15,00<small>15,31 €</small></div></div>
+            <div class="voce"><div class="av premio">€</div><div class="t"><b>Stipendio di novembre</b><span>30 nov · da Cibotari S.r.l.</span></div><div class="imp piu">+25,00<small>25,51 €</small></div></div>
+            <div class="voce"><div class="av">€</div><div class="t"><b>Convertiti in euro</b><span>20 nov · 30,00 manti a 0,9816 · pagata</span></div><div class="imp">−30,00<small>29,45 €</small></div></div>
+            <div class="voce"><div class="av multa">!</div><div class="t"><b>Multa pagata · V-014</b><span>8 nov · 1,50 alla polizia, 1,50 bruciati</span></div><div class="imp">−3,00<small>3,06 €</small></div></div>
+            <div class="voce"><div class="av premio">€</div><div class="t"><b>Stipendio di ottobre</b><span>31 ott · da Cibotari S.r.l.</span></div><div class="imp piu">+25,00<small>25,51 €</small></div></div>
           </div>
         </div>
         <div class="tabbar"><div class="on"><i></i>Conto</div><div class="badge"><i></i>Multe</div><div><i></i>Rubrica</div><div><i></i>Sicurezza</div></div>
@@ -449,7 +459,7 @@ tfoot td { border-top: 1px solid var(--surface-3); border-bottom: 0; font-weight
               <div class="coord">mnt1 q8f3 k2ma 9x7d hv4t …</div>
               <div class="piccolo muto">Indirizzo nuovo, valido per un pagamento. Chi inquadra paga a te; nessun altro potrà collegarlo a te.</div>
             </div>
-            <div class="campo"><label for="ric-imp" style="text-align:center">Importo richiesto, facoltativo</label><div class="importo-in">12,00</div><div class="piccolo muto" style="text-align:center;margin-top:-6px">≈ 12,44 €</div></div>
+            <div class="campo"><label for="ric-imp" style="text-align:center">Importo richiesto, facoltativo</label><div class="importo-in">12,00</div><div class="piccolo muto" style="text-align:center;margin-top:-6px">≈ 12,25 €</div></div>
             <div class="campo"><label for="ric-cau">Causale, la legge solo chi paga</label><input id="ric-cau" type="text" value="pranzo di ieri"></div>
             <button class="btn primario largo">Condividi link di pagamento</button>
             <button class="btn largo">Condividi le mie coordinate</button>
@@ -469,7 +479,7 @@ tfoot td { border-top: 1px solid var(--surface-3); border-bottom: 0; font-weight
           <div class="titolo-schermo"><span class="back">‹</span><h2>Bonifico</h2></div>
           <div class="form">
             <div class="lista"><div class="voce"><div class="av">L</div><div class="t"><b>Luca</b><span class="mono">mnt1 3ka9 … · dalla rubrica</span></div><a href="#" class="piccolo">cambia</a></div></div>
-            <div class="campo"><div class="importo-in">10,00</div><div class="piccolo muto" style="text-align:center;margin-top:-6px">≈ 10,37 € · ne hai 71,30</div></div>
+            <div class="campo"><div class="importo-in">10,00</div><div class="piccolo muto" style="text-align:center;margin-top:-6px">≈ 10,21 € · ne hai 71,30</div></div>
             <div class="chip-row"><button class="btn">5</button><button class="btn">10</button><button class="btn">20</button><button class="btn">Tutto</button></div>
             <div class="campo"><label for="bon-cau">Causale, la legge solo Luca</label><input id="bon-cau" type="text" value="turno di sabato"></div>
             <div class="conto">
@@ -497,12 +507,12 @@ tfoot td { border-top: 1px solid var(--surface-3); border-bottom: 0; font-weight
               <div style="display:flex;justify-content:space-between;align-items:center"><span class="pill bad">da pagare</span><span class="piccolo muto">scade il 27 dic · 12 giorni</span></div>
               <div class="cifra" style="font-size:1.3rem">V-031 · Parolaccia in sala</div>
               <div class="piccolo muto">12 dicembre, 10:00 · polizia · "In sala, davanti al tavolo 4, verso le 9:50."</div>
-              <div class="cifra" style="font-size:2rem">2,00 <span class="muto" style="font-size:.9rem;font-family:var(--body);font-weight:500">manti ≈ 2,07 €</span></div>
+              <div class="cifra" style="font-size:2rem">2,00 <span class="muto" style="font-size:.9rem;font-family:var(--body);font-weight:500">manti ≈ 2,04 €</span></div>
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
                 <button class="btn primario">Paga ora</button>
                 <button class="btn">Contesta</button>
               </div>
-              <p class="piccolo muto">Pagare significa inquadrare il QR della polizia contenuto nel verbale. Se non fai nulla entro il 27, la multa viene trattenuta dal prossimo stipendio e non puoi convertire finché non è saldata.</p>
+              <p class="piccolo muto">Paghi dal verbale: 1,00 va alla polizia e 1,00 viene bruciato, e alza il valore di tutti i manti, anche i tuoi. Se non fai nulla entro il 27, la multa viene trattenuta dal prossimo stipendio e non puoi convertire finché non è saldata.</p>
             </div>
             <h3>Chiuse</h3>
             <div class="lista">
@@ -580,12 +590,11 @@ tfoot td { border-top: 1px solid var(--surface-3); border-bottom: 0; font-weight
 <section class="vista" id="vista-azienda" role="tabpanel" hidden>
   <div class="pann">
     <nav class="menu">
-      <div class="cap">Fine mese</div>
-      <a class="on" href="#az-mese">Dicembre</a>
+      <div class="cap">Il conto</div>
+      <a class="on" href="#az-mese">Conto e fine mese</a>
       <a href="#az-premi">Premi da assegnare</a>
-      <a href="#az-riserva">Versamento in riserva</a>
+      <a href="#az-riserva">Compra manti</a>
       <div class="cap">Quando serve</div>
-      <a href="#az-conv">Conversioni <span class="pill warn">1</span></a>
       <a href="#az-catalogo">Catalogo</a>
       <a href="#az-tariffario">Tariffario</a>
       <div class="cap">Raramente</div>
@@ -595,30 +604,35 @@ tfoot td { border-top: 1px solid var(--surface-3); border-bottom: 0; font-weight
     <main>
       <div id="az-mese">
         <div class="testata">
-          <div class="who"><i></i><div><div class="piccolo muto">Cibotari S.r.l. · chiave <span class="mono">4a91…0e2c</span></div><h1 style="font-size:1.6rem">Fine mese di dicembre</h1></div></div>
-          <button class="btn primario" disabled>Firma il fine mese · 31 dic</button>
+          <div class="who"><i></i><div><div class="piccolo muto">Cibotari S.r.l. · chiave <span class="mono">4a91…0e2c</span></div><h1 style="font-size:1.6rem">Conto azienda</h1></div></div>
+          <button class="btn primario" disabled>Paga il fine mese · 31 dic</button>
         </div>
-        <p class="muto" style="margin-top:10px">Il 31 alle 23:59 firmi una sola transazione: versamento in riserva, stipendi, premi e trattenute insieme. Fino ad allora prepari.</p>
+        <div class="saldo-card" style="margin-top:14px">
+          <div class="tasso">1 manto = 1,021 €</div>
+          <div class="l">Saldo</div>
+          <div class="m">2.000,00<small>manti</small></div>
+          <div class="e">≈ 2.041 € · comprati 3.000 a 1,00 il 1 ottobre · pagati 1.000 in due fine mese</div>
+        </div>
         <div class="griglia g3" style="margin-top:16px">
-          <div class="card stat"><h3>Emissione di dicembre</h3><div class="v">480<small> manti</small></div><div class="s">mese 3 · 500 × 0,98²</div></div>
-          <div class="card stat"><h3>Stipendi</h3><div class="v">240<small> = 10 × 24,00</small></div><div class="s">metà dell'emissione, 10 dipendenti attivi</div></div>
-          <div class="card stat"><h3>Premi preparati</h3><div class="v">187,20<small> / 240</small></div><div class="budget-barra"><i style="width:78%"></i></div><div class="s">52,80 ancora assegnabili. Il non assegnato non si emette</div></div>
-          <div class="card stat"><h3>Trattenute</h3><div class="v">0</div><div class="s">nessuna multa definitiva non pagata</div></div>
-          <div class="card stat"><h3>Valore atteso il 31</h3><div class="v">≈ 1,040<small> €</small></div><div class="s">se i premi restano 187,20 e il fatturato è 50.000</div></div>
-          <div class="card stat"><h3>Conto azienda</h3><div class="v">0,00</div><div class="s">l'azienda non tiene manti: emette e basta</div></div>
+          <div class="card stat"><h3>Stipendi di dicembre</h3><div class="v">250<small> = 10 × 25,00</small></div><div class="s">stipendio base uguale per tutti, deciso da te</div></div>
+          <div class="card stat"><h3>Premi preparati</h3><div class="v">195,00</div><div class="s">7 dipendenti · dal catalogo</div></div>
+          <div class="card stat"><h3>Trattenute</h3><div class="v">5,00</div><div class="s">V-022 definitivo · 2,50 alla polizia, 2,50 bruciati</div></div>
+          <div class="card stat"><h3>Totale del 31</h3><div class="v">445,00</div><div class="s">dal tuo conto · restano 1.555 manti</div></div>
+          <div class="card stat"><h3>Ti bastano per</h3><div class="v">3<small> mesi</small></div><div class="s">a questo ritmo. Poi ricompri dalla banca</div></div>
+          <div class="card stat"><h3>Valore dei tuoi manti</h3><div class="v">+2,1%</div><div class="s">dall'acquisto. Non può scendere</div></div>
         </div>
       </div>
 
       <div class="sezione" id="az-premi">
-        <div class="testa"><h2>Premi da assegnare</h2><span class="piccolo muto">catalogo v3 · quote sull'emissione di 480</span></div>
+        <div class="testa"><h2>Premi da assegnare</h2><span class="piccolo muto">catalogo v3 · importi fissi in manti</span></div>
         <div class="griglia g2">
           <div class="card pad form">
             <div class="campo"><label for="p-dip">Dipendente</label><select id="p-dip"><option>Sara Conti</option><option>Marco Rossi</option><option>Giulia Bianchi</option><option>Luca Ferrari</option><option>Andrea Greco</option><option>Elena Ricci</option><option>Davide Moretti</option><option>Chiara Gallo</option><option>Matteo Fontana</option><option>Francesca Serra</option></select></div>
-            <div class="campo"><label for="p-voce">Comportamento</label><select id="p-voce"><option>Giornata senza parolacce · 1% · 4,80</option><option>Settimana puntuale · 3% · 14,40</option><option>Recensione positiva di un cliente · 4% · 19,20</option><option>Problema segnalato e risolto · 2% · 9,60</option><option>Aiuto a un collega · 2% · 9,60</option><option>Mese senza errori · 10% · 48,00</option></select></div>
+            <div class="campo"><label for="p-voce">Comportamento</label><select id="p-voce"><option>Giornata senza parolacce · 5,00</option><option>Settimana puntuale · 15,00</option><option>Recensione positiva di un cliente · 20,00</option><option>Problema segnalato e risolto · 10,00</option><option>Aiuto a un collega · 10,00</option><option>Mese senza errori · 50,00</option></select></div>
             <div class="campo"><label for="p-n">Quante volte nel mese</label><input id="p-n" type="number" value="1" min="1"></div>
             <div class="conto">
-              <div><span>Sara Conti riceve il 31</span><span class="num">4,80 manti</span></div>
-              <div class="tot"><span>Premi preparati dopo</span><span class="num">192,00 / 240</span></div>
+              <div><span>Sara Conti riceve il 31</span><span class="num">5,00 manti</span></div>
+              <div class="tot"><span>Premi preparati dopo</span><span class="num">200,00</span></div>
             </div>
             <div><button class="btn acc">Aggiungi alla lista del 31</button></div>
             <p class="piccolo muto">Le assegnazioni restano in bozza fino alla firma di fine mese. Più avanti si compileranno da sole dai dati del mese.</p>
@@ -629,15 +643,15 @@ tfoot td { border-top: 1px solid var(--surface-3); border-bottom: 0; font-weight
               <table>
                 <thead><tr><th>Dipendente</th><th>Premi</th><th class="r">Manti</th></tr></thead>
                 <tbody>
-                  <tr><td>Giulia Bianchi</td><td class="muto piccolo">Mese senza errori · 4 giornate senza parolacce</td><td class="r">67,20</td></tr>
-                  <tr><td>Luca Ferrari</td><td class="muto piccolo">Settimana puntuale × 2 · Aiuto a un collega</td><td class="r">38,40</td></tr>
-                  <tr><td>Andrea Greco</td><td class="muto piccolo">Recensione positiva · Settimana puntuale</td><td class="r">33,60</td></tr>
-                  <tr><td>Elena Ricci</td><td class="muto piccolo">Problema risolto × 2</td><td class="r">19,20</td></tr>
-                  <tr><td>Chiara Gallo</td><td class="muto piccolo">Settimana puntuale</td><td class="r">14,40</td></tr>
-                  <tr><td>Marco Rossi</td><td class="muto piccolo">2 giornate senza parolacce</td><td class="r">9,60</td></tr>
-                  <tr><td>Francesca Serra</td><td class="muto piccolo">1 giornata senza parolacce</td><td class="r">4,80</td></tr>
+                  <tr><td>Giulia Bianchi</td><td class="muto piccolo">Mese senza errori · 4 giornate senza parolacce</td><td class="r">70,00</td></tr>
+                  <tr><td>Luca Ferrari</td><td class="muto piccolo">Settimana puntuale × 2 · Aiuto a un collega</td><td class="r">40,00</td></tr>
+                  <tr><td>Andrea Greco</td><td class="muto piccolo">Recensione positiva · Settimana puntuale</td><td class="r">35,00</td></tr>
+                  <tr><td>Elena Ricci</td><td class="muto piccolo">Problema risolto × 2</td><td class="r">20,00</td></tr>
+                  <tr><td>Chiara Gallo</td><td class="muto piccolo">Settimana puntuale</td><td class="r">15,00</td></tr>
+                  <tr><td>Marco Rossi</td><td class="muto piccolo">2 giornate senza parolacce</td><td class="r">10,00</td></tr>
+                  <tr><td>Francesca Serra</td><td class="muto piccolo">1 giornata senza parolacce</td><td class="r">5,00</td></tr>
                 </tbody>
-                <tfoot><tr><td colspan="2">7 dipendenti · 3 senza premi</td><td class="r">187,20</td></tr></tfoot>
+                <tfoot><tr><td colspan="2">7 dipendenti · 3 senza premi</td><td class="r">195,00</td></tr></tfoot>
               </table>
             </div>
           </div>
@@ -645,44 +659,30 @@ tfoot td { border-top: 1px solid var(--surface-3); border-bottom: 0; font-weight
       </div>
 
       <div class="sezione" id="az-riserva">
-        <div class="testa"><h2>Versamento in riserva</h2></div>
+        <div class="testa"><h2>Compra manti dalla banca</h2><span class="piccolo muto">prezzo di oggi 1,0715 € · valore 1,0205 + 5%</span></div>
         <div class="griglia g2">
           <div class="card pad form">
-            <div class="campo"><label for="r-fatt">Fatturato di dicembre, netto IVA</label><input id="r-fatt" type="text" placeholder="si compila il 31"></div>
+            <div class="campo"><label for="r-eur">Euro da spendere</label><input id="r-eur" type="text" value="500,00"></div>
             <div class="conto">
-              <div><span>Quota 1%, stimata</span><span class="num">500,00 €</span></div>
-              <div><span>Riserva dopo</span><span class="num">1.439,28 €</span></div>
-              <div class="tot"><span>Firmato insieme a stipendi e premi</span><span>31 dic, 23:59</span></div>
+              <div><span>Prezzo di acquisto</span><span class="num">1,0715 €</span></div>
+              <div><span>Ricevi</span><span class="num">466,63 manti</span></div>
+              <div><span>Spazio sotto il tetto</span><span class="num">545,56 €</span></div>
+              <div class="tot"><span>Saldo dopo</span><span class="num">2.466,63 manti</span></div>
             </div>
-            <p class="piccolo muto">Il versamento va fatto davvero sul conto separato. Qui lo registri, e il registro lo mostra a tutti.</p>
+            <button class="btn primario">Richiedi l'acquisto</button>
+            <p class="piccolo muto">Paghi gli euro alla banca fuori dal sistema. Quando li riceve, la banca firma la vendita e i manti arrivano sul tuo conto. Il sovrapprezzo entra in riserva e alza il valore anche dei manti che hai già.</p>
           </div>
           <div class="card pad">
-            <h3>Fine mese passati</h3>
+            <h3>I tuoi acquisti</h3>
             <table style="margin-top:8px">
-              <thead><tr><th>Mese</th><th class="r">Versato</th><th class="r">Stipendi</th><th class="r">Premi</th><th class="r">Non emessi</th></tr></thead>
+              <thead><tr><th>Quando</th><th class="r">Euro</th><th class="r">Prezzo</th><th class="r">Manti</th></tr></thead>
               <tbody>
-                <tr><td>Novembre</td><td class="r">500,00 €</td><td class="r">245,00</td><td class="r">235,00</td><td class="r">10,00</td></tr>
-                <tr><td>Ottobre</td><td class="r">500,00 €</td><td class="r">250,00</td><td class="r">235,00</td><td class="r">15,00</td></tr>
+                <tr><td>1 ott 2026</td><td class="r">3.000,00</td><td class="r">1,0000</td><td class="r">3.000,00</td></tr>
               </tbody>
+              <tfoot><tr><td>Valgono oggi</td><td class="r">3.061,50 €</td><td class="r">+2,1%</td><td></td></tr></tfoot>
             </table>
+            <div class="nota piccolo" style="margin-top:14px">Quando la riserva tocca il tetto di 4.000 €, la banca non vende più. Chi ne vuole li compra da chi li ha.</div>
           </div>
-        </div>
-      </div>
-
-      <div class="sezione" id="az-conv">
-        <div class="testa"><h2>Conversioni</h2><span class="piccolo muto">le esegue la banca; qui vedi cosa devi pagare in euro</span></div>
-        <div class="card pad">
-          <div class="scroll">
-            <table>
-              <thead><tr><th>Eseguita</th><th>Dipendente</th><th class="r">Manti</th><th class="r">Euro dovuti</th><th>Stato</th><th></th></tr></thead>
-              <tbody>
-                <tr><td>13 dic · #410</td><td>Matteo Fontana</td><td class="r">20,00</td><td class="r"><b>20,31</b></td><td><span class="pill warn">da pagare</span></td><td><button class="btn mini">Segna pagata</button></td></tr>
-                <tr><td>20 nov · #298</td><td>Marco Rossi</td><td class="r">30,00</td><td class="r">30,31</td><td><span class="pill ok">pagata 25 nov</span></td><td></td></tr>
-                <tr><td>6 nov · #201</td><td>Chiara Gallo</td><td class="r">10,00</td><td class="r">10,10</td><td><span class="pill ok">pagata 10 nov</span></td><td></td></tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="nota piccolo" style="margin-top:14px">Il nome lo vedi perché la banca ha decifrato i dati di pagamento della richiesta. Nel registro pubblico c'è solo l'importo. <b>Gli euro li paghi tu, fuori dal sistema.</b></div>
         </div>
       </div>
 
@@ -691,20 +691,20 @@ tfoot td { border-top: 1px solid var(--surface-3); border-bottom: 0; font-weight
         <div class="card pad">
           <div class="scroll">
             <table>
-              <thead><tr><th>Comportamento</th><th>Regola</th><th class="r">Quota</th><th class="r">A dic.</th><th></th></tr></thead>
+              <thead><tr><th>Comportamento</th><th>Regola</th><th class="r">Manti</th><th class="r">≈ €</th><th></th></tr></thead>
               <tbody>
-                <tr><td><input class="cat-in" id="c1" value="Giornata senza parolacce"></td><td class="muto piccolo">una al giorno, conferma del responsabile</td><td class="r"><input class="cat-q" id="q1" value="1"> %</td><td class="r">4,80</td><td><a href="#" class="piccolo">togli</a></td></tr>
-                <tr><td><input class="cat-in" id="c2" value="Settimana puntuale"></td><td class="muto piccolo">cinque giorni di fila in orario</td><td class="r"><input class="cat-q" id="q2" value="3"> %</td><td class="r">14,40</td><td><a href="#" class="piccolo">togli</a></td></tr>
-                <tr><td><input class="cat-in" id="c3" value="Recensione positiva di un cliente"></td><td class="muto piccolo">pubblica, che nomina il dipendente</td><td class="r"><input class="cat-q" id="q3" value="4"> %</td><td class="r">19,20</td><td><a href="#" class="piccolo">togli</a></td></tr>
-                <tr><td><input class="cat-in" id="c4" value="Problema segnalato e risolto"></td><td class="muto piccolo">segnalazione scritta, risolta in settimana</td><td class="r"><input class="cat-q" id="q4" value="2"> %</td><td class="r">9,60</td><td><a href="#" class="piccolo">togli</a></td></tr>
-                <tr><td><input class="cat-in" id="c5" value="Aiuto a un collega"></td><td class="muto piccolo">lo segnala il collega aiutato</td><td class="r"><input class="cat-q" id="q5" value="2"> %</td><td class="r">9,60</td><td><a href="#" class="piccolo">togli</a></td></tr>
-                <tr><td><input class="cat-in" id="c6" value="Mese senza errori"></td><td class="muto piccolo">nessun errore registrato nel mese</td><td class="r"><input class="cat-q" id="q6" value="10"> %</td><td class="r">48,00</td><td><a href="#" class="piccolo">togli</a></td></tr>
+                <tr><td><input class="cat-in" id="c1" value="Giornata senza parolacce"></td><td class="muto piccolo">una al giorno, conferma del responsabile</td><td class="r"><input class="cat-q" id="q1" value="5,00"></td><td class="r">5,10</td><td><a href="#" class="piccolo">togli</a></td></tr>
+                <tr><td><input class="cat-in" id="c2" value="Settimana puntuale"></td><td class="muto piccolo">cinque giorni di fila in orario</td><td class="r"><input class="cat-q" id="q2" value="15,00"></td><td class="r">15,31</td><td><a href="#" class="piccolo">togli</a></td></tr>
+                <tr><td><input class="cat-in" id="c3" value="Recensione positiva di un cliente"></td><td class="muto piccolo">pubblica, che nomina il dipendente</td><td class="r"><input class="cat-q" id="q3" value="20,00"></td><td class="r">20,41</td><td><a href="#" class="piccolo">togli</a></td></tr>
+                <tr><td><input class="cat-in" id="c4" value="Problema segnalato e risolto"></td><td class="muto piccolo">segnalazione scritta, risolta in settimana</td><td class="r"><input class="cat-q" id="q4" value="10,00"></td><td class="r">10,21</td><td><a href="#" class="piccolo">togli</a></td></tr>
+                <tr><td><input class="cat-in" id="c5" value="Aiuto a un collega"></td><td class="muto piccolo">lo segnala il collega aiutato</td><td class="r"><input class="cat-q" id="q5" value="10,00"></td><td class="r">10,21</td><td><a href="#" class="piccolo">togli</a></td></tr>
+                <tr><td><input class="cat-in" id="c6" value="Mese senza errori"></td><td class="muto piccolo">nessun errore registrato nel mese</td><td class="r"><input class="cat-q" id="q6" value="50,00"></td><td class="r">51,03</td><td><a href="#" class="piccolo">togli</a></td></tr>
               </tbody>
             </table>
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px">
             <button class="btn">+ Aggiungi comportamento</button>
-            <div><button class="btn primario">Firma e pubblica</button> <span class="piccolo muto" style="margin-left:8px">vale dal prossimo fine mese</span></div>
+            <div><button class="btn primario">Firma e pubblica</button> <span class="piccolo muto" style="margin-left:8px">vale da subito; i premi già assegnati non cambiano</span></div>
           </div>
         </div>
       </div>
@@ -726,7 +726,7 @@ tfoot td { border-top: 1px solid var(--surface-3); border-bottom: 0; font-weight
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px">
             <button class="btn">+ Aggiungi infrazione</button>
-            <div><button class="btn primario">Firma e pubblica</button> <span class="piccolo muto" style="margin-left:8px">vale da subito; i verbali già emessi non cambiano</span></div>
+            <div><button class="btn primario">Firma e pubblica</button> <span class="piccolo muto" style="margin-left:8px">vale da subito; i verbali già emessi non cambiano. Metà di ogni multa viene bruciata</span></div>
           </div>
         </div>
       </div>
@@ -737,16 +737,16 @@ tfoot td { border-top: 1px solid var(--surface-3); border-bottom: 0; font-weight
           <table>
             <thead><tr><th>Nome</th><th>Coordinate</th><th>Dal</th><th class="r">Stipendi ricevuti</th><th class="r">Premi ricevuti</th><th>Multe definitive</th><th>Stato</th></tr></thead>
             <tbody>
-              <tr><td>Marco Rossi</td><td class="mono">mnt1 q8f3…</td><td>1 ott</td><td class="r">49,50</td><td class="r">24,50</td><td class="muto">nessuna</td><td><span class="pill ok">attivo</span></td></tr>
-              <tr><td>Giulia Bianchi</td><td class="mono">mnt1 7hh2…</td><td>1 ott</td><td class="r">49,50</td><td class="r">96,40</td><td class="muto">nessuna</td><td><span class="pill ok">attivo</span></td></tr>
-              <tr><td>Luca Ferrari</td><td class="mono">mnt1 3ka9…</td><td>1 ott</td><td class="r">49,50</td><td class="r">63,70</td><td class="muto">nessuna</td><td><span class="pill ok">attivo</span></td></tr>
-              <tr><td>Sara Conti</td><td class="mono">mnt1 pp0d…</td><td>1 ott</td><td class="r">49,50</td><td class="r">44,10</td><td class="muto">nessuna</td><td><span class="pill ok">attivo</span></td></tr>
-              <tr><td>Andrea Greco</td><td class="mono">mnt1 zz41…</td><td>1 ott</td><td class="r">49,50</td><td class="r">58,80</td><td class="muto">nessuna</td><td><span class="pill ok">attivo</span></td></tr>
-              <tr><td>Elena Ricci</td><td class="mono">mnt1 e2mm…</td><td>1 ott</td><td class="r">49,50</td><td class="r">34,30</td><td class="muto">nessuna</td><td><span class="pill ok">attivo</span></td></tr>
-              <tr><td>Davide Moretti</td><td class="mono">mnt1 4rr8…</td><td>1 ott</td><td class="r">49,50</td><td class="r">19,60</td><td><span class="pill warn">V-022 · 5,00 · scade 20 dic</span></td><td><span class="pill ok">attivo</span></td></tr>
-              <tr><td>Chiara Gallo</td><td class="mono">mnt1 c9x1…</td><td>1 ott</td><td class="r">49,50</td><td class="r">63,70</td><td class="muto">nessuna</td><td><span class="pill ok">attivo</span></td></tr>
-              <tr><td>Matteo Fontana</td><td class="mono">mnt1 8dd3…</td><td>1 ott</td><td class="r">49,50</td><td class="r">39,20</td><td class="muto">nessuna</td><td><span class="pill ok">attivo</span></td></tr>
-              <tr><td>Francesca Serra</td><td class="mono">mnt1 n5k7…</td><td>1 ott</td><td class="r">49,50</td><td class="r">25,60</td><td class="muto">nessuna</td><td><span class="pill ok">attivo</span></td></tr>
+              <tr><td>Marco Rossi</td><td class="mono">mnt1 q8f3…</td><td>1 ott</td><td class="r">50,00</td><td class="r">25,00</td><td class="muto">nessuna</td><td><span class="pill ok">attivo</span></td></tr>
+              <tr><td>Giulia Bianchi</td><td class="mono">mnt1 7hh2…</td><td>1 ott</td><td class="r">50,00</td><td class="r">100,00</td><td class="muto">nessuna</td><td><span class="pill ok">attivo</span></td></tr>
+              <tr><td>Luca Ferrari</td><td class="mono">mnt1 3ka9…</td><td>1 ott</td><td class="r">50,00</td><td class="r">65,00</td><td class="muto">nessuna</td><td><span class="pill ok">attivo</span></td></tr>
+              <tr><td>Sara Conti</td><td class="mono">mnt1 pp0d…</td><td>1 ott</td><td class="r">50,00</td><td class="r">45,00</td><td class="muto">nessuna</td><td><span class="pill ok">attivo</span></td></tr>
+              <tr><td>Andrea Greco</td><td class="mono">mnt1 zz41…</td><td>1 ott</td><td class="r">50,00</td><td class="r">60,00</td><td class="muto">nessuna</td><td><span class="pill ok">attivo</span></td></tr>
+              <tr><td>Elena Ricci</td><td class="mono">mnt1 e2mm…</td><td>1 ott</td><td class="r">50,00</td><td class="r">35,00</td><td class="muto">nessuna</td><td><span class="pill ok">attivo</span></td></tr>
+              <tr><td>Davide Moretti</td><td class="mono">mnt1 4rr8…</td><td>1 ott</td><td class="r">50,00</td><td class="r">20,00</td><td><span class="pill warn">V-022 · 5,00 · scade 20 dic</span></td><td><span class="pill ok">attivo</span></td></tr>
+              <tr><td>Chiara Gallo</td><td class="mono">mnt1 c9x1…</td><td>1 ott</td><td class="r">50,00</td><td class="r">65,00</td><td class="muto">nessuna</td><td><span class="pill ok">attivo</span></td></tr>
+              <tr><td>Matteo Fontana</td><td class="mono">mnt1 8dd3…</td><td>1 ott</td><td class="r">50,00</td><td class="r">40,00</td><td class="muto">nessuna</td><td><span class="pill ok">attivo</span></td></tr>
+              <tr><td>Francesca Serra</td><td class="mono">mnt1 n5k7…</td><td>1 ott</td><td class="r">50,00</td><td class="r">25,00</td><td class="muto">nessuna</td><td><span class="pill ok">attivo</span></td></tr>
             </tbody>
           </table>
         </div>
@@ -806,7 +806,7 @@ tfoot td { border-top: 1px solid var(--surface-3); border-bottom: 0; font-weight
             <h3>Dicembre finora</h3>
             <div class="griglia g2" style="margin-top:10px">
               <div class="stat" style="padding:0"><div class="v">9</div><div class="s">verbali emessi</div></div>
-              <div class="stat" style="padding:0"><div class="v">26,00</div><div class="s">manti multati</div></div>
+              <div class="stat" style="padding:0"><div class="v">26,00</div><div class="s">manti multati · metà bruciati se pagati</div></div>
               <div class="stat" style="padding:0"><div class="v">6</div><div class="s">pagati</div></div>
               <div class="stat" style="padding:0"><div class="v">1 · 1 · 1</div><div class="s">in attesa · contestato · annullato</div></div>
             </div>
@@ -831,7 +831,7 @@ tfoot td { border-top: 1px solid var(--surface-3); border-bottom: 0; font-weight
             </tbody>
           </table>
         </div>
-        <p class="piccolo muto" style="margin-top:8px">V-022 è scaduto senza pagamento né contestazione: il 31 l'azienda trattiene 5,00 dallo stipendio di Davide e li versa al conto polizia. Le sue conversioni sono bloccate fino ad allora.</p>
+        <p class="piccolo muto" style="margin-top:8px">V-022 è scaduto senza pagamento né contestazione: il 31 l'azienda trattiene 5,00 dallo stipendio di Davide, 2,50 al conto polizia e 2,50 bruciati. Le sue conversioni sono bloccate fino ad allora.</p>
       </div>
 
       <div class="sezione" id="po-cont">
@@ -854,8 +854,8 @@ tfoot td { border-top: 1px solid var(--surface-3); border-bottom: 0; font-weight
           <div class="card pad">
             <div class="saldo-card" style="background:linear-gradient(135deg,#3A1518,var(--bad) 60%,#FF8A5B)">
               <div class="l">Saldo</div>
-              <div class="m">47,00<small>manti</small></div>
-              <div class="e">≈ 48,72 € · raccolti dalle multe</div>
+              <div class="m">18,00<small>manti</small></div>
+              <div class="e">≈ 18,37 € · metà delle multe pagate; l'altra metà è bruciata</div>
             </div>
             <div class="azioni" style="grid-template-columns:repeat(3,1fr)"><button><i>→</i>Bonifico</button><button><i>€</i>Converti</button><button><i>▣</i>Inquadra</button></div>
             <p class="piccolo muto">È un conto come gli altri. Quello che ci fate, cene o altro, lo decidete voi. Anche qui, nessuno vede il saldo dal registro.</p>
@@ -863,10 +863,10 @@ tfoot td { border-top: 1px solid var(--surface-3); border-bottom: 0; font-weight
           <div class="card pad">
             <h3>Ultime entrate</h3>
             <div class="lista" style="margin-top:8px;box-shadow:none;background:var(--surface-2)">
-              <div class="voce"><div class="av multa">!</div><div class="t"><b>V-028 pagato</b><span>14 dic · riga 411</span></div><div class="imp piu">+5,00</div></div>
-              <div class="voce"><div class="av multa">!</div><div class="t"><b>V-030 pagato</b><span>12 dic · riga 402</span></div><div class="imp piu">+3,00</div></div>
-              <div class="voce"><div class="av multa">!</div><div class="t"><b>V-029 pagato</b><span>9 dic · riga 388</span></div><div class="imp piu">+2,00</div></div>
-              <div class="voce"><div class="av">🍕</div><div class="t"><b>Bonifico · pizzeria (Luca ha anticipato)</b><span>29 nov · cena di novembre</span></div><div class="imp">−38,00</div></div>
+              <div class="voce"><div class="av multa">!</div><div class="t"><b>V-028 pagato</b><span>14 dic · 5,00 multati, 2,50 bruciati · riga 411</span></div><div class="imp piu">+2,50</div></div>
+              <div class="voce"><div class="av multa">!</div><div class="t"><b>V-030 pagato</b><span>12 dic · 3,00 multati, 1,50 bruciati · riga 402</span></div><div class="imp piu">+1,50</div></div>
+              <div class="voce"><div class="av multa">!</div><div class="t"><b>V-029 pagato</b><span>9 dic · 2,00 multati, 1,00 bruciato · riga 388</span></div><div class="imp piu">+1,00</div></div>
+              <div class="voce"><div class="av">🍕</div><div class="t"><b>Bonifico · pizzeria (Luca ha anticipato)</b><span>29 nov · cena di novembre</span></div><div class="imp">−8,00</div></div>
             </div>
           </div>
         </div>
@@ -877,10 +877,158 @@ tfoot td { border-top: 1px solid var(--surface-3); border-bottom: 0; font-weight
   </div>
 </section>
 
+
+<!-- ================= BANCA ================= -->
+<section class="vista" id="vista-banca" role="tabpanel" hidden>
+  <div class="pann">
+    <nav class="menu">
+      <div class="cap">Ogni giorno</div>
+      <a class="on" href="#ba-riserva">Riserva</a>
+      <a href="#ba-vendite">Vendite <span class="pill warn">1</span></a>
+      <a href="#ba-conv">Conversioni <span class="pill warn">1</span></a>
+      <div class="cap">Ogni mese</div>
+      <a href="#ba-interessi">Interessi ed estratto</a>
+      <div class="cap">Raramente</div>
+      <a href="#ba-tetto">Tetto</a>
+      <a href="#ba-ident">Identificazioni <span class="pill warn">1</span></a>
+      <a href="#ba-aziende">Aziende</a>
+    </nav>
+    <main>
+      <div id="ba-riserva">
+        <div class="testata">
+          <div class="who"><i style="background:linear-gradient(135deg,#0F0F14,#3B5BFF)"></i><div><div class="piccolo muto">Banca · chiave <span class="mono">0d5f…77a3</span> · dispositivo dedicato</div><h1 style="font-size:1.6rem">Riserva</h1></div></div>
+        </div>
+        <div class="saldo-card" style="margin-top:14px;background:linear-gradient(135deg,#0F0F14 0%,#1B1F3A 50%,#3B5BFF 100%)">
+          <div class="tasso">tetto 4.000 €</div>
+          <div class="l">Euro in riserva, conto dedicato</div>
+          <div class="m">3.454,44<small>€</small></div>
+          <div class="e">copre 3.384,85 manti a 1,0205 € · spazio sotto il tetto 545,56 €</div>
+          <div class="budget-barra" style="background:rgba(255,255,255,.2);margin-top:12px"><i style="width:86%;background:#fff"></i></div>
+        </div>
+        <div class="griglia g3" style="margin-top:16px">
+          <div class="card stat"><h3>Valore ufficiale</h3><div class="v">1,0205<small> €</small></div><div class="s">3.454,44 ÷ 3.384,85</div></div>
+          <div class="card stat"><h3>Vendi a</h3><div class="v">1,0715<small> €</small></div><div class="s">+5%, in riserva</div></div>
+          <div class="card stat"><h3>Riconverti a</h3><div class="v">1,0000<small> €</small></div><div class="s">−2%, resta in riserva</div></div>
+          <div class="card stat"><h3>Entrate totali</h3><div class="v">3.513,35<small> €</small></div><div class="s">3.500 vendite + 13,35 interessi</div></div>
+          <div class="card stat"><h3>Uscite totali</h3><div class="v">58,91<small> €</small></div><div class="s">3 conversioni pagate</div></div>
+          <div class="card stat"><h3>Tuo guadagno</h3><div class="v">0,00<small> €</small></div><div class="s">tutto va in riserva. Un canone alle aziende è fuori dal sistema</div></div>
+        </div>
+      </div>
+
+      <div class="sezione" id="ba-vendite">
+        <div class="testa"><h2>Vendite</h2><span class="piccolo muto">firmi quando gli euro sono arrivati sul conto di riserva</span></div>
+        <div class="card pad">
+          <div class="scroll">
+            <table>
+              <thead><tr><th>Richiesta</th><th>Chi</th><th class="r">Euro</th><th class="r">Prezzo</th><th class="r">Manti</th><th>Stato</th><th></th></tr></thead>
+              <tbody>
+                <tr><td>15 dic 10:12</td><td>Cibotari S.r.l.</td><td class="r">500,00</td><td class="r">1,0715</td><td class="r">466,63</td><td><span class="pill warn">in attesa del bonifico</span></td><td><button class="btn primario mini">Euro ricevuti, firma</button></td></tr>
+                <tr><td>20 nov 11:20</td><td>privato · <span class="mono">mnt1 9ke2…</span></td><td class="r">500,00</td><td class="r">1,0619</td><td class="r">470,85</td><td><span class="pill ok">firmata</span></td><td></td></tr>
+                <tr><td>1 ott 09:00</td><td>Cibotari S.r.l.</td><td class="r">3.000,00</td><td class="r">1,0000</td><td class="r">3.000,00</td><td><span class="pill ok">firmata · prima vendita</span></td><td></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="nota piccolo" style="margin-top:14px">Il prezzo lo calcola il motore al momento della firma. Non puoi vendere se la riserva è al tetto: il pulsante si disattiva da solo. Firmata la vendita, i manti arrivano all'indirizzo dell'acquirente.</div>
+        </div>
+      </div>
+
+      <div class="sezione" id="ba-conv">
+        <div class="testa"><h2>Conversioni</h2><span class="piccolo muto">esegui, paga gli euro fuori dal sistema, segna pagata</span></div>
+        <div class="card pad">
+          <div class="scroll">
+            <table>
+              <thead><tr><th>Richiesta</th><th>Chi</th><th class="r">Manti</th><th class="r">Prezzo</th><th class="r">Euro dovuti</th><th>Stato</th><th></th></tr></thead>
+              <tbody>
+                <tr><td>13 dic · #409</td><td>Matteo Fontana · IBAN IT60…</td><td class="r">20,00</td><td class="r">1,0000</td><td class="r"><b>20,00</b></td><td><span class="pill warn">eseguita, da pagare</span></td><td><button class="btn mini">Segna pagata</button></td></tr>
+                <tr><td>20 nov · #298</td><td>Marco Rossi</td><td class="r">30,00</td><td class="r">0,9816</td><td class="r">29,45</td><td><span class="pill ok">pagata 22 nov</span></td><td></td></tr>
+                <tr><td>6 nov · #201</td><td>Chiara Gallo</td><td class="r">10,00</td><td class="r">0,9820</td><td class="r">9,82</td><td><span class="pill ok">pagata 8 nov</span></td><td></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="nota piccolo" style="margin-top:14px">Vedi il nome perché il richiedente si è identificato e ha cifrato per te i dati di pagamento. Nel registro pubblico ci sono solo manti bruciati ed euro dovuti. Un dipendente con multe definitive non saldate non compare qui: l'app non gli lascia chiedere.</div>
+        </div>
+      </div>
+
+      <div class="sezione" id="ba-interessi">
+        <div class="testa"><h2>Interessi ed estratto conto</h2></div>
+        <div class="griglia g2">
+          <div class="card pad form">
+            <div class="campo"><label for="int-mese">Mese</label><input id="int-mese" type="text" value="Dicembre 2026" disabled></div>
+            <div class="campo"><label for="int-eur">Interessi accreditati dal conto, in euro</label><input id="int-eur" type="text" placeholder="si compila il 31"></div>
+            <div class="campo"><label for="int-est">Estratto conto del mese, PDF o immagine</label><button class="btn largo" id="int-est">Carica l'estratto</button></div>
+            <div class="conto">
+              <div><span>Riserva calcolata dal registro al 30 nov</span><span class="num">3.454,44 €</span></div>
+              <div><span>Saldo dell'estratto di novembre</span><span class="num">3.454,44 €</span></div>
+              <div class="tot"><span>Differenza</span><span class="num" style="color:var(--ok)">0,00 €</span></div>
+            </div>
+            <button class="btn primario" disabled>Firma interessi ed estratto · 31 dic</button>
+            <p class="piccolo muto">L'estratto è l'unica prova che il registro non può dare da solo. Viene pubblicato sul sito accanto alla riga firmata.</p>
+          </div>
+          <div class="card pad">
+            <h3>Storico</h3>
+            <table style="margin-top:8px">
+              <thead><tr><th>Mese</th><th class="r">Interessi</th><th class="r">Estratto</th><th class="r">Registro</th><th>Esito</th></tr></thead>
+              <tbody>
+                <tr><td>Novembre</td><td class="r">7,10 €</td><td class="r">3.454,44</td><td class="r">3.454,44</td><td><span class="pill ok">coincide</span></td></tr>
+                <tr><td>Ottobre</td><td class="r">6,25 €</td><td class="r">3.006,25</td><td class="r">3.006,25</td><td><span class="pill ok">coincide</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="sezione" id="ba-tetto">
+        <div class="testa"><h2>Tetto della riserva</h2></div>
+        <div class="card pad form" style="max-width:520px">
+          <div class="conto">
+            <div><span>Tetto attuale</span><span class="num">4.000,00 €</span></div>
+            <div><span>Riserva</span><span class="num">3.454,44 €</span></div>
+            <div class="tot"><span>Spazio per nuove vendite</span><span class="num">545,56 €</span></div>
+          </div>
+          <div class="campo"><label for="tetto-new">Nuovo tetto</label><input id="tetto-new" type="text" placeholder="es. 6.000,00"></div>
+          <div><button class="btn primario">Firma il nuovo tetto</button></div>
+          <p class="piccolo muto">È una transazione pubblica: tutti vedono quando e a quanto lo hai alzato. Le nuove vendite partono dal prezzo di acquisto del giorno, mai sotto, così chi ha già manti non viene diluito.</p>
+        </div>
+      </div>
+
+      <div class="sezione" id="ba-ident">
+        <div class="testa"><h2>Identificazioni</h2><span class="piccolo muto">servono solo per convertire</span></div>
+        <div class="card pad">
+          <div class="scroll">
+            <table>
+              <thead><tr><th>Quando</th><th>Coordinate</th><th>Come</th><th>Stato</th><th></th></tr></thead>
+              <tbody>
+                <tr><td>14 dic</td><td class="mono">mnt1 9ke2…</td><td>documento caricato, cifrato</td><td><span class="pill warn">da verificare</span></td><td><button class="btn mini primario">Apri e conferma</button></td></tr>
+                <tr><td>1 ott</td><td colspan="2" class="muto">10 dipendenti di Cibotari S.r.l., identificati dall'azienda</td><td><span class="pill ok">identificati</span></td><td></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="piccolo muto" style="margin-top:10px">Chi non si identifica può fare tutto tranne convertire. L'anagrafica non è nel registro e non si pubblica.</p>
+        </div>
+      </div>
+
+      <div class="sezione" id="ba-aziende">
+        <div class="testa"><h2>Aziende</h2><button class="btn mini acc">+ Registra un'azienda</button></div>
+        <div class="card scroll">
+          <table>
+            <thead><tr><th>Nome</th><th>Chiave</th><th>Dal</th><th class="r">Comprati</th><th>Dipendenti</th><th>Polizia</th></tr></thead>
+            <tbody>
+              <tr><td>Cibotari S.r.l.</td><td class="mono">4a91…0e2c</td><td>1 ott</td><td class="r">3.000,00</td><td>10</td><td>Andrea Greco</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="piccolo muto" style="margin-top:8px">Ogni azienda ha il proprio conto, catalogo, tariffario e polizia. Riserva e valore del manto sono unici per tutte.</p>
+      </div>
+
+      <div class="firma"><span>Pannello della banca · vendite, conversioni, interessi, estratti e tetto sono righe firmate con la chiave banca. Non esiste un pulsante per prelevare dalla riserva.</span></div>
+    </main>
+  </div>
+</section>
+
 <script>
 (function () {
   var tabs = document.querySelectorAll('.switch [role=tab]');
-  var viste = { sito: document.getElementById('vista-sito'), app: document.getElementById('vista-app'), azienda: document.getElementById('vista-azienda'), polizia: document.getElementById('vista-polizia') };
+  var viste = { sito: document.getElementById('vista-sito'), app: document.getElementById('vista-app'), azienda: document.getElementById('vista-azienda'), polizia: document.getElementById('vista-polizia'), banca: document.getElementById('vista-banca') };
   function mostra(nome) {
     Object.keys(viste).forEach(function (k) { viste[k].hidden = k !== nome; });
     tabs.forEach(function (t) { t.setAttribute('aria-selected', String(t.dataset.vista === nome)); });

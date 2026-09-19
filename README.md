@@ -1,10 +1,10 @@
 # messaggi
 
-Sistema di moneta aziendale: gettoni convertibili in euro, usati come gioco a premi tra dipendenti e come campo di prova per portafoglio, registro firmato ed economia tra persone.
+Il **manto**: una moneta privata emessa da una banca, coperta uno a uno da euro in riserva, convertibile. Chiunque apre un conto e compra, riceve, paga con QR, fa bonifici. Le aziende comprano manti per pagare stipendi e premi ai dipendenti, con catalogo, tariffario delle multe, polizia interna e giudice.
 
-- [Regole](REGOLE_MONETA.md): il manto, stipendi e premi a fine mese, multe con tariffario e giudice, riservatezza.
-- [Architettura](ARCHITETTURA.md): chiavi, indirizzi usa e getta, registro, transazioni, giudice, motore giornaliero.
-- [Mockup](mockup/index.html): sito pubblico, app della banca, pannello azienda e pannello polizia, con dati finti.
+- [Regole](REGOLE_MONETA.md): riserva, tetto, prezzi di acquisto e conversione, cosa fa salire il valore, aziende, multe, giudice, riservatezza.
+- [Architettura](ARCHITETTURA.md): chiavi, indirizzi usa e getta, registro, transazioni, motore giornaliero, piano dei passi.
+- [Mockup](mockup/index.html): sito pubblico, app, pannelli azienda, polizia e banca, con dati finti.
 
 Metodo di lavoro: un passo alla volta, ogni passo discusso, autorizzato, committato e pushato.
 
