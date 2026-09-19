@@ -19,6 +19,7 @@
 //                      perché gli importi riservati non si leggono
 //   bruciati_cent:     somma delle bruciature
 //   emessi_cent:       somma di tutto ciò che è stato creato da chi può crearlo
+// Le somme nello stato sono BigInt; gli importi nelle righe sono interi JSON.
 //
 // Chi crea manti dal nulla (la vendita) chiama `creaUscite` con
 // `nuovi = true`. Una spesa non può: entra tanto quanto esce.
@@ -97,15 +98,15 @@ export function creaUscite(stato, hashRiga, out, opz = {}) {
   preparaStato(stato);
   for (const [i, u] of out.entries()) {
     if (u.addr === null) {
-      stato.bruciati_cent += u.amount;
-      stato.circolazione_cent -= u.amount;
+      stato.bruciati_cent += BigInt(u.amount);
+      stato.circolazione_cent -= BigInt(u.amount);
       continue;
     }
     registraUscita(stato, `${hashRiga}:${i}`, { addr: u.addr, commit: impegnoInChiaro(u.amount), amount: u.amount });
   }
   if (opz.nuovi) {
-    stato.emessi_cent += sommaUscite(out);
-    stato.circolazione_cent += sommaUscite(out);
+    stato.emessi_cent += BigInt(sommaUscite(out));
+    stato.circolazione_cent += BigInt(sommaUscite(out));
   }
 }
 
@@ -118,9 +119,9 @@ export function preparaStato(stato) {
   stato.immagini ??= {};
   stato.ordine_uscite ??= 0;
   stato.disponibili ??= 0; // uscite mai spese in chiaro: le esche possibili
-  stato.circolazione_cent ??= 0;
-  stato.bruciati_cent ??= 0;
-  stato.emessi_cent ??= 0;
+  stato.circolazione_cent ??= 0n;
+  stato.bruciati_cent ??= 0n;
+  stato.emessi_cent ??= 0n;
 }
 
 /**

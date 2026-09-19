@@ -116,7 +116,8 @@ function regolaGenesi(riga, stato) {
   }
   if (p.sovrapprezzo_pct > 100 || p.commissione_pct > 100 || p.multe_bruciate_pct > 100) throw new Error('genesi: percentuale oltre 100');
   stato.genesi = { banca: { chiave: banca.chiave, coordinate: banca.coordinate }, parametri: { ...p } };
-  stato.tetto_cent = p.tetto_cent;
+  stato.tetto_cent = BigInt(p.tetto_cent);
+  stato.riserva_cent = 0n;
   return [banca.chiave];
 }
 

@@ -78,11 +78,13 @@ Nessun decimale. Tutte le quantità sono interi.
 | Prezzi | centesimi di euro per manto, con quattro decimali interni (1 manto = 1,0000 €) |
 | Tempo | ISO 8601 in UTC |
 
-Formule, tutte su interi con arrotondamento per difetto a favore della riserva:
+Formule, tutte su interi BigInt, con l'arrotondamento sempre nel verso che lascia euro in riserva (in `banca.js`, due sole funzioni: `perDifetto` e `perEccesso`):
 
-- `valore = riserva_cent × 10000 / circolazione_cent` (in decimillesimi di euro per manto)
-- `prezzo_acquisto = valore × 105 / 100`; `manti_venduti = euro_pagati × 10000 / prezzo_acquisto`
-- `prezzo_conversione = valore × 98 / 100`; `euro_dovuti = manti × prezzo_conversione / 10000`
+- `valore = riserva_cent × 10000 / circolazione_cent` per difetto (in decimillesimi di euro per manto; nessuno a circolazione zero)
+- `prezzo_acquisto = valore × 105 / 100` per eccesso; `manti_venduti = euro_pagati × 10000 / prezzo_acquisto` per difetto. A circolazione zero il prezzo è quello di lancio, 1,0000 €
+- `prezzo_conversione = valore × 98 / 100` per difetto; `euro_dovuti = manti × prezzo_conversione / 10000` per difetto
+
+Invariante, ricontrollato da ogni riga della banca dopo aver cambiato lo stato: `riserva × 10000 ≥ circolazione × valore_prima`, cioè il valore non scende mai. Gli importi nelle righe sono interi JSON; le somme nello stato sono BigInt.
 - `bruciati_per_multa = importo / 2` (se dispari, il centesimo in più va alla polizia)
 
 ## 5. Chiavi, coordinate e indirizzi usa e getta
@@ -180,7 +182,7 @@ Verifica di una riga: hash uguale, firme valide, `prev` giusto, immagini di chia
 | `cap.set` | banca | Nuovo tetto in centesimi di euro | Sostituisce il precedente |
 | `sale` | banca | Euro ricevuti, prezzo applicato, uscite in chiaro verso l'acquirente con `tag: vendita`, riferimento al pagamento in euro | Riserva prima della vendita < tetto. Prezzo = prezzo di acquisto del giorno (1,00 se prima vendita). Manti = euro / prezzo. Riserva += euro |
 | `reserve.interest` | banca | Interessi maturati in centesimi di euro, periodo | Riserva += interessi |
-| `reserve.statement` | banca | Mese, saldo dell'estratto conto, hash del documento pubblicato | Il saldo coincide con la riserva calcolata a fine mese, o la riga spiega la differenza |
+| `reserve.statement` | banca | Mese, saldo dell'estratto conto, hash del documento pubblicato | Il saldo coincide con la riserva calcolata, o la riga spiega la differenza. È un'**affermazione firmata**, non una prova: il registro fa i conti tra le sue righe, non può sapere se gli euro esistono. È l'unico punto in cui la fiducia entra nel sistema |
 | `company.register` | banca | Chiave, coordinate e nome pubblico dell'azienda | Una volta per azienda |
 | `police.appoint` | azienda | Chiave e coordinate della polizia | Sostituisce la precedente |
 | `judge.register` | banca | Chiave del giudice, versione delle istruzioni | Sostituisce la precedente |
@@ -266,7 +268,7 @@ Se il modello non risponde o risponde con un esito non ammesso, nessuna sentenza
 | 9 | Prova di intervallo Bulletproofs+ a 64 bit: 9a per un impegno, 9b aggregata per riga. Test | A |
 | 10 | Immagini di chiave, anelli, firma CLSAG e verifica. Test | A |
 | 11 | `transfer` riservato con resto sopra il passo 7; la spesa in chiaro resta come base del `payout`. Test | A |
-| 12 | Vendite, tetto, interessi, estratti, valore e prezzi. Test | A |
+| 12 | Vendite, tetto, interessi, estratti, valore e prezzi, invariante di copertura. Test | A |
 | 13 | Aziende: registrazione, polizia, catalogo, tariffario, trattenute. Test | A |
 | 14 | Conversioni in anello con commissione e blocco per multe. Test | A |
 | 15 | Verbali, pagamento con bruciatura, contestazioni, repliche, sentenze (giudice finto). Test | A |

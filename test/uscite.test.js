@@ -59,8 +59,8 @@ test('il destinatario trova le proprie entrate e il saldo è la somma', () => {
   assert.equal(mie.length, 2);
   assert.equal(saldo(mie), 4000);
   assert.equal(mie[0].tag, 'stipendio');
-  assert.equal(reg.stato.circolazione_cent, 4000);
-  assert.equal(reg.stato.emessi_cent, 4000);
+  assert.equal(reg.stato.circolazione_cent, 4000n);
+  assert.equal(reg.stato.emessi_cent, 4000n);
   const altro = portafoglioDaFrase(generaFrase());
   assert.equal(mieEntrate(reg, altro).length, 0);
 });
@@ -80,7 +80,7 @@ test('un pagamento: chi riceve lo vede con la causale, chi paga ritrova il resto
   const diA = mieEntrate(reg, a);
   assert.equal(saldo(diA), 6130);
   assert.equal(diA[0].causale, null);
-  assert.equal(reg.stato.circolazione_cent, 7130, 'un transfer non cambia la circolazione');
+  assert.equal(reg.stato.circolazione_cent, 7130n, 'un transfer non cambia la circolazione');
 });
 
 test('la stessa entrata non si spende due volte', () => {
@@ -106,7 +106,7 @@ test('entrate e uscite devono tornare al centesimo', () => {
   const body = { in: [e.ref], out: [{ addr: dest.addr, eph: dest.eph, amount: 999 }], ref: null };
   const r = firmaRiga(preparaRiga(reg.ultima, { type: 'transfer', ts: ts(), body }), [{ by: e.addr, firma: (h) => firmaScalare(e.p, h) }]);
   assert.throws(() => reg.accoda(r), /entrate 1000 ≠ uscite 999/);
-  assert.equal(reg.stato.circolazione_cent, 1000, 'lo stato non cambia se la riga fallisce');
+  assert.equal(reg.stato.circolazione_cent, 1000n, 'lo stato non cambia se la riga fallisce');
 });
 
 test('firma solo chi possiede le entrate', () => {
@@ -131,8 +131,8 @@ test('le bruciature escono dalla circolazione e non hanno destinatario', () => {
   const a = portafoglioDaFrase(generaFrase());
   dona(reg, a.coordinate, [1000]);
   paga(reg, a, [], { bruciature: [{ amount: 300, reason: 'prova' }] });
-  assert.equal(reg.stato.circolazione_cent, 700);
-  assert.equal(reg.stato.bruciati_cent, 300);
+  assert.equal(reg.stato.circolazione_cent, 700n);
+  assert.equal(reg.stato.bruciati_cent, 300n);
   assert.equal(saldo(mieEntrate(reg, a)), 700);
 });
 
@@ -207,9 +207,9 @@ test('ricostruire da capo un registro con pagamenti dà lo stesso stato', () => 
   paga(reg, b, [{ coordinate: a.coordinate, amount: 100 }], { bruciature: [{ amount: 50, reason: 'prova' }] });
   const copia = Registro.daRighe(structuredClone(reg.righe), { tipi: tipiTest });
   assert.deepEqual(copia.stato, reg.stato);
-  assert.equal(copia.stato.circolazione_cent, 1200);
-  assert.equal(copia.stato.bruciati_cent, 50);
-  assert.equal(copia.stato.emessi_cent, 1250);
+  assert.equal(copia.stato.circolazione_cent, 1200n);
+  assert.equal(copia.stato.bruciati_cent, 50n);
+  assert.equal(copia.stato.emessi_cent, 1250n);
   assert.equal(saldo(mieEntrate(copia, a)), 650);
   assert.equal(saldo(mieEntrate(copia, b)), 550);
 });

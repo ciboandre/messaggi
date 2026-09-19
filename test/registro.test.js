@@ -48,7 +48,7 @@ test('la genesi apre il registro e fissa i parametri', () => {
   reg.accoda(g);
   assert.equal(reg.righe.length, 1);
   assert.deepEqual(/** @type {any} */ (reg.stato).genesi.parametri, PARAMETRI);
-  assert.equal(/** @type {any} */ (reg.stato).tetto_cent, 400000);
+  assert.equal(/** @type {any} */ (reg.stato).tetto_cent, 400000n);
 });
 
 test('le righe si concatenano: seq progressivo e prev uguale all\'hash precedente', () => {

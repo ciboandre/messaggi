@@ -76,7 +76,7 @@ test('un pagamento riservato: chi riceve vede importo e causale, chi paga il res
   const diA = mieEntrate(reg, a);
   assert.equal(saldo(diA), 8000 - 1200);
   assert.equal(diA.filter((e) => e.chiaro).length, 1, 'il 3000 in chiaro non è stato toccato');
-  assert.equal(reg.stato.circolazione_cent, 8000, 'la circolazione non cambia');
+  assert.equal(reg.stato.circolazione_cent, 8000n, 'la circolazione non cambia');
   assert.equal(reg.stato.disponibili, 4, 'le quattro uscite restano tutte esche possibili');
   assert.equal(Object.keys(reg.stato.immagini).length, 1);
 });
@@ -108,7 +108,7 @@ test('catena riservata: b paga c con un\'entrata riservata, tra esche in chiaro 
   assert.equal(saldo(mieEntrate(reg, c)), 1500);
   assert.equal(saldo(mieEntrate(reg, b)), 500);
   assert.equal(saldo(mieEntrate(reg, a)), 3500);
-  assert.equal(reg.stato.circolazione_cent, 5500);
+  assert.equal(reg.stato.circolazione_cent, 5500n);
   // due entrate consumate insieme: b ha resto 500, riceve 100, paga 550
   pagaRiservato(reg, a, [{ coordinate: b.coordinate, amount: 100 }]);
   const doppia = pagaRiservato(reg, b, [{ coordinate: c.coordinate, amount: 550 }]);
@@ -252,5 +252,5 @@ test('il registro si ricostruisce da capo con lo stesso stato', () => {
   assert.deepEqual(copia.stato, reg.stato);
   assert.equal(saldo(mieEntrate(copia, c)), 700);
   assert.equal(saldo(mieEntrate(copia, a)), 4000 - 1500 + 100);
-  assert.equal(copia.stato.circolazione_cent, 4000);
+  assert.equal(copia.stato.circolazione_cent, 4000n);
 });
