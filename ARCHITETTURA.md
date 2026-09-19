@@ -283,7 +283,7 @@ Se il modello non risponde o risponde con un esito non ammesso, nessuna sentenza
 | 14 | Conversioni: richiesta in anello con resto riservato, esecuzione al prezzo del giorno, pagamento attestato. Test (blocco per multe: della banca, con l'anagrafica) | A |
 | 15 | Verbali, pagamento con bruciatura e metà alla polizia verificabile, contestazioni, repliche, sentenze, trattenute, termini in giorni di registro. Test | A |
 | 16 | Motore giornaliero e generatore del sito; `correction` stretta; `fine.withdraw` | A |
-| 17 | Simulazione di tre mesi da riga di comando | A |
+| 17 | Simulazione di tre mesi da riga di comando: `node simulazione/tre-mesi.js [giorni] [correntisti] [righe/giorno] [seme]`, scenario con seme, crittografia con casualità vera, invarianti a ogni riga, riserva = euro veri, circolazione = somma dei saldi, replay del motore e tempi per tipo di riga | A |
 | 18 | GitHub Actions con cron e Pages | B |
 | 19 | Server via HTTP | C |
 | 20 | Servizio giudice con modello reale | C |
