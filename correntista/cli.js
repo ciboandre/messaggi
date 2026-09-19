@@ -7,7 +7,8 @@
 //   node correntista/cli.js paga <importo> <coordinate mnt1…> [causale]
 //   node correntista/cli.js converti <importo> "<nome e IBAN per la banca>"
 //
-// Il registro è ledger.jsonl nella cartella corrente (o MANTI_LEDGER). La
+// Il registro è ledger.jsonl nella cartella corrente (o MANTI_LEDGER), o il
+// server con MANTI_SERVER=http://…. La
 // frase la chiede a video senza mostrarla, o la legge da MANTI_FRASE.
 // Dopo un pagamento o una richiesta: git add ledger.jsonl, commit, push.
 
@@ -15,7 +16,7 @@ import * as c from './comandi.js';
 import { chiediFrase, mostraFrase, euro, manti, prezzo, fatto } from '../strumenti/terminale.js';
 
 const [comando, ...args] = process.argv.slice(2);
-const percorso = process.env.MANTI_LEDGER ?? 'ledger.jsonl';
+const percorso = process.env.MANTI_SERVER ? { server: process.env.MANTI_SERVER } : (process.env.MANTI_LEDGER ?? 'ledger.jsonl');
 
 async function main() {
   if (comando === 'nuovo') {
@@ -28,18 +29,18 @@ async function main() {
   switch (comando) {
     case 'coordinate': console.log(c.coordinate(frase)); return;
     case 'saldo': {
-      const s = c.saldo(percorso, frase);
+      const s = await c.saldo(percorso, frase);
       console.log(`saldo ${manti(s.totale)}${s.in_euro === null ? '' : ` ≈ ${euro(s.in_euro)} al valore di oggi (${prezzo(s.valore)})`}`);
       for (const e of s.entrate) console.log(`  riga ${e.seq}: ${manti(e.amount)}${e.tag ? ` [${e.tag}]` : ''}${e.causale ? ` "${e.causale}"` : ''}${e.chiaro ? ' (in chiaro)' : ''}`);
       return;
     }
     case 'paga': {
-      const e = c.paga(percorso, frase, args[0], args[1], args.slice(2).join(' ') || undefined);
+      const e = await c.paga(percorso, frase, args[0], args[1], args.slice(2).join(' ') || undefined);
       console.log(`resto sul conto: ${manti(e.resto)}`);
       return fatto(e.riga);
     }
     case 'converti': {
-      const e = c.converti(percorso, frase, args[0], args.slice(1).join(' '));
+      const e = await c.converti(percorso, frase, args[0], args.slice(1).join(' '));
       console.log(`richiesta inviata: ${e.euro_oggi === null ? '' : `oggi varrebbe ${euro(e.euro_oggi)}; `}la banca esegue al prezzo del giorno in cui paga`);
       return fatto(e.riga);
     }

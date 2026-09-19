@@ -287,7 +287,7 @@ Se il modello non risponde o risponde con un esito non ammesso, nessuna sentenza
 | 18 | GitHub Action senza chiavi: `pubblica` su cron (05:00 UTC) e a ogni push del registro, Pages; catena rotta = run fallito; uscita deterministica | B |
 | 19 | Pannello banca da terminale (`banca/cli.js`): frase di dodici parole della banca, genesi, giorno, vendite, tetto, interessi, estratti, correzioni, aziende, giudice, conversioni; ogni riga verificata e accodata, poi git push | A/B |
 | 19b | Conto di prova da terminale (`correntista/cli.js`): frase, coordinate, saldo, pagamento riservato, richiesta di conversione; righe in `ledger.jsonl` come quelle della banca | A/B |
-| 20 | Server via HTTP | C |
+| 20 | Server via HTTP (`server/server.js`): unico scrittore, senza chiavi; `GET /stato`, `GET /registro?da=N`, `GET /prossima`, `POST /righe` con 201/400/409; scritture in fila; `MANTI_PUSH=1` fa il push dopo ogni riga. Banca e correntista lo usano con `MANTI_SERVER=http://…` al posto del file | C |
 | 21 | Servizio giudice con modello reale | C |
 | 22 | App del correntista con QR | D |
 | 23 | Pannelli azienda e polizia; pannello banca con interfaccia | D |

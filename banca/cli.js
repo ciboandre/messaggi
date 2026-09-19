@@ -16,7 +16,8 @@
 //   node banca/cli.js pagata <hash> [data]
 //   node banca/cli.js stato
 //
-// Il registro è ledger.jsonl nella cartella corrente (o MANTI_LEDGER).
+// Il registro è ledger.jsonl nella cartella corrente (o MANTI_LEDGER); con
+// MANTI_SERVER=http://… le righe vanno al server della banca (fase C).
 // La frase la chiede a video senza mostrarla, oppure la legge da
 // MANTI_FRASE; mai da un argomento, che finirebbe nella cronologia della
 // shell. Dopo ogni riga: git add ledger.jsonl, commit, push. Il sito lo
@@ -26,7 +27,7 @@ import * as c from './comandi.js';
 import { chiediFrase, mostraFrase, euro, manti, prezzo, fatto as fattoRiga } from '../strumenti/terminale.js';
 
 const [comando, ...args] = process.argv.slice(2);
-const percorso = process.env.MANTI_LEDGER ?? 'ledger.jsonl';
+const percorso = process.env.MANTI_SERVER ? { server: process.env.MANTI_SERVER } : (process.env.MANTI_LEDGER ?? 'ledger.jsonl');
 const fatto = (esito) => fattoRiga(esito.riga);
 
 async function main() {
@@ -39,7 +40,7 @@ async function main() {
       return;
     }
     case 'stato': {
-      const s = c.stato(percorso);
+      const s = await c.stato(percorso);
       console.log(`${s.righe} righe, giorno ${s.giorno ?? '—'}`);
       console.log(`valore ${prezzo(s.valore)} · compri a ${prezzo(s.prezzo_acquisto)} · converti a ${prezzo(s.prezzo_conversione)}`);
       console.log(`riserva ${euro(s.riserva_cent)} · tetto ${euro(s.tetto_cent)} · spazio ${euro(s.spazio_cent)} · in circolazione ${manti(s.circolazione_cent)}`);
@@ -51,33 +52,33 @@ async function main() {
   switch (comando) {
     case 'genesi': {
       const t = args.indexOf('--tetto');
-      fatto(c.genesi(percorso, frase, t >= 0 ? { tetto_cent: c.centesimiDa(args[t + 1]) } : {}));
+      fatto(await c.genesi(percorso, frase, t >= 0 ? { tetto_cent: c.centesimiDa(args[t + 1]) } : {}));
       return;
     }
-    case 'giorno': return fatto(c.giorno(percorso, frase, args[0]));
+    case 'giorno': return fatto(await c.giorno(percorso, frase, args[0]));
     case 'vendita': {
-      const e = c.vendita(percorso, frase, args[0], args[1], args[2]);
+      const e = await c.vendita(percorso, frase, args[0], args[1], args[2]);
       console.log(`venduti ${manti(e.manti)} a ${prezzo(e.prezzo)}`);
       return fatto(e);
     }
-    case 'tetto': return fatto(c.tetto(percorso, frase, args[0]));
-    case 'interessi': return fatto(c.interessi(percorso, frase, args[0], args[1], args[2]));
-    case 'estratto': return fatto(c.estratto(percorso, frase, args[0], args[1], args[2], args[3]));
-    case 'correzione': return fatto(c.correzione(percorso, frase, args[0], args[1] === '-' ? null : args[1], args.slice(2).join(' ')));
-    case 'azienda': return fatto(c.azienda(percorso, frase, args[0], args[1], args.slice(2).join(' ')));
-    case 'giudice': return fatto(c.giudice(percorso, frase, args[0], args[1]));
+    case 'tetto': return fatto(await c.tetto(percorso, frase, args[0]));
+    case 'interessi': return fatto(await c.interessi(percorso, frase, args[0], args[1], args[2]));
+    case 'estratto': return fatto(await c.estratto(percorso, frase, args[0], args[1], args[2], args[3]));
+    case 'correzione': return fatto(await c.correzione(percorso, frase, args[0], args[1] === '-' ? null : args[1], args.slice(2).join(' ')));
+    case 'azienda': return fatto(await c.azienda(percorso, frase, args[0], args[1], args.slice(2).join(' ')));
+    case 'giudice': return fatto(await c.giudice(percorso, frase, args[0], args[1]));
     case 'conversioni': {
-      const lista = c.conversioniInAttesa(percorso, frase);
+      const lista = await c.conversioniInAttesa(percorso, frase);
       if (!lista.length) { console.log('nessuna richiesta in attesa'); return; }
       for (const r of lista) console.log(`${r.hash}\n  riga ${r.seq} · ${manti(r.amount)} → ${r.euro === null ? '—' : euro(r.euro)} oggi\n  dati: ${r.dati ?? '(non leggibili con questa frase)'}`);
       return;
     }
     case 'esegui': {
-      const e = c.esegui(percorso, frase, args[0]);
+      const e = await c.esegui(percorso, frase, args[0]);
       console.log(`da pagare: ${euro(e.euro)} a ${prezzo(e.prezzo)}`);
       return fatto(e);
     }
-    case 'pagata': return fatto(c.pagata(percorso, frase, args[0], args[1]));
+    case 'pagata': return fatto(await c.pagata(percorso, frase, args[0], args[1]));
     default:
       console.error('comando sconosciuto; vedi l\'intestazione di banca/cli.js');
       process.exitCode = 2;

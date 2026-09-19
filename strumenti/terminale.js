@@ -48,5 +48,5 @@ export const prezzo = (dm) => (dm === null || dm === undefined ? '—' : (Number
 /** Dopo una riga accodata: cosa fare. */
 export function fatto(riga) {
   console.log(`riga ${riga.seq} accodata, tipo ${riga.type}, hash ${riga.hash}`);
-  console.log(`ora: git add ledger.jsonl && git commit -m "Registro: ${riga.type} seq ${riga.seq}" && git push`);
+  if (!process.env.MANTI_SERVER) console.log(`ora: git add ledger.jsonl && git commit -m "Registro: ${riga.type} seq ${riga.seq}" && git push`);
 }
