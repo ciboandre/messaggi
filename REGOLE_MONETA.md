@@ -1,11 +1,11 @@
 # Regole dei manti
 
-Versione 2.0 — 19 settembre 2026
+Versione 2.1 — 19 settembre 2026
 Stato: definitivo per la fase di test interna. Si rivede prima di estendere il sistema a una seconda azienda.
 
 ## 1. Scopo
 
-Una moneta interna, il **manto**, convertibile in euro, usata in azienda come una banca vera: ogni dipendente ha un conto, riceve uno stipendio mensile in manti, paga e riceve con QR o bonifico, può essere multato da una polizia interna e può ricorrere a un giudice. Lo scopo dichiarato è il gioco. Lo scopo reale è collaudare in condizioni vere un portafoglio, un registro firmato, un sistema di pagamenti riservato e un'economia tra persone, prima di riusarli in un prodotto pubblico.
+Una moneta, il **manto**, convertibile in euro, gestita come una banca vera: chiunque può aprirsi un conto dall'app, ricevere, pagare con QR e fare bonifici. I dipendenti dell'azienda, in più, ricevono uno stipendio mensile in manti e i premi, possono essere multati da una polizia interna e possono ricorrere a un giudice. Lo scopo dichiarato è il gioco. Lo scopo reale è collaudare in condizioni vere un portafoglio, un registro firmato, un sistema di pagamenti riservato e un'economia tra persone, prima di riusarli in un prodotto pubblico.
 
 Il gioco è volontario. Chi non partecipa non perde nulla.
 
@@ -35,7 +35,8 @@ Tutti i numeri del sistema in un posto solo. Cambiarne uno significa aggiornare 
 | **Azienda** | Il titolare | Registra i dipendenti, versa in riserva, paga stipendi e premi a fine mese, scrive catalogo e tariffario, nomina la polizia | Emettere più del piano, prelevare da un conto, vedere i saldi |
 | **Polizia** | La persona nominata dall'azienda | Emette verbali da tariffario, replica alle contestazioni, usa il proprio conto | Multare fuori tariffario, prelevare da un conto, vedere i saldi |
 | **Giudice** | Il servizio che esegue l'intelligenza artificiale | Emette sentenze sulle contestazioni | Qualsiasi altra cosa |
-| **Correntista** | Il dipendente, sul proprio telefono | Riceve, paga, fa bonifici, converte, paga o contesta le multe | Nulla di vietato. Custodisce la propria chiave |
+| **Correntista** | Chiunque, sul proprio telefono | Riceve, paga, fa bonifici. Se identificato dalla banca, converte in euro | Nulla di vietato. Custodisce la propria chiave |
+| **Dipendente** | Un correntista registrato dall'azienda | Tutto quanto sopra, più stipendio e premi; può essere multato e può contestare | |
 
 Il sistema è progettato per più aziende fin dall'inizio, ognuna con il proprio conto, riserva, polizia e piano. Nella fase di test ce n'è una. Vedi la sezione 13 prima di aggiungerne altre.
 
@@ -78,15 +79,17 @@ Ogni premio non assegnato sposta questi numeri verso l'alto.
 
 ## 7. La conversione in euro
 
-1. Il correntista chiede di convertire un numero di manti dall'app. La richiesta contiene, cifrati per la sola banca, i dati per il pagamento in euro.
+1. Il correntista chiede di convertire un numero di manti dall'app. La richiesta contiene, cifrati per la sola banca, i dati per il pagamento in euro. **Può convertire solo chi è identificato dalla banca**: i dipendenti lo sono dalla registrazione dell'azienda; un esterno si identifica una volta, di persona o con un documento, e da lì in poi converte come tutti. Tenere, ricevere e pagare manti non richiede identificazione.
 2. La banca trattiene il 2% in manti come commissione e calcola gli euro sul resto, al valore del giorno.
 3. I manti convertiti vengono distrutti. La commissione va al conto della banca.
 4. La banca paga gli euro **fuori dal sistema**, con il mezzo che il titolare decide, e segna la conversione come pagata. Il registro mostra manti distrutti, commissione ed euro dovuti; non mostra chi.
 
 Non esistono limiti minimi o massimi. Un correntista con multe scadute e non pagate non può convertire finché non salda (sezione 10).
 
-## 8. Pagamenti e bonifici
+## 8. Apertura del conto, pagamenti e bonifici
 
+- **Il conto si apre da soli.** Chiunque installa l'app, scrive su carta la frase di recupero di dodici parole che l'app genera, e ha un conto con le proprie coordinate. Nessun invito, nessuna email, nessun numero di telefono, nessun permesso della banca. Un esterno all'azienda ha un conto identico a quello di un dipendente: può ricevere manti da chiunque, pagare, fare bonifici.
+- **Un dipendente** mostra le sue coordinate all'azienda, che lo registra in anagrafica con il nome. Da lì riceve stipendio e premi.
 - **Ricevere con QR**: il correntista mostra un QR con un indirizzo nuovo, generato al momento, e se vuole l'importo. Chi paga inquadra, controlla, firma. È il modo normale di pagarsi tra colleghi e di pagare le multe.
 - **Bonifico**: il correntista invia a un altro conoscendone le coordinate bancarie, una stringa che ognuno può condividere con chi vuole, come un IBAN. Il mittente le salva in rubrica. Chi non le ha ricevute non può inviare nulla a quella persona, né sapere che esiste.
 - **Causale**: facoltativa, la legge solo il destinatario.
@@ -140,7 +143,7 @@ Il registro è pubblico, ma non dice chi è chi.
 | Giudice | no, vede solo il fascicolo anonimo | no | il verbale contestato |
 | Il correntista | sé stesso | il proprio | i propri |
 
-- L'elenco dei dipendenti con le loro coordinate bancarie è un dato dell'azienda e della banca, non del registro. Non viene pubblicato.
+- L'elenco dei dipendenti con le loro coordinate bancarie è un dato dell'azienda e della banca, non del registro. Non viene pubblicato. Gli esterni non sono in nessun elenco finché non chiedono di convertire.
 - Le causali sono cifrate per il destinatario.
 - Le sentenze sono pubbliche ma con verbale e parti indicati per numero.
 
@@ -149,7 +152,7 @@ Il registro è pubblico, ma non dice chi è chi.
 Condizioni da verificare con un commercialista prima di partire e con un avvocato prima di ogni estensione.
 
 - **Gli euro delle conversioni sono retribuzione** e vanno trattati come tali. Come l'azienda li paga è fuori dal sistema.
-- **Una sola azienda, i propri dipendenti**: piano premi aziendale, nessuna autorizzazione. **Più aziende, o partecipanti non dipendenti**: servizi di pagamento o moneta elettronica, con autorizzazione della Banca d'Italia e regolamento MiCA. Non si parte senza quel passaggio.
+- **Conto aperto a chiunque, con manti convertibili in euro**: per la legge europea è emissione di moneta elettronica o servizio di pagamento, con autorizzazione della Banca d'Italia e regolamento MiCA. Il titolare ha scelto di costruire il sistema così fin dall'inizio, consapevole che prima di aprirlo davvero a esterni serve quel passaggio. La fase di test resta tra dipendenti.
 - **Le multe** in una moneta convertibile in euro sono, per la legge italiana, sanzioni disciplinari, con i limiti e le procedure dello Statuto dei lavoratori. È una scelta del titolare, presa consapevolmente.
 - **Dati personali**: l'anagrafica dei correntisti e i fascicoli delle contestazioni sono dati personali. Serve un'informativa e non escono dall'azienda.
 
@@ -186,7 +189,7 @@ Il motore è il programma che applica le regole. Gira da solo, ogni giorno. Ness
 
 - **Un correntista perde il telefono.** Al primo avvio l'app gli ha fatto scrivere una frase di recupero di dodici parole. Con quella, su un telefono nuovo, ritrova tutto. Senza, i manti sono persi come contanti persi. Non esiste una copia presso la banca: se esistesse, la regola 14.2 sarebbe una finzione.
 - **Il telefono viene rubato.** Chi lo ha non può firmare senza il blocco biometrico. Il correntista, con la frase di recupero su un telefono nuovo, sposta subito i manti su indirizzi nuovi.
-- **Un dipendente lascia l'azienda.** Può convertire tutto fino all'ultimo giorno. Dopo, l'azienda lo toglie dall'anagrafica: non riceve più stipendio né premi. I manti che gli restano sono suoi e li può ancora convertire per 90 giorni.
+- **Un dipendente lascia l'azienda.** L'azienda lo toglie dall'anagrafica: non riceve più stipendio né premi, non può più essere multato. Il conto resta suo, come quello di qualsiasi esterno: i manti che ha li tiene, li spende e, essendo già identificato, li converte quando vuole.
 - **Il fatturato cala molto.** La riserva cresce meno, l'emissione cala comunque. Il valore può scendere. Nessuna regola interviene: è il rischio dichiarato.
 - **La polizia sbaglia.** Il multato contesta, il giudice annulla. Se la polizia abusa, l'azienda ne nomina un'altra.
 - **L'azienda vuole chiudere il gioco.** Preavviso di un mese, tutti convertono al valore del giorno, la riserva residua torna all'azienda.

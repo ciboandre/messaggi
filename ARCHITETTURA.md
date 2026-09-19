@@ -1,6 +1,6 @@
 # Architettura del registro
 
-Versione 2.0 — 19 settembre 2026
+Versione 2.1 — 19 settembre 2026
 Stato: proposta per la fase di test. Da confermare prima del primo codice.
 
 Questo documento traduce le [regole](REGOLE_MONETA.md) in struttura tecnica. Ogni scelta rimanda alla sezione delle regole che la giustifica.
@@ -75,6 +75,8 @@ Emissione del mese *m*: `floor(50000 × 0.98^(m−1))` centesimi di manto. Stipe
 ## 5. Chiavi, coordinate e indirizzi usa e getta
 
 Questa è la parte che rende i saldi segreti su un registro pubblico (regola 12). Usa la tecnica degli indirizzi stealth: crittografia standard su Ed25519, nessuna invenzione.
+
+**Apertura del conto.** L'app è pubblica e chiunque la installa. Al primo avvio genera la frase di recupero, la fa trascrivere e verificare (tre parole a caso), deriva le chiavi e mostra le coordinate. Non parla con nessun server per farlo. L'indirizzo del server banca e le coordinate dell'azienda e della polizia sono nell'app stessa, firmati con la chiave banca, così un'app non può essere indirizzata a un server finto.
 
 **Ogni correntista ha:**
 
@@ -156,7 +158,7 @@ Un file `ledger.jsonl`. Ogni riga:
 | `tariff.set` | azienda | Tariffario completo | Sostituisce il precedente |
 | `payout` | azienda | Uscite con `tag` stipendio o premio, numero di dipendenti attivi, trattenute con riferimento ai verbali | Ultimo giorno del mese. Somma stipendi = base × attivi. Somma premi ≤ quota premi. Ogni trattenuta riferisce un verbale definitivo e crea un'uscita alla polizia |
 | `transfer` | chiavi usa e getta delle entrate | Entrate consumate, uscite create, `ref` facoltativo a un verbale | Entrate esistenti e non spese. Somma entrate = somma uscite |
-| `conversion.request` | chiavi usa e getta delle entrate | Entrate consumate, importo, dati di pagamento cifrati per la banca | Entrate non spese. Nessun verbale definitivo non saldato per il richiedente (lo controlla la banca sull'anagrafica) |
+| `conversion.request` | chiavi usa e getta delle entrate | Entrate consumate, importo, dati di pagamento e prova di identità cifrati per la banca | Entrate non spese. Il richiedente è identificato in anagrafica (dipendente registrato, o esterno identificato una volta). Nessun verbale definitivo non saldato |
 | `conversion.execute` | banca | Riferimento alla richiesta, manti distrutti, commissione (uscita alla banca), euro dovuti | Commissione = 2%. Euro = resto × valore, per difetto. Riserva sufficiente |
 | `conversion.paid` | banca | Riferimento, data del pagamento in euro | Una per esecuzione |
 | `fine.issue` | polizia | Numero verbale, voce del tariffario, importo, data, descrizione cifrata per il multato, indirizzo usa e getta di consegna | Voce esistente, importo uguale al tariffario |
@@ -178,7 +180,7 @@ Calcolato rileggendo tutto, mai memorizzato:
 - **Verbali**: aperti, pagati (un `transfer` con `ref`), contestati, decisi, definitivi non pagati (da trattenere).
 - **Catalogo, tariffario, polizia, giudice** in vigore.
 
-L'**anagrafica** (nome ↔ coordinate ↔ verbali a carico) è fuori dal registro, in un file cifrato della banca condiviso con l'azienda. Serve per stipendi, multe, conversioni e trattenute. Non è pubblica e non è necessaria per verificare il registro.
+L'**anagrafica** (nome ↔ coordinate ↔ verbali a carico ↔ identificato sì/no) è fuori dal registro, in un file cifrato della banca; la parte dei dipendenti è condivisa con l'azienda. Serve per stipendi, multe, conversioni e trattenute. Non è pubblica e non è necessaria per verificare il registro. Un esterno che non ha mai chiesto di convertire non compare da nessuna parte.
 
 ## 10. Il giudice
 
@@ -221,7 +223,7 @@ Non scrive mai nel registro. Il sito è statico. Chiunque può scaricare registr
 - Codifica esatta delle coordinate bancarie (prefisso, checksum) e formato del QR.
 - Formato del catalogo e del tariffario; se una voce ha un limite mensile per persona.
 - Come l'app scorre il registro in modo efficiente quando cresce (indice delle uscite per `R`).
-- Come i correntisti ricevono le coordinate dell'azienda e della polizia per pagare le multe: dal verbale stesso, ma la prima volta va verificato di persona.
+- Come un esterno si identifica presso la banca per convertire: di persona, o con documento caricato cifrato nella richiesta. Da decidere con l'avvocato insieme al perimetro legale.
 - Backup del registro fuori dal repository.
 - Modello e versione per il giudice, e formato esatto delle istruzioni.
 
