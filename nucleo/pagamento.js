@@ -14,7 +14,8 @@
 import { firmaScalare } from './chiavi.js';
 import { chiaveCausale, creaIndirizzo, riconosci } from './portafoglio.js';
 import { cifraCausale, decifraCausale } from './causale.js';
-import { impegno, apriUscita, mascheraDaSegreto, cifraImporto, mascherePseudo, sommaMaschere } from './impegni.js';
+import { impegno, impegnoInChiaro, apriUscita, mascheraDaSegreto, cifraImporto, mascherePseudo, sommaMaschere } from './impegni.js';
+import { numberToBytesLE } from '@noble/curves/utils.js';
 import { provaIntervalli } from './intervallo.js';
 import { firmaAnello, immagineChiave } from './anello.js';
 import { dimensioneAnello } from './trasferimento.js';
@@ -114,12 +115,19 @@ export function scegliEntrate(entrate, totale) {
  * @property {number} amount
  * @property {string} [causale]
  * @property {string} [tag]
+ * @property {string} [voce]   codice del catalogo, per i premi
  */
 
 /**
- * Costruisce il body di un `transfer` e i firmatari. Le entrate vengono
- * scelte tra quelle disponibili; il resto torna al portafoglio su un
- * indirizzo nuovo. Le causali sono cifrate per ciascun destinatario.
+ * Costruisce il body di una spesa in chiaro e i firmatari. Le entrate
+ * vengono scelte tra quelle disponibili; il resto torna al portafoglio su
+ * un indirizzo nuovo. Le causali sono cifrate per ciascun destinatario.
+ *
+ * Un'entrata riservata viene **rivelata**: importo, maschera e immagine
+ * di chiave finiscono nel registro, firmati con un anello di uno. Da quel
+ * momento quell'uscita è legata per sempre a chi la rivela: chiunque potrà
+ * vedere che quel pagamento riservato era per questo conto e di quanto.
+ * L'app deve avvertire prima di farlo. È il modo di spendere dei ruoli.
  * @param {object} p
  * @param {import('./portafoglio.js').Portafoglio} p.portafoglio
  * @param {EntrataMia[]} p.disponibili
@@ -142,6 +150,7 @@ export function costruisciPagamento({ portafoglio, disponibili, destinazioni, br
       addr: ind.addr, eph: ind.eph, amount: d.amount,
       ...(d.causale ? { memo: cifraCausale(chiaveCausale(ind.k), d.causale) } : {}),
       ...(d.tag ? { tag: d.tag } : {}),
+      ...(d.voce ? { voce: d.voce } : {}),
     });
   }
   for (const b of bruciature) out.push({ addr: null, amount: b.amount, reason: b.reason });
@@ -151,15 +160,32 @@ export function costruisciPagamento({ portafoglio, disponibili, destinazioni, br
     out.push({ addr: mio.addr, eph: mio.eph, amount: resto });
   }
 
-  const body = { in: entrate.map((e) => e.ref), out, ref };
+  const body = { in: entrate.map((e) => (e.chiaro ? e.ref : rivelazione(e))), out, ref };
   const firmatari = [];
   const visti = new Set();
   for (const e of entrate) {
-    if (visti.has(e.addr)) continue;
-    visti.add(e.addr);
-    firmatari.push({ by: e.addr, firma: (/** @type {string} */ h) => firmaScalare(e.p, h) });
+    if (e.chiaro) {
+      if (visti.has(e.addr)) continue;
+      visti.add(e.addr);
+      firmatari.push({ by: e.addr, firma: (/** @type {string} */ h) => firmaScalare(e.p, h) });
+    } else {
+      firmatari.push({
+        img: e.img,
+        firma: (/** @type {string} */ h) => firmaAnello({
+          membri: [{ addr: e.addr, commit: e.commit }], indice: 0, p: e.p, z: e.b, pseudo: impegnoInChiaro(e.amount), messaggio: h,
+        }).firma,
+      });
+    }
   }
   return { body, firmatari };
+}
+
+/**
+ * L'entrata rivelata di una spesa in chiaro.
+ * @param {EntrataMia} e
+ */
+function rivelazione(e) {
+  return { ref: e.ref, amount: e.amount, mask: Buffer.from(numberToBytesLE(e.b, 32)).toString('hex'), img: e.img };
 }
 
 /**

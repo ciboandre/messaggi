@@ -186,10 +186,10 @@ Verifica di una riga: hash uguale, firme valide, `prev` giusto, immagini di chia
 | `company.register` | banca | Chiave, coordinate e nome pubblico dell'azienda | Una volta per azienda |
 | `police.appoint` | azienda | Chiave e coordinate della polizia | Sostituisce la precedente |
 | `judge.register` | banca | Chiave del giudice, versione delle istruzioni | Sostituisce la precedente |
-| `catalog.set` | azienda | Catalogo completo: voci con importo fisso in manti | Sostituisce il precedente per quell'azienda |
-| `tariff.set` | azienda | Tariffario completo | Sostituisce il precedente per quell'azienda |
+| `catalog.set` | azienda | Catalogo completo: voci `{ codice, nome, amount }`, codice `[a-z0-9-]` unico | Sostituisce il precedente per quell'azienda |
+| `tariff.set` | azienda | Tariffario completo, stessa forma del catalogo | Sostituisce il precedente per quell'azienda |
 | `transfer` | CLSAG per ogni entrata in anello | Entrate in anello, uscite riservate, prova di intervallo, `ref` facoltativo a un verbale con le due uscite in chiaro | Immagini di chiave nuove, anelli di uscite esistenti e non spese in chiaro, bilancio degli impegni, prova valida. Se `ref` a un verbale: bruciatura = metà, alla polizia = metà, entrambe in chiaro |
-| `payout` | azienda (chiavi usa e getta delle sue entrate) | Entrate in chiaro, uscite in chiaro taggate stipendio o premio (voce), trattenute con riferimento ai verbali definitivi, ciascuna con metà alla polizia e metà bruciata; resto all'azienda in chiaro | Le uscite di stipendio sono tutte uguali tra loro; ogni premio riferisce una voce del catalogo in vigore con l'importo giusto |
+| `payout` | azienda, più le chiavi usa e getta delle sue entrate (o l'anello di uno delle rivelate) | Entrate in chiaro o rivelate, uscite in chiaro taggate stipendio o premio (voce), trattenute con riferimento ai verbali definitivi, ciascuna con metà alla polizia e metà bruciata; resto all'azienda in chiaro, tag resto | Le uscite di stipendio sono tutte uguali tra loro; ogni premio riferisce una voce del catalogo in vigore con l'importo giusto |
 | `conversion.request` | CLSAG per ogni entrata in anello | Entrate in anello, importo in chiaro da convertire, eventuale resto riservato con prova, dati di pagamento e identità cifrati per la banca | Bilancio: Σ pseudo = importo·H + impegno del resto. Il richiedente è identificato in anagrafica. Nessun verbale definitivo non saldato |
 | `conversion.execute` | banca | Riferimento alla richiesta, bruciatura di tutti i manti, prezzo applicato, euro dovuti | Prezzo = prezzo di conversione del giorno. Riserva −= euro dovuti |
 | `conversion.paid` | banca | Riferimento, data del pagamento in euro | Una per esecuzione |
@@ -246,7 +246,7 @@ Se il modello non risponde o risponde con un esito non ammesso, nessuna sentenza
 
 ## 13. Lasciato aperto
 
-- Formato esatto del catalogo e del tariffario; limiti mensili per voce.
+- Limiti mensili per voce di catalogo e tariffario.
 - Come l'app scorre il registro quando cresce (indice delle uscite per `R`). Con gli impegni, per ogni uscita c'è una moltiplicazione scalare in più.
 - **Scelta delle esche**: uniforme tra tutte le uscite, o pesata verso le recenti come fa Monero (distribuzione gamma). Uniforme nella fase di test; si decide con i dati.
 - **Anelli piccoli nei primi giorni**: la banca può seminare uscite in chiaro a sé stessa nella genesi per dare esche fin dall'inizio. Da valutare.
@@ -269,7 +269,7 @@ Se il modello non risponde o risponde con un esito non ammesso, nessuna sentenza
 | 10 | Immagini di chiave, anelli, firma CLSAG e verifica. Test | A |
 | 11 | `transfer` riservato con resto sopra il passo 7; la spesa in chiaro resta come base del `payout`. Test | A |
 | 12 | Vendite, tetto, interessi, estratti, valore e prezzi, invariante di copertura. Test | A |
-| 13 | Aziende: registrazione, polizia, catalogo, tariffario, trattenute. Test | A |
+| 13 | Aziende: registrazione, polizia, catalogo, tariffario, `payout`, rivelazione delle entrate riservate. Test (trattenute al 15) | A |
 | 14 | Conversioni in anello con commissione e blocco per multe. Test | A |
 | 15 | Verbali, pagamento con bruciatura, contestazioni, repliche, sentenze (giudice finto). Test | A |
 | 16 | Motore giornaliero e generatore del sito | A |
