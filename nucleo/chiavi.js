@@ -1,22 +1,31 @@
 // Chiavi Ed25519, firma e verifica.
 //
 // Ogni ruolo (banca, azienda, polizia, giudice) e ogni indirizzo usa e getta
-// firma con Ed25519 (ARCHITETTURA.md, sezioni 5 e 7). Qui c'è solo la
-// primitiva: da un seme di 32 byte si ottiene la coppia di chiavi, si firma
-// un hash, si verifica una firma. Gli indirizzi usa e getta arrivano al
-// passo successivo.
+// firma con Ed25519 (ARCHITETTURA.md, sezioni 5 e 7). Le librerie noble
+// girano identiche in Node e nel browser, così il nucleo è lo stesso sul
+// server e nell'app.
 //
-// Solo node:crypto. Le chiavi grezze vengono avvolte nei prefissi DER che
-// Node si aspetta; i prefissi sono fissi per Ed25519.
+// Due modi di firmare, una sola verifica:
+// - `firma` usa un seme di 32 byte, come Ed25519 standard (RFC 8032). È per
+//   le chiavi dei ruoli.
+// - `firmaScalare` usa direttamente uno scalare della curva. Serve agli
+//   indirizzi usa e getta, la cui chiave privata è `s + k` e non ha un seme.
+//   Produce una firma Ed25519 normale (R ‖ z), che `verifica` controlla con
+//   la stessa funzione standard: z·G = R + H(R ‖ A ‖ m)·A.
 
-import { createPrivateKey, createPublicKey, randomBytes, sign, verify } from 'node:crypto';
+import { ed25519 } from '@noble/curves/ed25519.js';
+import { bytesToHex, bytesToNumberLE, concatBytes, hexToBytes, numberToBytesLE, randomBytes } from '@noble/curves/utils.js';
+import { sha512 } from '@noble/hashes/sha2.js';
+import { base64 } from '@scure/base';
 
-const PREFISSO_PKCS8 = Buffer.from('302e020100300506032b657004220420', 'hex');
-const PREFISSO_SPKI = Buffer.from('302a300506032b6570032100', 'hex');
+const Punto = ed25519.Point;
+const G = Punto.BASE;
+const ORDINE = Punto.Fn.ORDER;
+const codifica = new TextEncoder();
 
 /**
  * Genera un seme casuale di 32 byte.
- * @returns {Buffer}
+ * @returns {Uint8Array}
  */
 export function generaSeme() {
   return randomBytes(32);
@@ -24,8 +33,8 @@ export function generaSeme() {
 
 /**
  * @typedef {object} Coppia
- * @property {import('node:crypto').KeyObject} privata
- * @property {string} pubblica  chiave pubblica grezza, 32 byte, esadecimale
+ * @property {Uint8Array} privata  il seme di 32 byte; non lascia mai il dispositivo
+ * @property {string} pubblica     chiave pubblica, 32 byte, esadecimale minuscolo
  */
 
 /**
@@ -37,42 +46,61 @@ export function coppiaDaSeme(seme) {
   if (!(seme instanceof Uint8Array) || seme.length !== 32) {
     throw new TypeError('il seme deve essere di 32 byte');
   }
-  const privata = createPrivateKey({
-    key: Buffer.concat([PREFISSO_PKCS8, Buffer.from(seme)]),
-    format: 'der',
-    type: 'pkcs8',
-  });
-  const spki = createPublicKey(privata).export({ format: 'der', type: 'spki' });
-  const pubblica = Buffer.from(spki.subarray(PREFISSO_SPKI.length)).toString('hex');
-  return { privata, pubblica };
+  return { privata: seme, pubblica: bytesToHex(ed25519.getPublicKey(seme)) };
 }
 
 /**
- * Ricostruisce l'oggetto chiave pubblica da 32 byte esadecimali.
- * @param {string} pubblicaHex
- * @returns {import('node:crypto').KeyObject}
- */
-function chiavePubblica(pubblicaHex) {
-  if (typeof pubblicaHex !== 'string' || !/^[0-9a-f]{64}$/.test(pubblicaHex)) {
-    throw new TypeError('chiave pubblica: attesi 64 caratteri esadecimali minuscoli');
-  }
-  return createPublicKey({
-    key: Buffer.concat([PREFISSO_SPKI, Buffer.from(pubblicaHex, 'hex')]),
-    format: 'der',
-    type: 'spki',
-  });
-}
-
-/**
- * Firma un hash (64 caratteri esadecimali). Restituisce la firma in base64.
- * Si firma l'hash come stringa: chi verifica deve ricalcolarlo allo stesso modo.
- * @param {import('node:crypto').KeyObject} privata
+ * Firma un hash (64 caratteri esadecimali) con un seme. Restituisce base64.
+ * Si firma l'hash come stringa UTF-8: chi verifica lo ricalcola allo stesso modo.
+ * @param {Uint8Array} privata
  * @param {string} hashHex
  * @returns {string}
  */
 export function firma(privata, hashHex) {
   controllaHash(hashHex);
-  return sign(null, Buffer.from(hashHex, 'utf8'), privata).toString('base64');
+  if (!(privata instanceof Uint8Array) || privata.length !== 32) {
+    throw new TypeError('la chiave privata deve essere un seme di 32 byte');
+  }
+  return toBase64(ed25519.sign(codifica.encode(hashHex), privata));
+}
+
+/**
+ * Riduce 64 byte di hash a uno scalare della curva, in [1, ordine).
+ * @param {Uint8Array} bytes64
+ * @returns {bigint}
+ */
+export function scalareDaBytes(bytes64) {
+  const n = bytesToNumberLE(bytes64) % ORDINE;
+  return n === 0n ? 1n : n;
+}
+
+/**
+ * Chiave pubblica (esadecimale) di uno scalare.
+ * @param {bigint} scalare
+ * @returns {string}
+ */
+export function pubblicaDaScalare(scalare) {
+  controllaScalare(scalare);
+  return G.multiply(scalare).toHex();
+}
+
+/**
+ * Firma un hash con uno scalare della curva. Firma Ed25519 standard, nonce
+ * deterministico derivato da scalare e messaggio.
+ * @param {bigint} scalare
+ * @param {string} hashHex
+ * @returns {string}
+ */
+export function firmaScalare(scalare, hashHex) {
+  controllaHash(hashHex);
+  controllaScalare(scalare);
+  const m = codifica.encode(hashHex);
+  const A = G.multiply(scalare);
+  const r = scalareDaBytes(sha512(concatBytes(codifica.encode('manti/nonce/v1'), numberToBytesLE(scalare, 32), m)));
+  const R = G.multiply(r);
+  const c = scalareDaBytes(sha512(concatBytes(R.toBytes(), A.toBytes(), m)));
+  const z = (r + c * scalare) % ORDINE;
+  return toBase64(concatBytes(R.toBytes(), numberToBytesLE(z, 32)));
 }
 
 /**
@@ -85,9 +113,10 @@ export function firma(privata, hashHex) {
 export function verifica(pubblicaHex, hashHex, firmaBase64) {
   try {
     controllaHash(hashHex);
-    const sig = Buffer.from(firmaBase64, 'base64');
+    if (typeof pubblicaHex !== 'string' || !/^[0-9a-f]{64}$/.test(pubblicaHex)) return false;
+    const sig = fromBase64(firmaBase64);
     if (sig.length !== 64) return false;
-    return verify(null, Buffer.from(hashHex, 'utf8'), chiavePubblica(pubblicaHex), sig);
+    return ed25519.verify(sig, codifica.encode(hashHex), hexToBytes(pubblicaHex));
   } catch {
     return false;
   }
@@ -98,4 +127,22 @@ function controllaHash(h) {
   if (typeof h !== 'string' || !/^[0-9a-f]{64}$/.test(h)) {
     throw new TypeError('hash: attesi 64 caratteri esadecimali minuscoli');
   }
+}
+
+/** @param {bigint} s */
+function controllaScalare(s) {
+  if (typeof s !== 'bigint' || s <= 0n || s >= ORDINE) {
+    throw new TypeError('scalare fuori dalla curva');
+  }
+}
+
+/** @param {Uint8Array} b */
+function toBase64(b) {
+  return base64.encode(b);
+}
+
+/** @param {string} s */
+function fromBase64(s) {
+  if (typeof s !== 'string') throw new TypeError('base64');
+  return base64.decode(s);
 }

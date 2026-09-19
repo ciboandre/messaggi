@@ -5,7 +5,8 @@
 // ordine alfabetico a ogni livello, nessuno spazio, UTF-8, e nessun valore
 // che JSON non sappia rappresentare in modo univoco.
 
-import { createHash } from 'node:crypto';
+import { sha256 as nobleSha256 } from '@noble/hashes/sha2.js';
+import { bytesToHex } from '@noble/hashes/utils.js';
 
 /**
  * Serializza un valore in JSON canonico.
@@ -53,7 +54,8 @@ function normalizza(v, percorso) {
  * @returns {string}
  */
 export function sha256(dati) {
-  return createHash('sha256').update(dati).digest('hex');
+  const bytes = typeof dati === 'string' ? new TextEncoder().encode(dati) : dati;
+  return bytesToHex(nobleSha256(bytes));
 }
 
 /**

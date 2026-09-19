@@ -4,8 +4,16 @@
   "version": "0.0.1",
   "type": "module",
   "description": "Il manto: moneta privata coperta in euro. Nucleo, motore, server, app.",
-  "engines": { "node": ">=22" },
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "test": "node --test test/"
+  },
+  "dependencies": {
+    "@noble/curves": "^2.4.0",
+    "@noble/hashes": "^2.4.0",
+    "@scure/base": "^2.4.0",
+    "@scure/bip39": "^2.4.0"
   }
 }

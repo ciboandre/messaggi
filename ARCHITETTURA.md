@@ -53,7 +53,8 @@ Nella fase A tutto si prova da riga di comando con chiavi finte, per tre mesi si
 ## 3. Tecnologia
 
 - **Node.js** (versione 26 installata). Librerie di sistema: `node:crypto` per hash, casualità e cifratura simmetrica, `node:test` per i test, `node:fs` per il registro.
-- **Una sola dipendenza esterna: `@noble/curves`** (con `@noble/hashes`), per l'aritmetica sulla curva Ed25519 che serve agli indirizzi usa e getta. `node:crypto` firma e verifica ma non espone le operazioni sui punti. Noble è piccola, senza dipendenze, con audit pubblici. Ogni altra aggiunta va motivata nel commit.
+- **Una sola famiglia di dipendenze esterne, noble/scure** dello stesso autore, con audit pubblici e senza dipendenze a loro volta: `@noble/curves` per l'aritmetica su Ed25519, `@noble/hashes` per SHA-256 e SHA-512, `@scure/bip39` per la frase di dodici parole, `@scure/base` per bech32m e base64. Si usano anche al posto di `node:crypto` per hash e firme, così il nucleo gira identico in Node e nel browser (regola: stesso codice sul server e nell'app). Ogni altra aggiunta va motivata nel commit.
+- **Firma degli indirizzi usa e getta.** La chiave privata di un indirizzo è uno scalare `s + k`, non un seme: si firma con lo scalare direttamente (nonce deterministico da scalare e messaggio) e la firma che ne esce è una firma Ed25519 normale, verificata dalla stessa funzione standard. È la tecnica di Monero; i test lo controllano.
 - **JavaScript con JSDoc**, non TypeScript.
 - **JSONL** per il registro.
 - **Giudice**: un modello linguistico via API. Modello e versione sono parametri pubblici; le istruzioni sono un file nel repository.
@@ -89,7 +90,7 @@ Questa è la parte che rende i saldi segreti su un registro pubblico (regola 12)
 
 - una **frase di recupero** di dodici parole, generata al primo avvio e mai trasmessa;
 - da questa, la **chiave di spesa** `s` e la **chiave di vista** `v`, con le pubbliche `S = s·G` e `V = v·G`;
-- le **coordinate**: la coppia `(S, V)` in bech32m con prefisso `mnt`, circa 115 caratteri, con checksum. Sono l'equivalente dell'IBAN.
+- le **coordinate**: la coppia `(S, V)` in bech32m con prefisso `mnt`, 113 caratteri, con checksum. Sono l'equivalente dell'IBAN. La frase usa la lista di parole italiana di BIP39; le chiavi `s` e `v` sono derivate dal seme della frase con hash separati (`manti/spesa/v1`, `manti/vista/v1`).
 
 **Quando qualcuno paga a delle coordinate `(S, V)`:** genera `r` casuale, `R = r·G`, `k = H(r·V)`, indirizzo usa e getta `P = S + k·G`; scrive un'uscita con `P`, `R` e l'importo.
 
