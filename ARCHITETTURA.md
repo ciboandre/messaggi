@@ -57,7 +57,7 @@ Nella fase A tutto si prova da riga di comando con chiavi finte, per tre mesi si
 - **Riservatezza alla Monero, scritta in casa.** Nessuna libreria pronta: impegni di Pedersen, prove di intervallo, firme ad anello e immagini di chiave stanno in `nucleo/`, su Ed25519 con le primitive di `@noble/curves`. Nel dettaglio:
   - **secondo generatore** `H = hash_to_curve("manti/H/v1")` con l'Elligator 2 di RFC 9380 che noble espone per Ed25519; nessuno conosce il logaritmo di `H` rispetto a `G`;
   - **impegno** di un importo `a` con maschera `b`: `C = b·G + a·H`. Un importo in chiaro è l'impegno con `b = 0`;
-  - **prova di intervallo**: Bulletproofs+ a 64 bit, una prova aggregata per riga, così un importo non può essere negativo né traboccare;
+  - **prova di intervallo**: Bulletproofs+ a 64 bit, una prova aggregata per riga fino a 16 uscite riservate (riempite a potenza di 2 con impegni all'identità), così un importo non può essere negativo né traboccare;
   - **immagine di chiave** dell'indirizzo `P` con chiave privata `p`: `I = p·hash_to_curve(P)`. È la stessa per chiunque spenda `P`, quindi la doppia spesa si vede;
   - **firma ad anello** CLSAG sull'hash della riga: prova che il firmatario conosce la chiave di uno dei membri e la differenza di maschera tra il suo impegno e lo pseudo-impegno dichiarato, senza rivelare quale membro.
   Ogni costruzione ha test contro vettori generati a mano e contro le proprietà (una prova falsificata non passa, un'immagine ripetuta viene rifiutata). Prima di soldi veri va fatta rivedere da qualcuno che non l'ha scritta.
