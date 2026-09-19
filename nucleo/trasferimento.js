@@ -119,22 +119,19 @@ export function controllaAnello(stato, ring, dove) {
 }
 
 /**
- * Regola del tipo `transfer` riservato.
- * @type {import('./registro.js').RegolaTipo}
+ * Controlla le entrate in anello di una riga: forma, immagini di chiave
+ * nuove e distinte, pseudo-impegni, anelli. Non tocca lo stato.
+ * @param {Record<string, any>} stato
+ * @param {unknown} ins
+ * @returns {Array<{ img: string, pseudo: string, membri: Array<{ addr: string, commit: string }> }>}
  */
-export function regolaTransfer(riga, stato) {
-  const b = /** @type {any} */ (riga.body);
-  const extra = Object.keys(b).filter((k) => !['in', 'out', 'proof', 'ref'].includes(k));
-  if (extra.length) throw new Error(`transfer: campi sconosciuti ${extra.join(', ')}`);
-  if (b.ref !== null) throw new Error('transfer: ref deve essere null');
+export function controllaEntrateInAnello(stato, ins) {
+  if (!Array.isArray(ins) || ins.length === 0) throw new Error('nessuna entrata');
+  if (ins.length > ENTRATE_MAX) throw new Error(`al massimo ${ENTRATE_MAX} entrate`);
   preparaStato(stato);
-  const out = controllaUsciteRiservate(b.out);
-
-  if (!Array.isArray(b.in) || b.in.length === 0) throw new Error('transfer: nessuna entrata');
-  if (b.in.length > ENTRATE_MAX) throw new Error(`transfer: al massimo ${ENTRATE_MAX} entrate`);
   const immagini = new Set();
   const entrate = [];
-  for (const [i, e] of b.in.entries()) {
+  for (const [i, e] of ins.entries()) {
     const dove = `entrata ${i}`;
     if (!e || typeof e !== 'object') throw new Error(`${dove}: malformata`);
     const extraE = Object.keys(e).filter((k) => !['ring', 'img', 'pseudo'].includes(k));
@@ -147,13 +144,18 @@ export function regolaTransfer(riga, stato) {
     const membri = controllaAnello(stato, e.ring, dove);
     entrate.push({ img: e.img, pseudo: e.pseudo, membri });
   }
+  return entrate;
+}
 
-  if (!bilancio({ pseudo: entrate.map((e) => e.pseudo), uscite: out.map((u) => u.commit) })) {
-    throw new Error('transfer: il bilancio degli impegni non torna');
-  }
-  if (!verificaIntervalli(riempi(out.map((u) => u.commit)), b.proof)) {
-    throw new Error('transfer: prova di intervallo non valida');
-  }
+/**
+ * Verifica la firma ad anello di ogni entrata sull'hash della riga, poi
+ * segna le immagini come spese. Restituisce le immagini richieste.
+ * @param {import('./registro.js').Riga} riga
+ * @param {Record<string, any>} stato
+ * @param {ReturnType<typeof controllaEntrateInAnello>} entrate
+ * @returns {string[]}
+ */
+export function firmeAnello(riga, stato, entrate) {
   for (const [i, e] of entrate.entries()) {
     const firma = riga.sigs.find((s) => s.img === e.img);
     if (!firma) throw new Error(`entrata ${i}: manca la firma ad anello`);
@@ -161,10 +163,30 @@ export function regolaTransfer(riga, stato) {
       throw new Error(`entrata ${i}: firma ad anello non valida`);
     }
   }
-
   for (const e of entrate) stato.immagini[e.img] = riga.hash;
+  return entrate.map((e) => e.img);
+}
+
+/**
+ * Regola del tipo `transfer` riservato.
+ * @type {import('./registro.js').RegolaTipo}
+ */
+export function regolaTransfer(riga, stato) {
+  const b = /** @type {any} */ (riga.body);
+  const extra = Object.keys(b).filter((k) => !['in', 'out', 'proof', 'ref'].includes(k));
+  if (extra.length) throw new Error(`transfer: campi sconosciuti ${extra.join(', ')}`);
+  if (b.ref !== null) throw new Error('transfer: ref deve essere null');
+  const out = controllaUsciteRiservate(b.out);
+  const entrate = controllaEntrateInAnello(stato, b.in);
+  if (!bilancio({ pseudo: entrate.map((e) => e.pseudo), uscite: out.map((u) => u.commit) })) {
+    throw new Error('transfer: il bilancio degli impegni non torna');
+  }
+  if (!verificaIntervalli(riempi(out.map((u) => u.commit)), b.proof)) {
+    throw new Error('transfer: prova di intervallo non valida');
+  }
+  const img = firmeAnello(riga, stato, entrate);
   for (const [i, u] of out.entries()) {
     registraUscita(stato, `${riga.hash}:${i}`, { addr: u.addr, commit: u.commit, amount: null });
   }
-  return { by: [], img: entrate.map((e) => e.img) };
+  return { by: [], img };
 }

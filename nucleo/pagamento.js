@@ -265,3 +265,56 @@ export function costruisciPagamentoRiservato({ portafoglio, disponibili, destina
   }
   return { body: { in: ins, out, proof, ref: null }, firmatari };
 }
+
+/**
+ * Costruisce il body di una `conversion.request` e i firmatari ad anello.
+ * L'importo da convertire è in chiaro; il resto è riservato con la sua
+ * prova, e c'è sempre, anche da zero, perché lo pseudo-impegno dell'entrata
+ * possa avere una maschera a caso. I dati per il pagamento (nome, IBAN, quello che la banca
+ * chiede) sono cifrati per le coordinate della banca: nel registro non
+ * compaiono. Chi converte viene comunque identificato dalla banca, fuori
+ * dal registro.
+ * @param {object} p
+ * @param {import('./portafoglio.js').Portafoglio} p.portafoglio
+ * @param {EntrataMia[]} p.disponibili
+ * @param {number} p.amount              manti da convertire, centesimi
+ * @param {string} p.dati                testo per la banca, fino a 140 caratteri
+ * @param {string} p.coordinateBanca
+ * @param {Record<string, any>} p.stato
+ * @param {(n: number) => number} [p.caso]
+ * @returns {{ body: Record<string, unknown>, firmatari: Array<{ img: string, firma: (h: string) => unknown }> }}
+ */
+export function costruisciRichiestaConversione({ portafoglio, disponibili, amount, dati, coordinateBanca, stato, caso }) {
+  if (!Number.isInteger(amount) || amount <= 0) throw new Error('importo non valido');
+  const entrate = scegliEntrate(disponibili, amount);
+  const resto = saldo(entrate) - amount;
+
+  const mio = creaIndirizzo(portafoglio.coordinate);
+  const bResto = mascheraDaSegreto(mio.k);
+  const out = [{ addr: mio.addr, eph: mio.eph, commit: impegno(resto, bResto), amt: cifraImporto(mio.k, resto) }];
+  const valori = [{ a: BigInt(resto), b: bResto }];
+  const perBanca = creaIndirizzo(coordinateBanca);
+  const body = {
+    in: [],
+    amount,
+    out,
+    proof: provaIntervalli(valori),
+    dati: { addr: perBanca.addr, eph: perBanca.eph, memo: cifraCausale(chiaveCausale(perBanca.k), dati) },
+  };
+
+  const maschere = mascherePseudo(valori.map((v) => v.b), entrate.length);
+  const firmatari = [];
+  for (const [i, e] of entrate.entries()) {
+    const pseudo = impegno(e.amount, maschere[i]);
+    const z = sommaMaschere([e.b, ORDINE - maschere[i]]);
+    if (z === 0n) throw new Error('maschera dello pseudo-impegno coincidente: riprova');
+    const { ring, indice } = scegliEsche(stato, e.ref, caso);
+    const membri = ring.map((ref) => ({ addr: stato.uscite[ref].addr, commit: stato.uscite[ref].commit }));
+    body.in.push({ ring, img: e.img, pseudo });
+    firmatari.push({
+      img: e.img,
+      firma: (/** @type {string} */ h) => firmaAnello({ membri, indice, p: e.p, z, pseudo, messaggio: h }).firma,
+    });
+  }
+  return { body, firmatari };
+}

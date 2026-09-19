@@ -190,9 +190,9 @@ Verifica di una riga: hash uguale, firme valide, `prev` giusto, immagini di chia
 | `tariff.set` | azienda | Tariffario completo, stessa forma del catalogo | Sostituisce il precedente per quell'azienda |
 | `transfer` | CLSAG per ogni entrata in anello | Entrate in anello, uscite riservate, prova di intervallo, `ref` facoltativo a un verbale con le due uscite in chiaro | Immagini di chiave nuove, anelli di uscite esistenti e non spese in chiaro, bilancio degli impegni, prova valida. Se `ref` a un verbale: bruciatura = metà, alla polizia = metà, entrambe in chiaro |
 | `payout` | azienda, più le chiavi usa e getta delle sue entrate (o l'anello di uno delle rivelate) | Entrate in chiaro o rivelate, uscite in chiaro taggate stipendio o premio (voce), trattenute con riferimento ai verbali definitivi, ciascuna con metà alla polizia e metà bruciata; resto all'azienda in chiaro, tag resto | Le uscite di stipendio sono tutte uguali tra loro; ogni premio riferisce una voce del catalogo in vigore con l'importo giusto |
-| `conversion.request` | CLSAG per ogni entrata in anello | Entrate in anello, importo in chiaro da convertire, eventuale resto riservato con prova, dati di pagamento e identità cifrati per la banca | Bilancio: Σ pseudo = importo·H + impegno del resto. Il richiedente è identificato in anagrafica. Nessun verbale definitivo non saldato |
-| `conversion.execute` | banca | Riferimento alla richiesta, bruciatura di tutti i manti, prezzo applicato, euro dovuti | Prezzo = prezzo di conversione del giorno. Riserva −= euro dovuti |
-| `conversion.paid` | banca | Riferimento, data del pagamento in euro | Una per esecuzione |
+| `conversion.request` | CLSAG per ogni entrata in anello | Entrate in anello, importo in chiaro da convertire, un resto riservato con prova (sempre, anche da zero: altrimenti con una sola entrata lo pseudo-impegno coinciderebbe con l'impegno vero e l'anello direbbe quale membro è), dati di pagamento cifrati per le coordinate della banca | Bilancio: Σ pseudo = importo·H + impegno del resto; la prova copre solo il resto. I manti chiesti non sono un'uscita: stanno in `conversioni`, fuori da anelli e spese, in circolazione finché non vengono bruciati. Identificazione e blocco per multe li controlla la banca prima di eseguire, con l'anagrafica: l'anello nasconde di chi è la richiesta anche al registro |
+| `conversion.execute` | banca | Riferimento alla richiesta, prezzo applicato, euro dovuti | Prezzo = prezzo di conversione **del giorno dell'esecuzione**: è il valore che la riserva copre in quel momento, e siccome il valore non scende un'esecuzione tardiva non danneggia mai chi ha chiesto. Brucia i manti, riserva −= euro dovuti, invariante ricontrollato |
+| `conversion.paid` | banca | Riferimento, data del pagamento in euro | Una per esecuzione. **Affermazione firmata**, come l'estratto conto: che gli euro siano arrivati lo dice solo la banca |
 | `fine.issue` | polizia | Numero verbale, voce, importo, data, descrizione cifrata per il multato, indirizzo di consegna | Voce e importo dal tariffario della sua azienda. Il pannello propone solo dipendenti registrati |
 | `fine.contest` | chiave usa e getta dell'indirizzo di consegna | Verbale, testo cifrato per giudice e polizia | Entro 15 giorni |
 | `fine.reply` | polizia | Verbale, testo cifrato per il giudice | Una per contestazione |
@@ -253,6 +253,7 @@ Se il modello non risponde o risponde con un esito non ammesso, nessuna sentenza
 - **Dimensione delle righe**: un `transfer` con due entrate pesa 2–3 KB tra anelli, firme e prova. Il registro cresce più in fretta; va bene per anni, ma il sito non lo mostra più intero.
 - Come un esterno si identifica presso la banca: di persona, o con documento cifrato nella richiesta.
 - Come la banca verifica l'arrivo degli euro di una vendita prima di firmarla: manuale nella fase di test. In fase C, Stripe Checkout con webhook: al pagamento riuscito il server fa firmare la `sale` alla chiave banca, con il riferimento del pagamento nel `body`. Stripe Identity per l'identificazione degli esterni. Il nucleo non vede Stripe: una vendita firmata è una vendita firmata.
+- Una `conversion.request` che la banca non esegue (richiedente non identificato, multe non saldate) resta in sospeso: serve un tipo di riga che restituisca i manti, firmato dalla banca, verso un indirizzo indicato nella richiesta.
 - Backup del registro fuori dal repository.
 - Modello e versione per il giudice.
 
@@ -270,7 +271,7 @@ Se il modello non risponde o risponde con un esito non ammesso, nessuna sentenza
 | 11 | `transfer` riservato con resto sopra il passo 7; la spesa in chiaro resta come base del `payout`. Test | A |
 | 12 | Vendite, tetto, interessi, estratti, valore e prezzi, invariante di copertura. Test | A |
 | 13 | Aziende: registrazione, polizia, catalogo, tariffario, `payout`, rivelazione delle entrate riservate. Test (trattenute al 15) | A |
-| 14 | Conversioni in anello con commissione e blocco per multe. Test | A |
+| 14 | Conversioni: richiesta in anello con resto riservato, esecuzione al prezzo del giorno, pagamento attestato. Test (blocco per multe: della banca, con l'anagrafica) | A |
 | 15 | Verbali, pagamento con bruciatura, contestazioni, repliche, sentenze (giudice finto). Test | A |
 | 16 | Motore giornaliero e generatore del sito | A |
 | 17 | Simulazione di tre mesi da riga di comando | A |
