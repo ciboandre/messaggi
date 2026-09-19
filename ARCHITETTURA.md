@@ -260,11 +260,11 @@ Se il modello non risponde o risponde con un esito non ammesso, nessuna sentenza
 | 4 | Serializzazione canonica, hash, chiavi Ed25519, firma e verifica. Test | A |
 | 5 | Frase di recupero, chiavi di spesa e di vista, coordinate bech32m, indirizzi usa e getta, riconoscimento. Test | A |
 | 6 | Registro: genesi, accodamento, verifica della catena. Test | A |
-| 7 | Cifratura delle causali. Test | A |
+| 7 | Uscite, entrate, bruciature, `transfer` in chiaro, causali cifrate. Test. Fatto: il passo 11 lo rende riservato | A |
 | 8 | Generatore `H`, impegni di Pedersen, maschera e importo cifrato derivati da `k`, bilancio. Test | A |
 | 9 | Prova di intervallo Bulletproofs+ a 64 bit, aggregata. Test | A |
 | 10 | Immagini di chiave, anelli, firma CLSAG e verifica. Test | A |
-| 11 | Uscite, entrate, bruciature, `transfer` riservato con resto, `payout` in chiaro. Test | A |
+| 11 | `transfer` riservato con resto e `payout` in chiaro sopra il passo 7. Test | A |
 | 12 | Vendite, tetto, interessi, estratti, valore e prezzi. Test | A |
 | 13 | Aziende: registrazione, polizia, catalogo, tariffario, trattenute. Test | A |
 | 14 | Conversioni in anello con commissione e blocco per multe. Test | A |
