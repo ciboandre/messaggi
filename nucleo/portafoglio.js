@@ -105,6 +105,7 @@ export function coordinateLeggibili(coordinate) {
  * @property {string} addr  P, esadecimale: dove vanno i manti
  * @property {string} eph   R, esadecimale: serve al destinatario per riconoscere l'uscita
  * @property {bigint} k     segreto condiviso; serve a chi paga per cifrare la causale
+ * @property {string} r     lo scalare casuale, esadecimale: rivelarlo prova a chiunque a chi va l'uscita
  */
 
 /**
@@ -119,7 +120,25 @@ export function creaIndirizzo(coordinate, rBytes) {
   const R = G.multiply(r);
   const k = segretoCondiviso(Punto.fromHex(V).multiply(r));
   const P = Punto.fromHex(S).add(G.multiply(k));
-  return { addr: P.toHex(), eph: R.toHex(), k };
+  return { addr: P.toHex(), eph: R.toHex(), k, r: Buffer.from(numberToBytesLE(r, 32)).toString('hex') };
+}
+
+/**
+ * Chiunque, con r: ricalcola l'indirizzo usa e getta di delle coordinate.
+ * Serve dove il destinatario è pubblico per regola (la polizia che incassa
+ * una multa) e il registro deve poterlo controllare. Null se r è malformato.
+ * @param {string} coordinate
+ * @param {string} rHex
+ * @returns {{ addr: string, eph: string } | null}
+ */
+export function indirizzoDaR(coordinate, rHex) {
+  if (typeof rHex !== 'string' || !/^[0-9a-f]{64}$/.test(rHex)) return null;
+  const r = BigInt('0x' + Buffer.from(rHex, 'hex').reverse().toString('hex'));
+  if (r === 0n || r >= ORDINE) return null;
+  const { S, V } = decodificaCoordinate(coordinate);
+  const R = G.multiply(r);
+  const k = segretoCondiviso(Punto.fromHex(V).multiply(r));
+  return { addr: Punto.fromHex(S).add(G.multiply(k)).toHex(), eph: R.toHex() };
 }
 
 /**

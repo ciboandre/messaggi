@@ -19,6 +19,7 @@ import { numberToBytesLE } from '@noble/curves/utils.js';
 import { provaIntervalli } from './intervallo.js';
 import { firmaAnello, immagineChiave } from './anello.js';
 import { dimensioneAnello } from './trasferimento.js';
+import { divisioneMulta } from './banca.js';
 import { ed25519 } from '@noble/curves/ed25519.js';
 
 const ORDINE = ed25519.Point.Fn.ORDER;
@@ -119,6 +120,28 @@ export function scegliEntrate(entrate, totale) {
  */
 
 /**
+ * Le due uscite in chiaro che saldano un verbale: la metà bruciata e la
+ * metà alla polizia dell'azienda, con r in chiaro perché il registro possa
+ * controllare il destinatario.
+ * @param {Record<string, any>} stato
+ * @param {string} id
+ * @returns {{ uscite: Array<Record<string, unknown>>, amount: number }}
+ */
+export function uscitePerMulta(stato, id) {
+  const v = stato.verbali?.[id];
+  if (!v) throw new Error(`verbale sconosciuto ${id}`);
+  const { bruciati, polizia } = divisioneMulta(stato, v.amount);
+  const pol = creaIndirizzo(stato.aziende[v.azienda].polizia.coordinate);
+  return {
+    amount: v.amount,
+    uscite: [
+      { addr: null, amount: bruciati, reason: `multa:${id}` },
+      { addr: pol.addr, eph: pol.eph, amount: polizia, tag: 'multa', ref: id, r: pol.r },
+    ],
+  };
+}
+
+/**
  * Costruisce il body di una spesa in chiaro e i firmatari. Le entrate
  * vengono scelte tra quelle disponibili; il resto torna al portafoglio su
  * un indirizzo nuovo. Le causali sono cifrate per ciascun destinatario.
@@ -134,15 +157,18 @@ export function scegliEntrate(entrate, totale) {
  * @param {Destinazione[]} p.destinazioni
  * @param {Array<{ amount: number, reason: string }>} [p.bruciature]
  * @param {string | null} [p.ref]
+ * @param {string[]} [p.trattenute]         verbali da trattenere (payout), con lo stato del registro
+ * @param {Record<string, any>} [p.stato]
  * @returns {{ body: Record<string, unknown>, firmatari: Array<{ by: string, firma: (h: string) => string }> }}
  */
-export function costruisciPagamento({ portafoglio, disponibili, destinazioni, bruciature = [], ref = null }) {
-  if (!destinazioni.length && !bruciature.length) throw new Error('niente da pagare');
-  const totale = destinazioni.reduce((s, d) => s + d.amount, 0) + bruciature.reduce((s, b) => s + b.amount, 0);
+export function costruisciPagamento({ portafoglio, disponibili, destinazioni, bruciature = [], ref = null, trattenute = [], stato }) {
+  if (!destinazioni.length && !bruciature.length && !trattenute.length) throw new Error('niente da pagare');
+  const multe = trattenute.map((id) => uscitePerMulta(stato, id));
+  const totale = destinazioni.reduce((s, d) => s + d.amount, 0) + bruciature.reduce((s, b) => s + b.amount, 0) + multe.reduce((s, m) => s + m.amount, 0);
   const entrate = scegliEntrate(disponibili, totale);
   const somma = saldo(entrate);
 
-  const out = [];
+  const out = multe.flatMap((m) => m.uscite);
   for (const d of destinazioni) {
     if (!Number.isInteger(d.amount) || d.amount <= 0) throw new Error('importo non valido');
     const ind = creaIndirizzo(d.coordinate);
@@ -160,7 +186,7 @@ export function costruisciPagamento({ portafoglio, disponibili, destinazioni, br
     out.push({ addr: mio.addr, eph: mio.eph, amount: resto });
   }
 
-  const body = { in: entrate.map((e) => (e.chiaro ? e.ref : rivelazione(e))), out, ref };
+  const body = { in: entrate.map((e) => (e.chiaro ? e.ref : rivelazione(e))), out, ref, ...(trattenute.length ? { trattenute } : {}) };
   const firmatari = [];
   const visti = new Set();
   for (const e of entrate) {
@@ -220,19 +246,21 @@ export function scegliEsche(stato, refVera, caso = (n) => Math.floor(Math.random
  * @param {EntrataMia[]} p.disponibili
  * @param {Destinazione[]} p.destinazioni   senza tag
  * @param {Record<string, any>} p.stato     lo stato del registro, per le esche
+ * @param {string} [p.multa]                verbale da pagare: aggiunge le due uscite in chiaro e `ref`
  * @param {(n: number) => number} [p.caso]
  * @returns {{ body: Record<string, unknown>, firmatari: Array<{ img: string, firma: (h: string) => unknown }> }}
  */
-export function costruisciPagamentoRiservato({ portafoglio, disponibili, destinazioni, stato, caso }) {
-  if (!destinazioni.length) throw new Error('niente da pagare');
-  const totale = destinazioni.reduce((s, d) => s + d.amount, 0);
+export function costruisciPagamentoRiservato({ portafoglio, disponibili, destinazioni, stato, multa = null, caso }) {
+  if (!destinazioni.length && !multa) throw new Error('niente da pagare');
+  const m = multa ? uscitePerMulta(stato, multa) : null;
+  const totale = destinazioni.reduce((s, d) => s + d.amount, 0) + (m ? m.amount : 0);
   const entrate = scegliEntrate(disponibili, totale);
   const resto = saldo(entrate) - totale;
 
-  const out = [];
+  const out = m ? [...m.uscite] : [];
   const valori = [];
-  const versa = (coordinate, amount, causale) => {
-    if (!Number.isInteger(amount) || amount <= 0) throw new Error('importo non valido');
+  const versa = (coordinate, amount, causale, ancheZero = false) => {
+    if (!Number.isInteger(amount) || amount < 0 || (amount === 0 && !ancheZero)) throw new Error('importo non valido');
     const ind = creaIndirizzo(coordinate);
     const b = mascheraDaSegreto(ind.k);
     out.push({
@@ -245,7 +273,8 @@ export function costruisciPagamentoRiservato({ portafoglio, disponibili, destina
     if (d.tag) throw new Error('nessun tag sui pagamenti tra correntisti');
     versa(d.coordinate, d.amount, d.causale);
   }
-  if (resto > 0) versa(portafoglio.coordinate, resto);
+  // il resto c'è sempre, anche da zero: senza uscite riservate lo pseudo-impegno svelerebbe l'entrata
+  if (resto > 0 || valori.length === 0) versa(portafoglio.coordinate, resto, undefined, true);
   const proof = provaIntervalli(valori);
 
   const maschere = mascherePseudo(valori.map((v) => v.b), entrate.length);
@@ -263,7 +292,7 @@ export function costruisciPagamentoRiservato({ portafoglio, disponibili, destina
       firma: (/** @type {string} */ h) => firmaAnello({ membri, indice, p: e.p, z, pseudo, messaggio: h }).firma,
     });
   }
-  return { body: { in: ins, out, proof, ref: null }, firmatari };
+  return { body: { in: ins, out, proof, ref: multa }, firmatari };
 }
 
 /**

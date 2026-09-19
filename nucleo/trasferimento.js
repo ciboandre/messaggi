@@ -2,9 +2,10 @@
 //
 // ARCHITETTURA.md, sezioni 6 e 8. Body:
 //   in:    [ { ring: [ref…], img, pseudo } ]   una per entrata
-//   out:   [ { addr, eph, commit, amt, memo? } ] riservate
-//   proof: prova di intervallo aggregata su riempi(out.commit)
-//   ref:   null (le multe, che aggiungono due uscite in chiaro, arrivano dopo)
+//   out:   [ { addr, eph, commit, amt, memo? } ] riservate, almeno una;
+//          con `ref` anche le due uscite in chiaro della multa
+//   proof: prova di intervallo aggregata su riempi(commit delle riservate)
+//   ref:   null, o l'id del verbale che si paga (multe.js)
 // e in `sigs` una firma ad anello { img, sig } per ogni entrata.
 //
 // La regola verifica, in quest'ordine: forma, immagini di chiave nuove,
@@ -23,10 +24,11 @@
 
 import { ed25519 } from '@noble/curves/ed25519.js';
 import { formaCausaleValida } from './causale.js';
-import { bilancio } from './impegni.js';
+import { bilancio, impegnoInChiaro } from './impegni.js';
 import { verificaIntervalli, riempi, USCITE_MAX } from './intervallo.js';
 import { verificaAnello } from './anello.js';
-import { preparaStato, registraUscita } from './uscite.js';
+import { preparaStato, registraUscita, controllaUscite } from './uscite.js';
+import { saldaVerbale } from './multe.js';
 
 export const ANELLO = 16;
 export const ENTRATE_MAX = 16;
@@ -175,18 +177,45 @@ export function regolaTransfer(riga, stato) {
   const b = /** @type {any} */ (riga.body);
   const extra = Object.keys(b).filter((k) => !['in', 'out', 'proof', 'ref'].includes(k));
   if (extra.length) throw new Error(`transfer: campi sconosciuti ${extra.join(', ')}`);
-  if (b.ref !== null) throw new Error('transfer: ref deve essere null');
-  const out = controllaUsciteRiservate(b.out);
+  if (b.ref !== null && typeof b.ref !== 'string') throw new Error('transfer: ref non valido');
+  if (!Array.isArray(b.out)) throw new Error('nessuna uscita');
+  // riservate e in chiaro si distinguono dal campo: commit le une, amount le altre
+  const riservate = controllaUsciteRiservate(b.out.filter((u) => u && typeof u === 'object' && u.amount === undefined));
+  const chiare = b.out.filter((u) => u && typeof u === 'object' && u.amount !== undefined);
+  if (b.ref === null && chiare.length) throw new Error('transfer: uscite in chiaro solo per pagare una multa');
+  const chiareOk = chiare.length ? controllaUscite(chiare, { tagAmmessi: true, multeAmmesse: true }) : [];
   const entrate = controllaEntrateInAnello(stato, b.in);
-  if (!bilancio({ pseudo: entrate.map((e) => e.pseudo), uscite: out.map((u) => u.commit) })) {
+  if (!bilancio({ pseudo: entrate.map((e) => e.pseudo), uscite: riservate.map((u) => u.commit), usciteChiare: chiareOk.map((u) => u.amount) })) {
     throw new Error('transfer: il bilancio degli impegni non torna');
   }
-  if (!verificaIntervalli(riempi(out.map((u) => u.commit)), b.proof)) {
+  if (!verificaIntervalli(riempi(riservate.map((u) => u.commit)), b.proof)) {
     throw new Error('transfer: prova di intervallo non valida');
   }
-  const img = firmeAnello(riga, stato, entrate);
-  for (const [i, u] of out.entries()) {
-    registraUscita(stato, `${riga.hash}:${i}`, { addr: u.addr, commit: u.commit, amount: null });
+  if (b.ref !== null) {
+    if (chiareOk.length !== 2) throw new Error('transfer: per pagare una multa servono esattamente due uscite in chiaro');
+    saldaVerbale(stato, b.ref, chiareOk, { come: 'pagato' });
   }
+  const img = firmeAnello(riga, stato, entrate);
+  // le uscite prendono l'indice che hanno nel body, riservate e in chiaro
+  for (const [i, u] of b.out.entries()) {
+    if (u.amount === undefined) registraUscita(stato, `${riga.hash}:${i}`, { addr: u.addr, commit: u.commit, amount: null });
+  }
+  if (chiareOk.length) creaUsciteConIndici(stato, riga.hash, b.out);
   return { by: [], img };
+}
+
+/**
+ * Registra le uscite in chiaro di un body misto, con l'indice che hanno
+ * nel body (creaUscite le numererebbe da zero).
+ */
+function creaUsciteConIndici(stato, hashRiga, out) {
+  for (const [i, u] of out.entries()) {
+    if (u.amount === undefined) continue;
+    if (u.addr === null) {
+      stato.bruciati_cent += BigInt(u.amount);
+      stato.circolazione_cent -= BigInt(u.amount);
+    } else {
+      registraUscita(stato, `${hashRiga}:${i}`, { addr: u.addr, commit: impegnoInChiaro(u.amount), amount: u.amount });
+    }
+  }
 }

@@ -189,20 +189,22 @@ Verifica di una riga: hash uguale, firme valide, `prev` giusto, immagini di chia
 | `judge.register` | banca | Chiave del giudice, versione delle istruzioni | Sostituisce la precedente |
 | `catalog.set` | azienda | Catalogo completo: voci `{ codice, nome, amount }`, codice `[a-z0-9-]` unico | Sostituisce il precedente per quell'azienda |
 | `tariff.set` | azienda | Tariffario completo, stessa forma del catalogo | Sostituisce il precedente per quell'azienda |
-| `transfer` | CLSAG per ogni entrata in anello | Entrate in anello, uscite riservate, prova di intervallo, `ref` facoltativo a un verbale con le due uscite in chiaro | Immagini di chiave nuove, anelli di uscite esistenti e non spese in chiaro, bilancio degli impegni, prova valida. Se `ref` a un verbale: bruciatura = metà, alla polizia = metà, entrambe in chiaro |
+| `transfer` | CLSAG per ogni entrata in anello | Entrate in anello, uscite riservate (almeno una: il resto c'è sempre, anche da zero), prova di intervallo, `ref` facoltativo a un verbale con le due uscite in chiaro | Immagini di chiave nuove, anelli di uscite esistenti e non spese in chiaro, bilancio degli impegni, prova valida. Se `ref` a un verbale: bruciatura `reason: multa:id` per la quota bruciata, alla polizia il resto con `tag: multa`, `ref` e lo scalare `r` dell'indirizzo, così chiunque ricalcola l'indirizzo dalle coordinate della polizia e vede che i manti sono andati lì |
 | `payout` | azienda, più le chiavi usa e getta delle sue entrate (o l'anello di uno delle rivelate) | Entrate in chiaro o rivelate, uscite in chiaro taggate stipendio o premio (voce), trattenute con riferimento ai verbali definitivi, ciascuna con metà alla polizia e metà bruciata; resto all'azienda in chiaro, tag resto | Le uscite di stipendio sono tutte uguali tra loro; ogni premio riferisce una voce del catalogo in vigore con l'importo giusto |
 | `conversion.request` | CLSAG per ogni entrata in anello | Entrate in anello, importo in chiaro da convertire, un resto riservato con prova (sempre, anche da zero: altrimenti con una sola entrata lo pseudo-impegno coinciderebbe con l'impegno vero e l'anello direbbe quale membro è), dati di pagamento cifrati per le coordinate della banca, indirizzo effimero di ritorno (per una futura restituzione: il registro non sa di chi è la richiesta, può restituire solo a un indirizzo che la richiesta porta) | Bilancio: Σ pseudo = importo·H + impegno del resto; la prova copre solo il resto. I manti chiesti non sono un'uscita: stanno in `conversioni`, fuori da anelli e spese, in circolazione finché non vengono bruciati. Identificazione e blocco per multe li controlla la banca prima di eseguire, con l'anagrafica: l'anello nasconde di chi è la richiesta anche al registro |
 | `conversion.execute` | banca | Riferimento alla richiesta, prezzo applicato, euro dovuti | Prezzo = prezzo di conversione **del giorno dell'esecuzione**: è il valore che la riserva copre in quel momento, e siccome il valore non scende un'esecuzione tardiva non danneggia mai chi ha chiesto. Brucia i manti, riserva −= euro dovuti, invariante ricontrollato |
 | `conversion.paid` | banca | Riferimento, data del pagamento in euro | Una per esecuzione. **Affermazione firmata**, come l'estratto conto: che gli euro siano arrivati lo dice solo la banca |
-| `fine.issue` | polizia | Numero verbale, voce, importo, data, descrizione cifrata per il multato, indirizzo di consegna | Voce e importo dal tariffario della sua azienda. Il pannello propone solo dipendenti registrati |
-| `fine.contest` | chiave usa e getta dell'indirizzo di consegna | Verbale, testo cifrato per giudice e polizia | Entro 15 giorni |
+| `fine.issue` | polizia | Azienda, numero verbale, voce, importo, descrizione cifrata per il multato all'indirizzo di consegna | Voce e importo dal tariffario della sua azienda; serve un giorno aperto, il verbale nasce in quel giorno. Il pannello propone solo dipendenti registrati |
+| `fine.contest` | chiave usa e getta dell'indirizzo di consegna | Verbale, testo cifrato per giudice e polizia | Entro 15 righe `day` dal giorno del verbale; serve un giudice registrato |
 | `fine.reply` | polizia | Verbale, testo cifrato per il giudice | Una per contestazione |
-| `verdict` | giudice | Verbale, esito, motivazione pubblica, hash del fascicolo, versione delle istruzioni | Contestazione aperta |
+| `verdict` | giudice | Verbale, esito (annullata / confermata), motivazione pubblica, hash del fascicolo, versione delle istruzioni | Contestazione aperta, dopo la replica o dopo 3 giorni senza; versione uguale a quella registrata |
 | `correction` | banca | Riga errata, movimento inverso, motivazione | Solo per righe segnalate invalide dal motore |
 
 Non esiste un tipo che crei manti senza una `sale`, che tolga euro dalla riserva senza una conversione, o che consumi un'entrata senza la sua chiave. Il codice non li riconosce.
 
 Regola generale: **chi firma con la chiave di un ruolo spende e paga in chiaro; chi firma da correntista spende in anello e paga riservato.** Le sole uscite in chiaro create da un correntista sono le due metà di una multa.
+
+**Definitivo non saldato**: un verbale aperto da più di 15 giorni di registro senza contestazione né pagamento, o confermato dal giudice e non pagato. Si paga ancora (anche in ritardo); l'azienda può trattenerlo in un `payout` con la stessa coppia di uscite, al posto del dipendente, e gliela scala fuori dal registro. La banca lo usa per bloccare le conversioni (con l'anagrafica).
 
 ## 9. Lo stato
 
@@ -276,7 +278,7 @@ Se il modello non risponde o risponde con un esito non ammesso, nessuna sentenza
 | 12 | Vendite, tetto, interessi, estratti, valore e prezzi, invariante di copertura. Test | A |
 | 13 | Aziende: registrazione, polizia, catalogo, tariffario, `payout`, rivelazione delle entrate riservate. Test (trattenute al 15) | A |
 | 14 | Conversioni: richiesta in anello con resto riservato, esecuzione al prezzo del giorno, pagamento attestato. Test (blocco per multe: della banca, con l'anagrafica) | A |
-| 15 | Verbali, pagamento con bruciatura, contestazioni, repliche, sentenze (giudice finto). Test | A |
+| 15 | Verbali, pagamento con bruciatura e metà alla polizia verificabile, contestazioni, repliche, sentenze, trattenute, termini in giorni di registro. Test | A |
 | 16 | Motore giornaliero e generatore del sito | A |
 | 17 | Simulazione di tre mesi da riga di comando | A |
 | 18 | GitHub Actions con cron e Pages | B |

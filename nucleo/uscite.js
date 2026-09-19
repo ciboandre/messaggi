@@ -43,7 +43,7 @@ import { verificaAnello } from './anello.js';
 
 const RE_HEX64 = /^[0-9a-f]{64}$/;
 const RE_REF = /^[0-9a-f]{64}:\d+$/;
-export const REASON_MAX = 64;
+export const REASON_MAX = 128; // "multa:" + chiave azienda + ":" + numero ci sta
 export const TAG_MAX = 64;
 
 /**
@@ -54,13 +54,15 @@ export const TAG_MAX = 64;
  * @property {string} [memo]        causale cifrata, base64
  * @property {string} [tag]         solo per chi crea manti o paga stipendi e premi
  * @property {string} [voce]        codice del catalogo, solo sui premi
+ * @property {string} [ref]         verbale, solo sulla metà alla polizia
+ * @property {string} [r]           scalare dell'indirizzo, solo sulla metà alla polizia: rende il destinatario verificabile
  * @property {string} [reason]      solo per le bruciature
  */
 
 /**
  * Controlla la forma di una lista di uscite. Lancia con il motivo.
  * @param {unknown} out
- * @param {{ tagAmmessi?: boolean, voceAmmessa?: boolean }} [opz]
+ * @param {{ tagAmmessi?: boolean, voceAmmessa?: boolean, multeAmmesse?: boolean }} [opz]
  * @returns {Uscita[]}
  */
 export function controllaUscite(out, opz = {}) {
@@ -88,7 +90,14 @@ export function controllaUscite(out, opz = {}) {
         if (!opz.voceAmmessa) throw new Error(`${dove}: voce non ammessa in questo tipo di riga`);
         if (typeof u.voce !== 'string' || !u.voce) throw new Error(`${dove}: voce non valida`);
       }
-      for (const k of ['addr', 'eph', 'amount', 'memo', 'tag', 'voce']) chiavi.delete(k);
+      if (u.ref !== undefined || u.r !== undefined) {
+        if (!opz.multeAmmesse) throw new Error(`${dove}: ref e r non ammessi in questo tipo di riga`);
+        if (u.tag !== 'multa') throw new Error(`${dove}: ref e r solo sulla metà alla polizia, tag "multa"`);
+        if (typeof u.ref !== 'string' || !u.ref || typeof u.r !== 'string' || !RE_HEX64.test(u.r)) throw new Error(`${dove}: metà alla polizia senza ref o r`);
+      } else if (u.tag === 'multa') {
+        throw new Error(`${dove}: la metà alla polizia porta ref e r`);
+      }
+      for (const k of ['addr', 'eph', 'amount', 'memo', 'tag', 'voce', 'ref', 'r']) chiavi.delete(k);
     }
     if (chiavi.size) throw new Error(`${dove}: campi sconosciuti ${[...chiavi].join(', ')}`);
   }

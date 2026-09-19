@@ -9,6 +9,8 @@
 //   manti_venduti     = euro × 10000 / prezzo_acquisto        per difetto
 //   prezzo_conversione= valore × (100 − commissione) / 100    per difetto
 //   euro_dovuti       = manti × prezzo_conversione / 10000    per difetto
+//   bruciati_per_multa= importo × quota_bruciata / 100        per difetto
+//                       (il centesimo dispari va alla polizia)
 //
 // Un solo verso per gli arrotondamenti: quello che lascia euro in riserva.
 // Le due funzioni `perDifetto` e `perEccesso` sono l'unico posto in cui si
@@ -104,6 +106,17 @@ export function mantiPerEuro(euroCent, prezzo) {
 /** Euro (centesimi) dovuti per dei manti (centesimi) a un prezzo. */
 export function euroPerManti(mantiCent, prezzo) {
   return perDifetto(mantiCent * prezzo, SCALA_PREZZO);
+}
+
+/**
+ * Quanto di una multa si brucia; il resto va alla polizia.
+ * @param {Record<string, any>} stato @param {number} amount
+ * @returns {{ bruciati: number, polizia: number }}
+ */
+export function divisioneMulta(stato, amount) {
+  const quota = BigInt(stato.genesi.parametri.multe_bruciate_pct);
+  const bruciati = Number(perDifetto(BigInt(amount) * quota, 100n));
+  return { bruciati, polizia: amount - bruciati };
 }
 
 /** Quanti euro la banca può ancora incassare sotto il tetto. */

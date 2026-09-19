@@ -7,8 +7,11 @@
 //
 // Nessun calcolo di percentuali qui: catalogo e tariffario portano importi
 // interi decisi da chi li firma, e il registro li confronta, non li
-// deriva. Le trattenute (multe scalate dallo stipendio) arrivano con i
-// verbali, al passo 15.
+// deriva. Le trattenute sono verbali definitivi non saldati di dipendenti
+// dell'azienda, pagati dall'azienda al posto loro con la stessa coppia di
+// uscite di una multa pagata (multe.js): metà bruciata, metà alla
+// polizia. Il registro non sa chi è dipendente di chi: controlla che il
+// verbale sia dell'azienda che firma.
 //
 // `payout` è firmato due volte: dalla chiave dell'azienda, che dice quale
 // catalogo vale, e dalle chiavi delle entrate consumate, che autorizzano
@@ -19,6 +22,7 @@
 
 import { controllaUscite, creaUscite, sommaUscite, consumaEntrate, preparaStato } from './uscite.js';
 import { decodificaCoordinate } from './portafoglio.js';
+import { saldaVerbale } from './multe.js';
 
 const RE_HEX64 = /^[0-9a-f]{64}$/;
 const RE_CODICE = /^[a-z0-9][a-z0-9-]{0,31}$/;
@@ -134,21 +138,31 @@ export function regolaTariffSet(riga, stato) {
  * `payout`: stipendi e premi dal conto dell'azienda. Uscite in chiaro,
  * ognuna con un tag: "stipendio" (tutti dello stesso importo nella riga),
  * "premio" con la voce del catalogo in vigore e il suo importo, oppure
- * "resto" (al massimo una, all'azienda). Niente bruciature.
+ * "resto" (al massimo una, all'azienda). Con `trattenute` (id di
+ * verbali), anche le coppie bruciatura + metà alla polizia di ciascuno.
  * @type {import('./registro.js').RegolaTipo}
  */
 export function regolaPayout(riga, stato) {
   const b = /** @type {any} */ (riga.body);
-  soloCampi(b, ['azienda', 'in', 'out'], 'payout');
+  soloCampi(b, ['azienda', 'in', 'out', 'trattenute'], 'payout');
   preparaStato(stato);
   const az = aziendaDi(stato, b, 'payout');
-  const out = controllaUscite(b.out, { tagAmmessi: true, voceAmmessa: true });
+  const trattenute = b.trattenute ?? [];
+  if (!Array.isArray(trattenute) || new Set(trattenute).size !== trattenute.length) throw new Error('payout: trattenute malformate o ripetute');
+  const out = controllaUscite(b.out, { tagAmmessi: true, voceAmmessa: true, multeAmmesse: true });
   let stipendio = null;
   let resti = 0;
   let pagati = 0;
   for (const [i, u] of out.entries()) {
     const dove = `payout: uscita ${i}`;
-    if (u.addr === null) throw new Error(`${dove} è una bruciatura`);
+    if (u.addr === null) {
+      if (!trattenute.includes(u.reason?.replace(/^multa:/, ''))) throw new Error(`${dove}: bruciatura fuori dalle trattenute`);
+      continue;
+    }
+    if (u.tag === 'multa') {
+      if (!trattenute.includes(u.ref)) throw new Error(`${dove}: metà alla polizia fuori dalle trattenute`);
+      continue;
+    }
     switch (u.tag) {
       case 'stipendio':
         if (u.voce !== undefined) throw new Error(`${dove}: voce solo sui premi`);
@@ -172,6 +186,7 @@ export function regolaPayout(riga, stato) {
         throw new Error(`${dove}: tag "${u.tag}" non ammesso nel payout`);
     }
   }
+  for (const id of trattenute) pagati += saldaVerbale(stato, id, out, { azienda: b.azienda, come: 'trattenuto' });
   if (pagati === 0) throw new Error('payout: niente stipendi né premi');
   const { totale, firmatari, immagini } = consumaEntrate(stato, b.in, riga);
   if (sommaUscite(out) !== totale) throw new Error(`payout: entrate ${totale} ≠ uscite ${sommaUscite(out)}`);

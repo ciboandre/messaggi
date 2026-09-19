@@ -159,7 +159,8 @@ test('anelli sbagliati: dimensione, ordine, ripetizioni, esche spese in chiaro o
   assert.throws(() => reg.accoda(costruisci((bd) => { bd.in[0].ring[2] = bd.in[0].ring[1]; })), /ordine di creazione, o con ripetizioni/);
   assert.throws(() => reg.accoda(costruisci((bd) => { bd.in[0].ring[0] = spesa; })), /spesa in chiaro/);
   assert.throws(() => reg.accoda(costruisci((bd) => { bd.in[0].ring[0] = 'f'.repeat(64) + ':0'; })), /inesistente/);
-  assert.throws(() => reg.accoda(costruisci((bd) => { bd.ref = 'x'; })), /ref deve essere null/);
+  assert.throws(() => reg.accoda(costruisci((bd) => { bd.ref = 'x'; })), /esattamente due uscite in chiaro/);
+  assert.throws(() => reg.accoda(costruisci((bd) => { bd.ref = 1; })), /ref non valido/);
   assert.throws(() => reg.accoda(costruisci((bd) => { bd.extra = 1; })), /campi sconosciuti/);
   // e una buona passa ancora
   reg.accoda(costruisci(() => {}));
