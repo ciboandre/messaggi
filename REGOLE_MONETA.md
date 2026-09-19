@@ -1,6 +1,6 @@
 # Regole dei manti
 
-Versione 2.1 — 19 settembre 2026
+Versione 2.2 — 19 settembre 2026
 Stato: definitivo per la fase di test interna. Si rivede prima di estendere il sistema a una seconda azienda.
 
 ## 1. Scopo
@@ -89,7 +89,7 @@ Non esistono limiti minimi o massimi. Un correntista con multe scadute e non pag
 ## 8. Apertura del conto, pagamenti e bonifici
 
 - **Il conto si apre da soli.** Chiunque installa l'app, scrive su carta la frase di recupero di dodici parole che l'app genera, e ha un conto con le proprie coordinate. Nessun invito, nessuna email, nessun numero di telefono, nessun permesso della banca. Un esterno all'azienda ha un conto identico a quello di un dipendente: può ricevere manti da chiunque, pagare, fare bonifici.
-- **Un dipendente** mostra le sue coordinate all'azienda, che lo registra in anagrafica con il nome. Da lì riceve stipendio e premi.
+- **Un dipendente** mostra le sue coordinate all'azienda, che lo registra in anagrafica con il nome e gli consegna un attestato di registrazione firmato, che l'app conserva. Da lì riceve stipendio e premi, e nell'app compare la sezione delle multe. Per chi non è registrato presso un'azienda, la sezione non esiste: un esterno non può essere multato.
 - **Ricevere con QR**: il correntista mostra un QR con un indirizzo nuovo, generato al momento, e se vuole l'importo. Chi paga inquadra, controlla, firma. È il modo normale di pagarsi tra colleghi e di pagare le multe.
 - **Bonifico**: il correntista invia a un altro conoscendone le coordinate bancarie, una stringa che ognuno può condividere con chi vuole, come un IBAN. Il mittente le salva in rubrica. Chi non le ha ricevute non può inviare nulla a quella persona, né sapere che esiste.
 - **Causale**: facoltativa, la legge solo il destinatario.
@@ -109,7 +109,7 @@ Il catalogo dice quali comportamenti valgono un premio e quanto. Ogni voce è un
 Funzionano come nella vita reale: verbale, termine per pagare, ricorso, e se non si fa niente, esecuzione forzata.
 
 - **Il tariffario** è un dato firmato dall'azienda, pubblico, con storia: "parolaccia in sala: 2 manti", "ritardo oltre 10 minuti: 5 manti". La polizia non può multare fuori tariffario né per importi diversi.
-- **Il verbale** lo emette la polizia con la sua chiave: voce del tariffario, importo, data e ora, descrizione. Arriva sul conto del multato. Nel registro pubblico compaiono numero, voce e importo, non il nome.
+- **Il verbale** lo emette la polizia con la sua chiave, solo verso un dipendente registrato presso la sua azienda: voce del tariffario, importo, data e ora, descrizione. Arriva sul conto del multato. Nel registro pubblico compaiono numero, voce e importo, non il nome.
 - **Entro 15 giorni** il multato fa una di due cose:
   - **paga**, inquadrando il QR della polizia dal verbale, con riferimento automatico;
   - **contesta**, scrivendo le proprie ragioni dall'app. La polizia può replicare. Decide il giudice (sezione 11). Finché la contestazione è aperta, nessun termine corre.

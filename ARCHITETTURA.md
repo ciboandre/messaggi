@@ -1,6 +1,6 @@
 # Architettura del registro
 
-Versione 2.1 — 19 settembre 2026
+Versione 2.2 — 19 settembre 2026
 Stato: proposta per la fase di test. Da confermare prima del primo codice.
 
 Questo documento traduce le [regole](REGOLE_MONETA.md) in struttura tecnica. Ogni scelta rimanda alla sezione delle regole che la giustifica.
@@ -77,6 +77,8 @@ Emissione del mese *m*: `floor(50000 × 0.98^(m−1))` centesimi di manto. Stipe
 Questa è la parte che rende i saldi segreti su un registro pubblico (regola 12). Usa la tecnica degli indirizzi stealth: crittografia standard su Ed25519, nessuna invenzione.
 
 **Apertura del conto.** L'app è pubblica e chiunque la installa. Al primo avvio genera la frase di recupero, la fa trascrivere e verificare (tre parole a caso), deriva le chiavi e mostra le coordinate. Non parla con nessun server per farlo. L'indirizzo del server banca e le coordinate dell'azienda e della polizia sono nell'app stessa, firmati con la chiave banca, così un'app non può essere indirizzata a un server finto.
+
+**Registrazione presso un'azienda.** Il dipendente mostra le coordinate all'azienda dal proprio telefono; il pannello azienda le salva in anagrafica e genera un **attestato di registrazione**: un QR firmato con la chiave azienda che contiene le coordinate del dipendente, il nome dell'azienda, le coordinate della polizia e la data. L'app lo inquadra e lo conserva. Solo con l'attestato l'app mostra la sezione delle multe e sa a quale polizia pagare. La revoca (dipendente che lascia) è un attestato di cancellazione, firmato allo stesso modo. Un'app senza attestato è un conto esterno: riceve, paga, fa bonifici, e nient'altro.
 
 **Ogni correntista ha:**
 
@@ -161,7 +163,7 @@ Un file `ledger.jsonl`. Ogni riga:
 | `conversion.request` | chiavi usa e getta delle entrate | Entrate consumate, importo, dati di pagamento e prova di identità cifrati per la banca | Entrate non spese. Il richiedente è identificato in anagrafica (dipendente registrato, o esterno identificato una volta). Nessun verbale definitivo non saldato |
 | `conversion.execute` | banca | Riferimento alla richiesta, manti distrutti, commissione (uscita alla banca), euro dovuti | Commissione = 2%. Euro = resto × valore, per difetto. Riserva sufficiente |
 | `conversion.paid` | banca | Riferimento, data del pagamento in euro | Una per esecuzione |
-| `fine.issue` | polizia | Numero verbale, voce del tariffario, importo, data, descrizione cifrata per il multato, indirizzo usa e getta di consegna | Voce esistente, importo uguale al tariffario |
+| `fine.issue` | polizia | Numero verbale, voce del tariffario, importo, data, descrizione cifrata per il multato, indirizzo usa e getta di consegna | Voce esistente, importo uguale al tariffario. Il pannello polizia propone solo dipendenti registrati presso la sua azienda |
 | `fine.contest` | chiave usa e getta dell'indirizzo di consegna | Verbale, testo cifrato per giudice e polizia | Entro 15 giorni. Prova di essere il destinatario |
 | `fine.reply` | polizia | Verbale, testo cifrato per il giudice | Una per contestazione |
 | `verdict` | giudice | Verbale, esito (confermato, annullato, ridotto a voce), motivazione pubblica, hash del fascicolo | Contestazione aperta |
