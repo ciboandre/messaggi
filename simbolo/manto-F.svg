@@ -1,5 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
-  <!-- F: due onde sovrapposte, m astratta che scorre -->
-  <path d="M8 44 Q29 16 50 44 T92 44" fill="none" stroke="currentColor" stroke-width="11" stroke-linecap="round"/>
-  <path d="M8 70 Q29 42 50 70 T92 70" fill="none" stroke="currentColor" stroke-width="11" stroke-linecap="round"/>
-</svg>
