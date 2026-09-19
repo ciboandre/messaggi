@@ -22,18 +22,20 @@ test('spazi e maiuscole non contano', () => {
   assert.deepEqual(semeDaFrase(sporca), semeDaFrase(f));
 });
 
-test('una parola cambiata rende la frase non valida', () => {
-  const p = generaFrase().split(' ');
-  const altra = parole().find((w) => w !== p[3]);
-  p[3] = altra;
-  // con 4 bit di controllo, una sostituzione passa 1 volta su 16: proviamo più parole
-  let rifiutate = 0;
-  for (let i = 0; i < 12; i++) {
-    const q = generaFrase().split(' ');
-    q[i] = parole().find((w) => w !== q[i]);
-    if (!fraseValida(q.join(' '))) rifiutate++;
+test('una parola cambiata passa il controllo circa 1 volta su 16, mai più di 1 su 8: il checksum fa il suo lavoro', () => {
+  // BIP39 ha 4 bit di controllo su 12 parole: una sostituzione a caso passa con probabilità 1/16.
+  // Si enumerano tutte le 2047 sostituzioni dell'ultima parola di una frase fissa.
+  const frase = 'abaco abaco abaco abaco abaco abaco abaco abaco abaco abaco abaco abaco'.split(' ');
+  const lista = parole();
+  const originale = lista.find((w) => fraseValida([...frase.slice(0, 11), w].join(' ')));
+  assert.ok(originale, 'esiste una dodicesima parola che rende valida la frase');
+  let passano = 0;
+  for (const w of lista) {
+    if (w === originale) continue;
+    if (fraseValida([...frase.slice(0, 11), w].join(' '))) passano++;
   }
-  assert.ok(rifiutate >= 8, `attese quasi tutte rifiutate, rifiutate ${rifiutate} su 12`);
+  const frazione = passano / (lista.length - 1);
+  assert.ok(frazione > 1 / 32 && frazione < 1 / 8, `passano ${passano} su ${lista.length - 1}: ${frazione}`);
 });
 
 test('undici o tredici parole non valgono', () => {
