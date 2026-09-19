@@ -235,12 +235,14 @@ export function regolaInteressi(riga, stato) {
 /**
  * `correction`: compensa una riga valida ma sbagliata nei fatti, con
  * riferimento e motivazione pubblica. Correggibile oggi: `reserve.interest`.
- * Una riga si corregge una volta sola.
+ * Una riga si corregge una volta sola, e al massimo per l'importo che
+ * riferisce (`euro_cent`, se manca tutto): il calo del valore è limitato a
+ * un errore preciso e ricontrollabile, non a una cifra a discrezione.
  * @type {import('./registro.js').RegolaTipo}
  */
 export function regolaCorrection(riga, stato) {
   const b = /** @type {any} */ (riga.body);
-  soloCampi(b, ['ref', 'motivazione'], 'correction');
+  soloCampi(b, ['ref', 'euro_cent', 'motivazione'], 'correction');
   preparaStato(stato);
   if (typeof b.ref !== 'string' || !RE_HEX64.test(b.ref)) throw new Error('correction: riferimento mancante');
   if (typeof b.motivazione !== 'string' || !b.motivazione.trim() || b.motivazione.length > 500) throw new Error('correction: motivazione mancante');
@@ -249,9 +251,11 @@ export function regolaCorrection(riga, stato) {
   const valorePrima = valore(stato);
   const interesse = stato.interessi?.[b.ref];
   if (interesse === undefined) throw new Error('correction: la riga non è un interesse; solo reserve.interest si corregge');
-  stato.riserva_cent -= interesse;
-  stato.interessi_cent -= interesse;
-  stato.correzioni[b.ref] = { correzione: riga.hash, euro_cent: interesse, motivazione: b.motivazione, valore_prima: valorePrima, valore_dopo: valore(stato) };
+  const euro = b.euro_cent === undefined ? interesse : centesimi(b.euro_cent, 'correction: euro_cent');
+  if (euro === 0n || euro > interesse) throw new Error(`correction: si corregge al massimo l'interesse riferito, ${interesse}`);
+  stato.riserva_cent -= euro;
+  stato.interessi_cent -= euro;
+  stato.correzioni[b.ref] = { correzione: riga.hash, euro_cent: euro, motivazione: b.motivazione, valore_prima: valorePrima, valore_dopo: valore(stato) };
   if (stato.riserva_cent < 0n) throw new Error('correction: la riserva andrebbe sotto zero');
   return [chiaveBanca(stato)];
 }

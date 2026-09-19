@@ -205,12 +205,19 @@ test('correction: solo un interesse, una volta, se la copertura regge; con motiv
   assert.throws(() => reg.accoda(correggi(v.hash)), /solo reserve.interest/);
   assert.throws(() => reg.accoda(correggi('f'.repeat(64))), /solo reserve.interest/);
   assert.throws(() => reg.accoda(correggi(i.hash, { motivazione: ' ' })), /motivazione/);
+  assert.throws(() => reg.accoda(correggi(i.hash, { euro_cent: 2501 })), /al massimo l'interesse riferito, 2500/);
+  assert.throws(() => reg.accoda(correggi(i.hash, { euro_cent: 0 })), /al massimo/);
   reg.accoda(correggi(i.hash));
   assert.equal(reg.stato.riserva_cent, 100000n);
   assert.equal(reg.stato.interessi_cent, 0n);
   assert.throws(() => reg.accoda(correggi(i.hash)), /già corretta/);
   // è l'unica riga in cui il valore scende, e lo dice
   assert.deepEqual(reg.stato.correzioni[i.hash], { correzione: reg.ultima.hash, euro_cent: 2500n, motivazione: 'cifra sbagliata: erano 250', valore_prima: 10250n, valore_dopo: 10000n });
+  // parziale: una cifra in più
+  const i3 = rigaBanca(reg, 'reserve.interest', { euro_cent: 2500, da: '2027-01-01', a: '2027-01-31' });
+  reg.accoda(i3);
+  reg.accoda(correggi(i3.hash, { euro_cent: 2250, motivazione: 'erano 250, non 2500' }));
+  assert.equal(reg.stato.riserva_cent, 100250n);
 });
 
 test('il registro si ricostruisce con lo stesso stato, BigInt compresi', () => {
