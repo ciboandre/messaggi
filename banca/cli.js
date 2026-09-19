@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Il pannello banca della fase di test, dal terminale. Uso:
 //
-//   node banca/cli.js nuova-frase
+//   node banca/cli.js nuova-frase          le parole in una finestra, mai nel terminale
 //   node banca/cli.js genesi [--tetto 4000]
 //   node banca/cli.js giorno [AAAA-MM-GG]
 //   node banca/cli.js vendita <euro> <coordinate mnt1…> <riferimento pagamento>
@@ -49,9 +49,23 @@ function fatto(esito) {
 async function main() {
   switch (comando) {
     case 'nuova-frase': {
+      // Le parole non passano dal terminale: un terminale può essere
+      // registrato, condiviso, o dentro un'app che ne inoltra l'uscita.
+      // Su Mac compaiono in una finestra di sistema; altrove in un file
+      // leggibile solo dall'utente, da cancellare dopo averle copiate.
       const { frase, pubblica, coordinate } = c.nuovaFrase();
-      console.log('Scrivi queste dodici parole su carta. Non le salva nessuno.\n');
-      console.log('  ' + frase + '\n');
+      const testo = 'Scrivi queste dodici parole su carta, nell\'ordine, e controlla di averle copiate giuste. Poi chiudi.\n\n' + frase;
+      if (process.platform === 'darwin') {
+        const { spawnSync } = await import('node:child_process');
+        const esito = spawnSync('osascript', ['-e', 'display dialog (item 1 of argv) with title "Frase della banca" buttons {"Ho copiato le parole"} default button 1', frase.length ? testo : ''], { stdio: ['ignore', 'ignore', 'ignore'] });
+        if (esito.status !== 0) { console.error('la finestra non si è aperta; riprova, o usa MANTI_FRASE_FILE=percorso per scriverla in un file'); process.exitCode = 1; return; }
+        console.log('Le parole sono comparse in una finestra a parte e non sono state stampate qui.');
+      } else {
+        const { writeFileSync } = await import('node:fs');
+        const percorsoFrase = process.env.MANTI_FRASE_FILE ?? 'frase-banca.txt';
+        writeFileSync(percorsoFrase, testo + '\n', { mode: 0o600 });
+        console.log(`Le parole sono in ${percorsoFrase} (leggibile solo da te). Copiale su carta e poi cancellalo: rm ${percorsoFrase}`);
+      }
       console.log('chiave pubblica della banca: ' + pubblica);
       console.log('coordinate della banca:      ' + coordinate);
       return;
