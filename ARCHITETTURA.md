@@ -53,7 +53,7 @@ Nella fase A tutto si prova da riga di comando con chiavi finte, per tre mesi si
 ## 3. Tecnologia
 
 - **Node.js** (versione 26 installata). Librerie di sistema: `node:crypto` per hash, casualità e cifratura simmetrica, `node:test` per i test, `node:fs` per il registro.
-- **Una sola famiglia di dipendenze esterne, noble/scure** dello stesso autore, con audit pubblici e senza dipendenze a loro volta: `@noble/curves` per l'aritmetica su Ed25519, `@noble/hashes` per SHA-256 e SHA-512, `@scure/bip39` per la frase di dodici parole, `@scure/base` per bech32m e base64. Si usano anche al posto di `node:crypto` per hash e firme, così il nucleo gira identico in Node e nel browser (regola: stesso codice sul server e nell'app). Ogni altra aggiunta va motivata nel commit.
+- **Una sola famiglia di dipendenze esterne, noble/scure** dello stesso autore, con audit pubblici e senza dipendenze a loro volta: `@noble/curves` per l'aritmetica su Ed25519, `@noble/hashes` per SHA-256 e SHA-512, `@scure/bip39` per la frase di dodici parole, `@scure/base` per bech32m e base64, `@noble/ciphers` per XChaCha20-Poly1305 sulle causali. Si usano anche al posto di `node:crypto` per hash e firme, così il nucleo gira identico in Node e nel browser (regola: stesso codice sul server e nell'app). Ogni altra aggiunta va motivata nel commit.
 - **Firma degli indirizzi usa e getta.** La chiave privata di un indirizzo è uno scalare `s + k`, non un seme: si firma con lo scalare direttamente (nonce deterministico da scalare e messaggio) e la firma che ne esce è una firma Ed25519 normale, verificata dalla stessa funzione standard. È la tecnica di Monero; i test lo controllano.
 - **JavaScript con JSDoc**, non TypeScript.
 - **JSONL** per il registro.
