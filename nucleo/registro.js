@@ -8,6 +8,10 @@
 //
 // Il registro non sa niente di manti. Sa tre cose: che la catena regge, che
 // le firme sono valide, e che ogni riga rispetta le regole del suo tipo.
+// Due forme di firma: { by, sig } è Ed25519 di una chiave, e la verifica
+// qui; { img, sig } è una firma ad anello legata a un'immagine di chiave, e
+// la verifica la regola del tipo, che sola conosce l'anello. La regola dice
+// poi quali `by` e quali `img` devono esserci, né uno di più né uno di meno.
 // Le regole dei tipi arrivano dall'esterno (`tipi`), una per tipo, e ricevono
 // lo stato accumulato fino alla riga precedente. Un tipo sconosciuto è
 // invalido: il codice non lo riconosce, e basta.
@@ -23,8 +27,15 @@ const RE_TS = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/;
 
 /**
  * @typedef {object} Firma
- * @property {string} by   chiave pubblica esadecimale di chi firma
- * @property {string} sig  firma base64
+ * @property {string} [by]   chiave pubblica esadecimale di chi firma (Ed25519)
+ * @property {string} [img]  immagine di chiave (firma ad anello)
+ * @property {unknown} sig   firma: base64 se Ed25519, oggetto se ad anello
+ */
+
+/**
+ * Cosa una regola richiede: le chiavi che devono aver firmato e le
+ * immagini di chiave delle firme ad anello che ha verificato.
+ * @typedef {string[] | { by: string[], img: string[] }} Richieste
  */
 
 /**
@@ -40,9 +51,9 @@ const RE_TS = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/;
 
 /**
  * Una regola di tipo: riceve la riga e lo stato fino alla riga precedente,
- * lancia se la riga non è valida, restituisce le chiavi che devono averla
- * firmata, e aggiorna lo stato.
- * @typedef {(riga: Riga, stato: Record<string, unknown>) => string[]} RegolaTipo
+ * lancia se la riga non è valida, restituisce le firme richieste, e aggiorna
+ * lo stato. Una lista di stringhe vale come { by: lista, img: [] }.
+ * @typedef {(riga: Riga, stato: Record<string, unknown>) => Richieste} RegolaTipo
  */
 
 /**
@@ -80,7 +91,10 @@ export function preparaRiga(ultima, dati) {
  * @returns {Riga}
  */
 export function firmaRiga(riga, firmatari) {
-  return { ...riga, sigs: firmatari.map((f) => ({ by: f.by, sig: f.firma(riga.hash) })) };
+  return {
+    ...riga,
+    sigs: firmatari.map((f) => ('img' in f ? { img: f.img, sig: f.firma(riga.hash) } : { by: f.by, sig: f.firma(riga.hash) })),
+  };
 }
 
 /**
@@ -180,21 +194,36 @@ export function verificaRiga(riga, precedente, stato, tipi) {
   if (riga.hash !== hashRiga(riga)) throw new Error('hash non corrisponde al contenuto');
   if (!Array.isArray(riga.sigs) || riga.sigs.length === 0) throw new Error('nessuna firma');
   const firmatari = new Set();
+  const immagini = new Set();
   for (const f of riga.sigs) {
-    if (!f || !RE_HEX64.test(f.by ?? '')) throw new Error('firma con chiave malformata');
+    if (!f || typeof f !== 'object') throw new Error('firma malformata');
+    if ('img' in f) {
+      if ('by' in f || !RE_HEX64.test(f.img ?? '')) throw new Error('firma ad anello malformata');
+      if (immagini.has(f.img)) throw new Error(`firma ad anello duplicata per ${f.img.slice(0, 8)}`);
+      immagini.add(f.img);
+      continue;
+    }
+    if (!RE_HEX64.test(f.by ?? '')) throw new Error('firma con chiave malformata');
     if (firmatari.has(f.by)) throw new Error(`firma duplicata di ${f.by.slice(0, 8)}`);
-    if (!verifica(f.by, riga.hash, f.sig)) throw new Error(`firma non valida di ${f.by.slice(0, 8)}`);
+    if (!verifica(f.by, riga.hash, /** @type {string} */ (f.sig))) throw new Error(`firma non valida di ${f.by.slice(0, 8)}`);
     firmatari.add(f.by);
   }
   if (riga.seq === 0 && riga.type !== 'genesis') throw new Error('la riga 0 deve essere la genesi');
   const regola = tipi[riga.type];
   if (!regola) throw new Error(`tipo sconosciuto: ${riga.type}`);
-  const richieste = regola(riga, stato);
-  for (const k of richieste) {
+  const esito = regola(riga, stato);
+  const richieste = Array.isArray(esito) ? { by: esito, img: [] } : esito;
+  for (const k of richieste.by) {
     if (!firmatari.has(k)) throw new Error(`manca la firma di ${k.slice(0, 8)}`);
   }
   for (const k of firmatari) {
-    if (!richieste.includes(k)) throw new Error(`firma non richiesta di ${k.slice(0, 8)}`);
+    if (!richieste.by.includes(k)) throw new Error(`firma non richiesta di ${k.slice(0, 8)}`);
+  }
+  for (const i of richieste.img) {
+    if (!immagini.has(i)) throw new Error(`manca la firma ad anello per ${i.slice(0, 8)}`);
+  }
+  for (const i of immagini) {
+    if (!richieste.img.includes(i)) throw new Error(`firma ad anello non richiesta per ${i.slice(0, 8)}`);
   }
 }
 

@@ -264,7 +264,7 @@ Se il modello non risponde o risponde con un esito non ammesso, nessuna sentenza
 | 8 | Generatore `H`, impegni di Pedersen, maschera e importo cifrato derivati da `k`, bilancio. Test | A |
 | 9 | Prova di intervallo Bulletproofs+ a 64 bit: 9a per un impegno, 9b aggregata per riga. Test | A |
 | 10 | Immagini di chiave, anelli, firma CLSAG e verifica. Test | A |
-| 11 | `transfer` riservato con resto e `payout` in chiaro sopra il passo 7. Test | A |
+| 11 | `transfer` riservato con resto sopra il passo 7; la spesa in chiaro resta come base del `payout`. Test | A |
 | 12 | Vendite, tetto, interessi, estratti, valore e prezzi. Test | A |
 | 13 | Aziende: registrazione, polizia, catalogo, tariffario, trattenute. Test | A |
 | 14 | Conversioni in anello con commissione e blocco per multe. Test | A |

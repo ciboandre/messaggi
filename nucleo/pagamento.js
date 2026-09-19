@@ -1,17 +1,38 @@
 // Lato portafoglio: trovare le proprie entrate nel registro e costruire un
 // pagamento. È il codice che girerà nell'app; il registro non lo usa.
+//
+// Due modi di pagare. `costruisciPagamento` spende in chiaro: entrate
+// dichiarate, importi visibili, firma Ed25519 per indirizzo; è quello dei
+// ruoli. `costruisciPagamentoRiservato` è quello dei correntisti: uscite
+// con impegno e importo cifrato, prova di intervallo, un anello di esche
+// per ogni entrata e una firma CLSAG per ciascuno.
+//
+// Come si sa se una propria uscita è già spesa: se in chiaro, lo dice lo
+// stato; se in anello, il registro non lo sa, ma il portafoglio calcola
+// l'immagine di chiave e la cerca tra quelle spese.
 
 import { firmaScalare } from './chiavi.js';
 import { chiaveCausale, creaIndirizzo, riconosci } from './portafoglio.js';
 import { cifraCausale, decifraCausale } from './causale.js';
+import { impegno, apriUscita, mascheraDaSegreto, cifraImporto, mascherePseudo, sommaMaschere } from './impegni.js';
+import { provaIntervalli } from './intervallo.js';
+import { firmaAnello, immagineChiave } from './anello.js';
+import { dimensioneAnello } from './trasferimento.js';
+import { ed25519 } from '@noble/curves/ed25519.js';
+
+const ORDINE = ed25519.Point.Fn.ORDER;
 
 /**
  * @typedef {object} EntrataMia
  * @property {string} ref       "hash:indice"
  * @property {string} addr
+ * @property {string} commit    impegno, anche per le uscite in chiaro
  * @property {number} amount
+ * @property {bigint} b         maschera (0 se in chiaro)
+ * @property {boolean} chiaro   importo visibile nel registro
  * @property {bigint} p         chiave privata dell'indirizzo
- * @property {bigint} k         segreto condiviso (per la causale)
+ * @property {bigint} k         segreto condiviso (per causale, maschera, importo)
+ * @property {string} img       immagine di chiave
  * @property {string | null} causale
  * @property {string} [tag]
  * @property {number} seq       riga che l'ha creata
@@ -25,7 +46,8 @@ import { cifraCausale, decifraCausale } from './causale.js';
  * @returns {EntrataMia[]}
  */
 export function mieEntrate(registro, portafoglio) {
-  const nonSpese = /** @type {Record<string, any>} */ (registro.stato.non_spese ?? {});
+  const uscite = /** @type {Record<string, any>} */ (registro.stato.uscite ?? {});
+  const immagini = /** @type {Record<string, any>} */ (registro.stato.immagini ?? {});
   /** @type {EntrataMia[]} */
   const mie = [];
   for (const riga of registro.righe) {
@@ -34,11 +56,22 @@ export function mieEntrate(registro, portafoglio) {
     for (const [i, u] of out.entries()) {
       if (u.addr === null) continue;
       const ref = `${riga.hash}:${i}`;
-      if (!nonSpese[ref]) continue;
+      const s = uscite[ref];
+      if (!s || s.spesa) continue;
       const r = riconosci(u, portafoglio);
       if (!r) continue;
+      let amount; let b;
+      if (s.amount !== null) {
+        amount = s.amount; b = 0n;
+      } else {
+        const aperta = apriUscita(u, r.k);
+        if (!aperta) continue; // nostra, ma l'importo cifrato non torna: non spendibile
+        amount = Number(aperta.a); b = aperta.b;
+      }
+      const img = immagineChiave(r.p);
+      if (immagini[img]) continue; // già spesa in anello
       mie.push({
-        ref, addr: u.addr, amount: u.amount, p: r.p, k: r.k, seq: riga.seq,
+        ref, addr: u.addr, commit: s.commit, amount, b, chiaro: s.amount !== null, p: r.p, k: r.k, img, seq: riga.seq,
         causale: u.memo ? decifraCausale(chiaveCausale(r.k), u.memo) : null,
         ...(u.tag ? { tag: u.tag } : {}),
       });
@@ -127,4 +160,82 @@ export function costruisciPagamento({ portafoglio, disponibili, destinazioni, br
     firmatari.push({ by: e.addr, firma: (/** @type {string} */ h) => firmaScalare(e.p, h) });
   }
   return { body, firmatari };
+}
+
+/**
+ * Sceglie le esche per un'entrata: tutte le uscite disponibili se sono
+ * poche, altrimenti l'entrata più altre a caso. In ordine di creazione,
+ * come vuole la regola.
+ * @param {Record<string, any>} stato
+ * @param {string} refVera
+ * @param {(n: number) => number} [caso]  solo per i test
+ * @returns {{ ring: string[], indice: number }}
+ */
+export function scegliEsche(stato, refVera, caso = (n) => Math.floor(Math.random() * n)) {
+  const uscite = stato.uscite ?? {};
+  const disponibili = Object.keys(uscite).filter((ref) => !uscite[ref].spesa);
+  const quante = dimensioneAnello(stato);
+  const scelte = new Set([refVera]);
+  const altre = disponibili.filter((ref) => ref !== refVera);
+  while (scelte.size < quante) {
+    scelte.add(altre.splice(caso(altre.length), 1)[0]);
+  }
+  const ring = [...scelte].sort((x, y) => uscite[x].ordine - uscite[y].ordine);
+  return { ring, indice: ring.indexOf(refVera) };
+}
+
+/**
+ * Costruisce il body di un `transfer` riservato e i firmatari ad anello.
+ * Le uscite hanno impegno e importo cifrato per il destinatario; una prova
+ * di intervallo le copre tutte; ogni entrata ha il suo anello e il suo
+ * pseudo-impegno, con le maschere scelte perché il bilancio torni.
+ * @param {object} p
+ * @param {import('./portafoglio.js').Portafoglio} p.portafoglio
+ * @param {EntrataMia[]} p.disponibili
+ * @param {Destinazione[]} p.destinazioni   senza tag
+ * @param {Record<string, any>} p.stato     lo stato del registro, per le esche
+ * @param {(n: number) => number} [p.caso]
+ * @returns {{ body: Record<string, unknown>, firmatari: Array<{ img: string, firma: (h: string) => unknown }> }}
+ */
+export function costruisciPagamentoRiservato({ portafoglio, disponibili, destinazioni, stato, caso }) {
+  if (!destinazioni.length) throw new Error('niente da pagare');
+  const totale = destinazioni.reduce((s, d) => s + d.amount, 0);
+  const entrate = scegliEntrate(disponibili, totale);
+  const resto = saldo(entrate) - totale;
+
+  const out = [];
+  const valori = [];
+  const versa = (coordinate, amount, causale) => {
+    if (!Number.isInteger(amount) || amount <= 0) throw new Error('importo non valido');
+    const ind = creaIndirizzo(coordinate);
+    const b = mascheraDaSegreto(ind.k);
+    out.push({
+      addr: ind.addr, eph: ind.eph, commit: impegno(amount, b), amt: cifraImporto(ind.k, amount),
+      ...(causale ? { memo: cifraCausale(chiaveCausale(ind.k), causale) } : {}),
+    });
+    valori.push({ a: BigInt(amount), b });
+  };
+  for (const d of destinazioni) {
+    if (d.tag) throw new Error('nessun tag sui pagamenti tra correntisti');
+    versa(d.coordinate, d.amount, d.causale);
+  }
+  if (resto > 0) versa(portafoglio.coordinate, resto);
+  const proof = provaIntervalli(valori);
+
+  const maschere = mascherePseudo(valori.map((v) => v.b), entrate.length);
+  const ins = [];
+  const firmatari = [];
+  for (const [i, e] of entrate.entries()) {
+    const pseudo = impegno(e.amount, maschere[i]);
+    const z = sommaMaschere([e.b, ORDINE - maschere[i]]);
+    if (z === 0n) throw new Error('maschera dello pseudo-impegno coincidente: riprova');
+    const { ring, indice } = scegliEsche(stato, e.ref, caso);
+    const membri = ring.map((ref) => ({ addr: stato.uscite[ref].addr, commit: stato.uscite[ref].commit }));
+    ins.push({ ring, img: e.img, pseudo });
+    firmatari.push({
+      img: e.img,
+      firma: (/** @type {string} */ h) => firmaAnello({ membri, indice, p: e.p, z, pseudo, messaggio: h }).firma,
+    });
+  }
+  return { body: { in: ins, out, proof, ref: null }, firmatari };
 }

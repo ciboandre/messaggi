@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { Registro, preparaRiga, firmaRiga } from '../nucleo/registro.js';
-import { regolaTransfer, controllaUscite, creaUscite } from '../nucleo/uscite.js';
+import { regolaSpesaInChiaro, controllaUscite, creaUscite } from '../nucleo/uscite.js';
 import { coppiaDaSeme, firma, firmaScalare } from '../nucleo/chiavi.js';
 import { portafoglioDaFrase, creaIndirizzo, riconosci } from '../nucleo/portafoglio.js';
 import { generaFrase } from '../nucleo/frase.js';
@@ -14,7 +14,7 @@ const PARAMETRI = { sovrapprezzo_pct: 5, commissione_pct: 2, multe_bruciate_pct:
 
 /** Tipo di prova che crea manti dal nulla verso delle uscite, firmato dalla banca. Solo per i test. */
 const tipiTest = {
-  transfer: regolaTransfer,
+  transfer: regolaSpesaInChiaro, // nei test il tipo 'transfer' è la spesa in chiaro
   dono: (riga, stato) => {
     const out = controllaUscite(/** @type {any} */ (riga.body).out, { tagAmmessi: true });
     creaUscite(stato, riga.hash, out, { nuovi: true });
