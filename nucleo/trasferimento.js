@@ -16,6 +16,10 @@
 // Dimensione dell'anello: 16, o tutte le uscite disponibili se sono meno
 // (REGOLE_MONETA.md, sezione 2). Disponibile = mai spesa in chiaro. Le
 // uscite spese in anello restano disponibili: nessuno sa quali sono.
+// "Disponibili" si conta fino all'esca più recente dell'anello, non fino
+// all'ultima riga: così una riga costruita dall'app resta valida anche se
+// nel frattempo sono nate altre uscite. Chi sceglie esche solo vecchie si
+// fa un anello più piccolo, e ci perde solo lui.
 
 import { ed25519 } from '@noble/curves/ed25519.js';
 import { formaCausaleValida } from './causale.js';
@@ -73,12 +77,17 @@ export function controllaUsciteRiservate(out) {
 }
 
 /**
- * Quante uscite possono stare in un anello, e quanto dev'essere grande.
+ * Quanto dev'essere grande un anello la cui esca più recente ha quell'ordine
+ * di creazione: 16, o tutte le uscite disponibili nate fino a lì.
  * @param {Record<string, any>} stato
+ * @param {number} [ordineMassimo]  senza: fino all'ultima uscita
  */
-export function dimensioneAnello(stato) {
+export function dimensioneAnello(stato, ordineMassimo = Infinity) {
   preparaStato(stato);
-  return Math.min(ANELLO, stato.disponibili ?? 0);
+  if (ordineMassimo === Infinity) return Math.min(ANELLO, stato.disponibili);
+  let quante = 0;
+  for (const u of Object.values(stato.uscite)) if (!u.spesa && u.ordine <= ordineMassimo) quante++;
+  return Math.min(ANELLO, quante);
 }
 
 /**
@@ -92,8 +101,7 @@ export function dimensioneAnello(stato) {
  */
 export function controllaAnello(stato, ring, dove) {
   if (!Array.isArray(ring) || ring.length === 0) throw new Error(`${dove}: anello vuoto`);
-  const attesa = dimensioneAnello(stato);
-  if (ring.length !== attesa) throw new Error(`${dove}: anello di ${ring.length}, atteso ${attesa}`);
+  if (ring.length > ANELLO) throw new Error(`${dove}: anello di ${ring.length}, al massimo ${ANELLO}`);
   let ultimoOrdine = -1;
   const membri = [];
   for (const ref of ring) {
@@ -105,6 +113,8 @@ export function controllaAnello(stato, ring, dove) {
     ultimoOrdine = u.ordine;
     membri.push({ addr: u.addr, commit: u.commit });
   }
+  const attesa = dimensioneAnello(stato, ultimoOrdine);
+  if (ring.length !== attesa) throw new Error(`${dove}: anello di ${ring.length}, atteso ${attesa}`);
   return membri;
 }
 

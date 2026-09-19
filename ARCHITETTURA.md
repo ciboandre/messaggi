@@ -132,8 +132,9 @@ in anello = { ring: ["3a1f…:0", "b07c…:2", … 16 riferimenti], img: "I", ps
 in chiaro = { ref: "3a1f…:0" }                       (se l'uscita era riservata: + amount, mask)
 ```
 
-- **In anello**, per i correntisti: l'entrata vera sta tra sedici riferimenti a uscite del registro, in ordine di `seq`; `img` è l'immagine di chiave dell'indirizzo vero; `pseudo` è un nuovo impegno allo stesso importo con maschera diversa, scelta da chi paga. Le esche sono uscite riservate o in chiaro di righe precedenti, non spese in chiaro. Se il registro ne ha meno di sedici, l'anello le comprende tutte. Come sceglierle è lasciato aperto (sezione 13).
-- **In chiaro**, per i ruoli: l'entrata è dichiarata. Se era un'uscita riservata (un'azienda che incassa un pagamento), la riga rivela importo e maschera e il motore ricalcola l'impegno.
+- **In anello**, per i correntisti: l'entrata vera sta tra sedici riferimenti a uscite del registro, in ordine di creazione; `img` è l'immagine di chiave dell'indirizzo vero; `pseudo` è un nuovo impegno allo stesso importo con maschera diversa, scelta da chi paga. Le esche sono uscite riservate o in chiaro di righe precedenti, non spese in chiaro. Se le uscite disponibili nate fino all'esca più recente sono meno di sedici, l'anello le comprende tutte: contare fino all'esca più recente, e non fino all'ultima riga, rende valida una riga anche se altre uscite nascono mentre viaggia. Come scegliere le esche è lasciato aperto (sezione 13).
+  Con una manciata di uscite l'anello dice tutto: la riservatezza delle prime spese è nominale finché il registro non ha almeno qualche decina di uscite.
+- **In chiaro**, per i ruoli: l'entrata è dichiarata. Se era un'uscita riservata (un'azienda che incassa un pagamento), la riga rivela importo e maschera, il motore ricalcola l'impegno, e porta anche l'immagine di chiave con una firma ad anello di uno: così la stessa uscita non si spende una volta in anello e una in chiaro. Il controllo va nei due versi: una rivelazione con immagine già spesa è invalida, e la rivelazione registra l'immagine.
 
 **Bilancio di una riga.** Vale sempre, senza leggere gli importi riservati:
 

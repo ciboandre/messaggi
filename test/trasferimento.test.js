@@ -152,7 +152,8 @@ test('anelli sbagliati: dimensione, ordine, ripetizioni, esche spese in chiaro o
     mod(body);
     return firmaRiga(preparaRiga(reg.ultima, { type: 'transfer', ts: ts(), body }), firmatari);
   };
-  assert.throws(() => reg.accoda(costruisci((bd) => bd.in[0].ring.pop())), /anello di 2, atteso 3/);
+  assert.throws(() => reg.accoda(costruisci((bd) => bd.in[0].ring.shift())), /anello di 2, atteso 3/);
+  assert.throws(() => reg.accoda(costruisci((bd) => bd.in[0].ring.push(...bd.in[0].ring))), /ordine di creazione/);
   assert.throws(() => reg.accoda(costruisci((bd) => bd.in[0].ring.reverse())), /ordine di creazione/);
   assert.throws(() => reg.accoda(costruisci((bd) => { bd.in[0].ring[2] = bd.in[0].ring[1]; })), /ordine di creazione, o con ripetizioni/);
   assert.throws(() => reg.accoda(costruisci((bd) => { bd.in[0].ring[0] = spesa; })), /spesa in chiaro/);
@@ -161,6 +162,25 @@ test('anelli sbagliati: dimensione, ordine, ripetizioni, esche spese in chiaro o
   assert.throws(() => reg.accoda(costruisci((bd) => { bd.extra = 1; })), /campi sconosciuti/);
   // e una buona passa ancora
   reg.accoda(costruisci(() => {}));
+});
+
+test('una riga costruita prima che nascano altre uscite resta valida: l\'anello si misura fino alla sua esca più recente', () => {
+  const reg = nuovoRegistro();
+  const a = portafoglioDaFrase(generaFrase());
+  const b = portafoglioDaFrase(generaFrase());
+  dona(reg, a.coordinate, [1000, 1000]);
+  const { body, firmatari } = costruisciPagamentoRiservato({ portafoglio: a, disponibili: mieEntrate(reg, a), destinazioni: [{ coordinate: b.coordinate, amount: 300 }], stato: reg.stato });
+  assert.equal(body.in[0].ring.length, 2);
+  dona(reg, b.coordinate, [500, 500, 500]);
+  assert.equal(reg.stato.disponibili, 5);
+  // stesso body, nuova posizione nella catena: il server la ripropone, l'app rifirma
+  reg.accoda(firmaRiga(preparaRiga(reg.ultima, { type: 'transfer', ts: ts(), body }), firmatari));
+  assert.equal(saldo(mieEntrate(reg, b)), 1800);
+  // ma un anello che salta un'uscita nata prima della sua esca più recente no
+  const { body: b2, firmatari: f2 } = costruisciPagamentoRiservato({ portafoglio: b, disponibili: mieEntrate(reg, b).filter((e) => e.chiaro), destinazioni: [{ coordinate: a.coordinate, amount: 100 }], stato: reg.stato });
+  assert.equal(b2.in[0].ring.length, 7, 'due di a, tre di b, due riservate');
+  b2.in[0].ring.splice(1, 1);
+  assert.throws(() => reg.accoda(firmaRiga(preparaRiga(reg.ultima, { type: 'transfer', ts: ts(), body: b2 }), f2)), /anello di 6, atteso 7/);
 });
 
 test('manomissioni: impegno, prova, pseudo-impegno, firma ad anello, firme in più o in meno', () => {
