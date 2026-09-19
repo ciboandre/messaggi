@@ -25,7 +25,7 @@
 // l'indice l decide solo l'ordine in cui si percorre l'anello.
 
 import { ed25519, ed25519_hasher } from '@noble/curves/ed25519.js';
-import { concatBytes, hexToBytes, numberToBytesLE, randomBytes } from '@noble/curves/utils.js';
+import { bytesToHex, bytesToNumberLE, concatBytes, hexToBytes, numberToBytesLE, randomBytes } from '@noble/curves/utils.js';
 import { sha512 } from '@noble/hashes/sha2.js';
 import { scalareDaBytes } from './chiavi.js';
 
@@ -41,10 +41,10 @@ const mod = (x) => ((x % ORDINE) + ORDINE) % ORDINE;
 const mul = (x, y) => mod(x * y);
 /** Su scalari pubblici. */
 const per = (P, k) => P.multiplyUnsafe(mod(k));
-const scalareHex = (k) => Buffer.from(numberToBytesLE(mod(k), 32)).toString('hex');
+const scalareHex = (k) => bytesToHex(numberToBytesLE(mod(k), 32));
 const scalareDaHex = (hex) => {
   if (typeof hex !== 'string' || !RE_HEX64.test(hex)) throw new Error('anello: scalare malformato');
-  const k = BigInt('0x' + Buffer.from(hex, 'hex').reverse().toString('hex'));
+  const k = bytesToNumberLE(hexToBytes(hex));
   if (k >= ORDINE) throw new Error('anello: scalare fuori dall\'ordine');
   return k;
 };

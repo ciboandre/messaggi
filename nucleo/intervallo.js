@@ -39,7 +39,7 @@
 
 import { ed25519, ed25519_hasher } from '@noble/curves/ed25519.js';
 import { pippenger } from '@noble/curves/abstract/curve.js';
-import { concatBytes, numberToBytesLE, randomBytes } from '@noble/curves/utils.js';
+import { bytesToHex, bytesToNumberLE, concatBytes, hexToBytes, numberToBytesLE, randomBytes } from '@noble/curves/utils.js';
 import { sha512 } from '@noble/hashes/sha2.js';
 import { scalareDaBytes } from './chiavi.js';
 import { H, controllaImporto, controllaMaschera } from './impegni.js';
@@ -153,10 +153,10 @@ class Trascrizione {
  * @property {string} d
  */
 
-const scalareHex = (k) => Buffer.from(numberToBytesLE(mod(k), 32)).toString('hex');
+const scalareHex = (k) => bytesToHex(numberToBytesLE(mod(k), 32));
 const scalareDaHex = (hex) => {
   if (typeof hex !== 'string' || !RE_HEX64.test(hex)) throw new Error('prova: scalare malformato');
-  const k = BigInt('0x' + Buffer.from(hex, 'hex').reverse().toString('hex'));
+  const k = bytesToNumberLE(hexToBytes(hex));
   if (k >= ORDINE) throw new Error('prova: scalare fuori dall\'ordine');
   return k;
 };

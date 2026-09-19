@@ -13,7 +13,7 @@
 // Nessuno che non abbia v può collegare due uscite alla stessa persona.
 
 import { ed25519 } from '@noble/curves/ed25519.js';
-import { concatBytes, hexToBytes, numberToBytesLE, randomBytes } from '@noble/curves/utils.js';
+import { bytesToHex, bytesToNumberLE, concatBytes, hexToBytes, numberToBytesLE, randomBytes } from '@noble/curves/utils.js';
 import { sha512 } from '@noble/hashes/sha2.js';
 import { bech32m } from '@scure/base';
 import { semeDaFrase } from './frase.js';
@@ -120,7 +120,7 @@ export function creaIndirizzo(coordinate, rBytes) {
   const R = G.multiply(r);
   const k = segretoCondiviso(Punto.fromHex(V).multiply(r));
   const P = Punto.fromHex(S).add(G.multiply(k));
-  return { addr: P.toHex(), eph: R.toHex(), k, r: Buffer.from(numberToBytesLE(r, 32)).toString('hex') };
+  return { addr: P.toHex(), eph: R.toHex(), k, r: bytesToHex(numberToBytesLE(r, 32)) };
 }
 
 /**
@@ -133,7 +133,7 @@ export function creaIndirizzo(coordinate, rBytes) {
  */
 export function indirizzoDaR(coordinate, rHex) {
   if (typeof rHex !== 'string' || !/^[0-9a-f]{64}$/.test(rHex)) return null;
-  const r = BigInt('0x' + Buffer.from(rHex, 'hex').reverse().toString('hex'));
+  const r = bytesToNumberLE(hexToBytes(rHex));
   if (r === 0n || r >= ORDINE) return null;
   const { S, V } = decodificaCoordinate(coordinate);
   const R = G.multiply(r);

@@ -37,6 +37,7 @@
 // `nuovi = true`. Una spesa non può: entra tanto quanto esce.
 
 import { ed25519 } from '@noble/curves/ed25519.js';
+import { bytesToNumberLE, hexToBytes } from '@noble/curves/utils.js';
 import { formaCausaleValida } from './causale.js';
 import { impegno, impegnoInChiaro } from './impegni.js';
 import { verificaAnello } from './anello.js';
@@ -214,7 +215,7 @@ export function consumaEntrate(stato, entrate, riga) {
     if (u.amount !== null) throw new Error(`rivelazione di un'uscita già in chiaro: ${ref.slice(0, 12)}`);
     if (!Number.isInteger(e.amount) || e.amount <= 0) throw new Error('rivelazione: importo non valido');
     if (typeof e.mask !== 'string' || !RE_HEX.test(e.mask)) throw new Error('rivelazione: maschera malformata');
-    const mask = BigInt('0x' + Buffer.from(e.mask, 'hex').reverse().toString('hex'));
+    const mask = bytesToNumberLE(hexToBytes(e.mask));
     if (mask === 0n || mask >= ORDINE) throw new Error('rivelazione: maschera fuori dall\'ordine');
     if (impegno(e.amount, mask) !== u.commit) throw new Error(`rivelazione: importo e maschera non aprono l'uscita ${ref.slice(0, 12)}`);
     if (typeof e.img !== 'string' || !RE_HEX.test(e.img)) throw new Error('rivelazione: immagine di chiave malformata');

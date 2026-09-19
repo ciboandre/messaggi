@@ -15,7 +15,7 @@ import { firmaScalare } from './chiavi.js';
 import { chiaveCausale, creaIndirizzo, riconosci } from './portafoglio.js';
 import { cifraCausale, decifraCausale } from './causale.js';
 import { impegno, impegnoInChiaro, apriUscita, mascheraDaSegreto, cifraImporto, mascherePseudo, sommaMaschere } from './impegni.js';
-import { numberToBytesLE } from '@noble/curves/utils.js';
+import { bytesToHex, numberToBytesLE } from '@noble/curves/utils.js';
 import { provaIntervalli } from './intervallo.js';
 import { firmaAnello, immagineChiave } from './anello.js';
 import { dimensioneAnello } from './trasferimento.js';
@@ -211,7 +211,7 @@ export function costruisciPagamento({ portafoglio, disponibili, destinazioni, br
  * @param {EntrataMia} e
  */
 function rivelazione(e) {
-  return { ref: e.ref, amount: e.amount, mask: Buffer.from(numberToBytesLE(e.b, 32)).toString('hex'), img: e.img };
+  return { ref: e.ref, amount: e.amount, mask: bytesToHex(numberToBytesLE(e.b, 32)), img: e.img };
 }
 
 /**
