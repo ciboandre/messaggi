@@ -68,6 +68,9 @@ export function riassunto(registro) {
     venduti_cent: String(s.venduti_cent ?? 0n),
     convertiti_cent: String(s.convertiti_cent ?? 0n),
     interessi_cent: String(s.interessi_cent ?? 0n),
+    incassati_cent: String(s.incassati_cent ?? 0n),
+    restituiti_cent: String(s.restituiti_cent ?? 0n),
+    serie: s.serie ?? [],
     uscite: Object.keys(s.uscite ?? {}).length,
     disponibili: s.disponibili ?? 0,
     immagini_spese: Object.keys(s.immagini ?? {}).length,
@@ -75,6 +78,7 @@ export function riassunto(registro) {
     correzioni: Object.fromEntries(Object.entries(s.correzioni ?? {}).map(([r, c]) => [r, { ...c, euro_cent: String(c.euro_cent), valore_prima: n(c.valore_prima), valore_dopo: n(c.valore_dopo) }])),
     aziende: Object.fromEntries(Object.entries(s.aziende ?? {}).map(([k, a]) => [k, {
       nome: a.nome, polizia: a.polizia?.chiave ?? null, catalogo: a.catalogo, tariffario: a.tariffario, pagati_cent: String(a.pagati_cent),
+      catalogo_v: a.catalogo_v, catalogo_dal: a.catalogo_dal, tariffario_v: a.tariffario_v, tariffario_dal: a.tariffario_dal,
     }])),
     giudice: s.giudice ?? null,
     verbali: {
@@ -104,14 +108,16 @@ export function pubblica(percorsoRegistro, cartellaSito) {
     righe = [];
     mkdirSync(cartellaSito, { recursive: true });
     const errore = { seq: -1, motivo: `registro illeggibile: ${/** @type {Error} */ (e).message}` };
-    writeFileSync(join(cartellaSito, 'index.html'), rendiSito({ riassunto: null, errore, righe: [] }));
+    writeFileSync(join(cartellaSito, 'index.html'), rendiSito({ riassunto: null, errore, righe: [], stato: {} }));
     return { ok: false, seq: -1, errore };
   }
   const { registro, errore } = rileggi(righe);
   const r = riassunto(registro);
   mkdirSync(cartellaSito, { recursive: true });
   writeFileSync(join(cartellaSito, 'stato.json'), JSON.stringify({ ...r, errore }, null, 2) + '\n');
-  writeFileSync(join(cartellaSito, 'index.html'), rendiSito({ riassunto: r, errore, righe: registro.righe }));
+  writeFileSync(join(cartellaSito, 'index.html'), rendiSito({ riassunto: r, errore, righe: registro.righe, stato: registro.stato, totali: righe.length }));
+  // il registro accanto alla pagina, così "scarica ledger.jsonl" funziona
+  if (righe.length) writeFileSync(join(cartellaSito, 'ledger.jsonl'), readFileSync(percorsoRegistro, 'utf8'));
   return { ok: errore === null, seq: registro.righe.length - 1, errore };
 }
 

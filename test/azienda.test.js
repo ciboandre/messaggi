@@ -80,6 +80,10 @@ test('polizia, catalogo e tariffario: li firma l\'azienda, sostituiscono i prece
   const voci = [{ codice: 'puntualita', nome: 'Mese senza ritardi', amount: 5000 }];
   reg.accoda(riga(reg, 'catalog.set', { azienda: aziendaK.pubblica, voci }, [firmaDi(aziendaK)]));
   assert.deepEqual(reg.stato.aziende[aziendaK.pubblica].catalogo, { puntualita: { nome: 'Mese senza ritardi', amount: 5000 } });
+  assert.equal(reg.stato.aziende[aziendaK.pubblica].catalogo_v, 1);
+  reg.accoda(riga(reg, 'catalog.set', { azienda: aziendaK.pubblica, voci: [{ codice: 'idea', nome: 'Idea adottata', descrizione: 'proposta scritta, adottata dal responsabile', amount: 20000 }] }, [firmaDi(aziendaK)]));
+  assert.equal(reg.stato.aziende[aziendaK.pubblica].catalogo.idea.descrizione, 'proposta scritta, adottata dal responsabile');
+  assert.throws(() => reg.accoda(riga(reg, 'catalog.set', { azienda: aziendaK.pubblica, voci: [{ codice: 'a', nome: 'x', descrizione: 'y'.repeat(141), amount: 1 }] }, [firmaDi(aziendaK)])), /descrizione non valida/);
   reg.accoda(riga(reg, 'catalog.set', { azienda: aziendaK.pubblica, voci: [] }, [firmaDi(aziendaK)]));
   assert.deepEqual(reg.stato.aziende[aziendaK.pubblica].catalogo, {}, 'il catalogo è completo, non incrementale');
   assert.throws(() => reg.accoda(riga(reg, 'catalog.set', { azienda: aziendaK.pubblica, voci: [...voci, ...voci] }, [firmaDi(aziendaK)])), /codice ripetuto/);

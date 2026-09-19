@@ -299,6 +299,10 @@ export function regolaGiorno(riga, stato) {
   if (riga.ts.slice(0, 10) < b.data) throw new Error(`day: la riga è datata ${riga.ts.slice(0, 10)}, prima del giorno che apre`);
   stato.giorno = b.data;
   stato.n_giorni = (stato.n_giorni ?? 0) + 1;
+  // la serie del valore, un punto per giorno: è il grafico del sito
+  const v = valore(stato);
+  stato.serie ??= [];
+  stato.serie.push({ data: b.data, valore: v === null ? null : String(v) });
   return [chiaveBanca(stato)];
 }
 

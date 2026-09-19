@@ -18,7 +18,8 @@
 // la spesa. Le entrate sono in chiaro o rivelate (uscite.js).
 //
 // Stato:
-//   aziende: { chiave → { nome, coordinate, polizia, catalogo, tariffario, pagati_cent } }
+//   aziende: { chiave → { nome, coordinate, polizia, catalogo, tariffario, pagati_cent,
+//                          catalogo_v, catalogo_dal, tariffario_v, tariffario_dal } }
 
 import { controllaUscite, creaUscite, sommaUscite, consumaEntrate, preparaStato } from './uscite.js';
 import { decodificaCoordinate } from './portafoglio.js';
@@ -57,7 +58,8 @@ function aziendaDi(stato, b, tipo) {
 
 /**
  * Controlla un catalogo o un tariffario: voci con codice unico, nome,
- * importo intero positivo. Restituisce { codice → { nome, amount } }.
+ * descrizione facoltativa, importo intero positivo.
+ * Restituisce { codice → { nome, amount, descrizione? } }.
  * @param {unknown} voci @param {string} tipo
  */
 export function controllaVoci(voci, tipo) {
@@ -68,12 +70,13 @@ export function controllaVoci(voci, tipo) {
   for (const [i, v] of voci.entries()) {
     const dove = `${tipo}: voce ${i}`;
     if (!v || typeof v !== 'object') throw new Error(`${dove} malformata`);
-    soloCampi(v, ['codice', 'nome', 'amount'], dove);
+    soloCampi(v, ['codice', 'nome', 'descrizione', 'amount'], dove);
     if (typeof v.codice !== 'string' || !RE_CODICE.test(v.codice)) throw new Error(`${dove}: codice non valido`);
     if (mappa[v.codice]) throw new Error(`${dove}: codice ripetuto ${v.codice}`);
     if (typeof v.nome !== 'string' || !v.nome.trim() || v.nome.length > NOME_MAX) throw new Error(`${dove}: nome non valido`);
+    if (v.descrizione !== undefined && (typeof v.descrizione !== 'string' || v.descrizione.length > 140)) throw new Error(`${dove}: descrizione non valida`);
     if (!Number.isInteger(v.amount) || v.amount <= 0) throw new Error(`${dove}: importo non valido`);
-    mappa[v.codice] = { nome: v.nome, amount: v.amount };
+    mappa[v.codice] = { nome: v.nome, amount: v.amount, ...(v.descrizione ? { descrizione: v.descrizione } : {}) };
   }
   return mappa;
 }
@@ -91,7 +94,7 @@ export function regolaCompanyRegister(riga, stato) {
   if (stato.aziende[b.chiave]) throw new Error('company.register: azienda già registrata');
   coordinateValide(b.coordinate, 'company.register');
   if (typeof b.nome !== 'string' || !b.nome.trim() || b.nome.length > NOME_MAX) throw new Error('company.register: nome non valido');
-  stato.aziende[b.chiave] = { nome: b.nome, coordinate: b.coordinate, polizia: null, catalogo: {}, tariffario: {}, pagati_cent: 0n };
+  stato.aziende[b.chiave] = { nome: b.nome, coordinate: b.coordinate, polizia: null, catalogo: {}, tariffario: {}, pagati_cent: 0n, catalogo_v: 0, catalogo_dal: null, tariffario_v: 0, tariffario_dal: null };
   return [stato.genesi.banca.chiave];
 }
 
@@ -119,6 +122,8 @@ export function regolaCatalogSet(riga, stato) {
   soloCampi(b, ['azienda', 'voci'], 'catalog.set');
   const az = aziendaDi(stato, b, 'catalog.set');
   az.catalogo = controllaVoci(b.voci, 'catalog.set');
+  az.catalogo_v += 1;
+  az.catalogo_dal = stato.giorno ?? null;
   return [b.azienda];
 }
 
@@ -131,6 +136,8 @@ export function regolaTariffSet(riga, stato) {
   soloCampi(b, ['azienda', 'voci'], 'tariff.set');
   const az = aziendaDi(stato, b, 'tariff.set');
   az.tariffario = controllaVoci(b.voci, 'tariff.set');
+  az.tariffario_v += 1;
+  az.tariffario_dal = stato.giorno ?? null;
   return [b.azienda];
 }
 

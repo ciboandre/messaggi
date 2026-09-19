@@ -54,12 +54,17 @@ test('il motore rilegge un registro buono, scrive stato.json e index.html con il
   assert.equal(stato.immagini_spese, 1);
   assert.equal(stato.estratti['2027-03'].saldo_cent, '100250');
   const html = readFileSync(join(dir, 'sito', 'index.html'), 'utf8');
-  assert.match(html, /1,0025 €/);
-  assert.match(html, /riserva 1002,50 € ÷ circolazione 1000,00 manti/);
-  assert.match(html, /<code>transfer<\/code>/);
-  assert.match(html, /riservata →/);
+  assert.match(html, /class="big">1,003<small>€ per 1/, 'il valore grande, tre decimali come nel mockup');
+  assert.match(html, /1002,50 ÷ 1000,00<\/span><span class="num">1,0025 €/, 'il conto di oggi');
+  assert.match(html, /▲ 0,3% dalla partenza · non è mai sceso/);
+  assert.match(html, /<span class="pill ">pagamento<\/span>/);
+  assert.match(html, /2 uscite riservate/);
+  assert.match(html, /verificato, 6 righe su 6/);
+  assert.match(html, /<symbol id="manto"/);
   assert.ok(!html.includes('1234'), 'l\'importo riservato non compare');
+  assert.ok(!html.includes('<script'), 'nessuno script');
   assert.ok(!html.includes('Registro rotto'));
+  assert.ok(existsSync(join(dir, 'sito', 'ledger.jsonl')));
 });
 
 test('una riga invalida in mezzo: il motore si ferma lì, mostra l\'ultimo stato buono e l\'avviso, esce con errore', () => {
@@ -79,8 +84,8 @@ test('una riga invalida in mezzo: il motore si ferma lì, mostra l\'ultimo stato
   assert.equal(stato.riserva_cent, '100000', 'senza l\'interesse');
   const html = readFileSync(join(dir, 'sito', 'index.html'), 'utf8');
   assert.match(html, /Registro rotto/);
-  assert.match(html, /riga <strong>3<\/strong>/);
-  assert.match(html, /ultima riga buona \(seq 2\)/);
+  assert.match(html, /La riga <b>3<\/b> non passa/);
+  assert.match(html, /numeri fermi alla riga 2 su 6/);
 });
 
 test('registro assente vale vuoto; illeggibile è un errore con pagina e senza stato', () => {
@@ -89,6 +94,7 @@ test('registro assente vale vuoto; illeggibile è un errore con pagina e senza s
   assert.equal(esito.ok, true);
   assert.equal(esito.seq, -1);
   assert.match(readFileSync(join(dir, 'sito', 'index.html'), 'utf8'), /Registro vuoto/);
+  assert.match(readFileSync(join(dir, 'sito', 'index.html'), 'utf8'), /in attesa della prima vendita/);
   writeFileSync(join(dir, 'rotto.jsonl'), '{"seq":0}\nnon json\n');
   const rotto = pubblica(join(dir, 'rotto.jsonl'), join(dir, 'sito2'));
   assert.equal(rotto.ok, false);
