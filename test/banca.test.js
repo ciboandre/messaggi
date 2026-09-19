@@ -176,6 +176,23 @@ test('invariante: riserva ≥ circolazione × valore e valore mai in calo, riga 
   controllaCopertura(rotto, null);
 });
 
+test('il giorno: date crescenti, la riga non prima del giorno che apre, contatore dei giorni', () => {
+  const reg = nuovoRegistro();
+  const giorno = (data, ts, firmatario = firmaBanca) => firmaRiga(preparaRiga(reg.ultima, { type: 'day', ts, body: { data } }), [firmatario]);
+  assert.equal(reg.stato.giorno, undefined);
+  reg.accoda(giorno('2026-12-01', '2026-12-01T05:00:00Z'));
+  assert.equal(reg.stato.giorno, '2026-12-01');
+  assert.equal(reg.stato.n_giorni, 1);
+  assert.throws(() => reg.accoda(giorno('2026-12-01', '2026-12-01T06:00:00Z')), /non è dopo/);
+  assert.throws(() => reg.accoda(giorno('2026-11-30', '2026-12-01T06:00:00Z')), /non è dopo/);
+  assert.throws(() => reg.accoda(giorno('2026-13-01', '2026-12-01T06:00:00Z')), /data non valida/);
+  assert.throws(() => reg.accoda(giorno('2026-12-03', '2026-12-02T06:00:00Z')), /datata 2026-12-02, prima/);
+  reg.accoda(giorno('2026-12-02', '2026-12-02T06:00:00Z'));
+  assert.equal(reg.stato.n_giorni, 2);
+  const altro = coppiaDaSeme(new Uint8Array(32).fill(5));
+  assert.throws(() => reg.accoda(giorno('2026-12-03', '2026-12-03T06:00:00Z', { by: altro.pubblica, firma: (h) => firma(altro.privata, h) })), /manca la firma/);
+});
+
 test('il registro si ricostruisce con lo stesso stato, BigInt compresi', () => {
   const reg = nuovoRegistro();
   const a = portafoglioDaFrase(generaFrase());

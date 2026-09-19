@@ -68,6 +68,7 @@ test('un pagamento riservato: chi riceve vede importo e causale, chi paga il res
   }
   assert.equal(riga.sigs.length, 1);
   assert.ok('img' in riga.sigs[0] && !('by' in riga.sigs[0]));
+  for (const ref of riga.body.in[0].ring) assert.notEqual(riga.body.in[0].pseudo, reg.stato.uscite[ref].commit, 'lo pseudo-impegno non coincide con nessun membro');
 
   const diB = mieEntrate(reg, b);
   assert.equal(saldo(diB), 1200);

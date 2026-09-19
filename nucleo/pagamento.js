@@ -294,12 +294,14 @@ export function costruisciRichiestaConversione({ portafoglio, disponibili, amoun
   const out = [{ addr: mio.addr, eph: mio.eph, commit: impegno(resto, bResto), amt: cifraImporto(mio.k, resto) }];
   const valori = [{ a: BigInt(resto), b: bResto }];
   const perBanca = creaIndirizzo(coordinateBanca);
+  const ritorno = creaIndirizzo(portafoglio.coordinate);
   const body = {
     in: [],
     amount,
     out,
     proof: provaIntervalli(valori),
     dati: { addr: perBanca.addr, eph: perBanca.eph, memo: cifraCausale(chiaveCausale(perBanca.k), dati) },
+    ritorno: { addr: ritorno.addr, eph: ritorno.eph },
   };
 
   const maschere = mascherePseudo(valori.map((v) => v.b), entrate.length);

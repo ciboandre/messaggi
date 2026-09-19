@@ -25,7 +25,7 @@ Tutti i numeri del sistema in un posto solo. Ogni parametro è pubblico; quelli 
 | Quota delle multe bruciata | 50% | L'altra metà al conto polizia |
 | Commissione su pagamenti e bonifici | 0% | |
 | Dimensione dell'anello | 16 | Uscite tra cui si nasconde ogni entrata spesa da un correntista |
-| Giorni per pagare o contestare una multa | 15 | Dalla data del verbale |
+| Giorni per pagare o contestare una multa | 15 | Dalla data del verbale, contati sulle righe di giorno del registro |
 | Pubblicazione | Giornaliera, 06:00 ora italiana | |
 | Estratto conto della riserva | Mensile | Pubblicato accanto al registro |
 

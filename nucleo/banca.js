@@ -24,6 +24,12 @@
 // regola di riga. (Confrontare la riserva con il valore *dopo* non dice
 // niente: è vero per costruzione, il valore è riserva / circolazione.)
 //
+// `day` è il calendario. Il registro non ha un orologio che chiunque possa
+// ricontrollare: ha solo le sue righe. La banca apre ogni giorno con una
+// riga `day`, e da lì in poi i termini (i 15 giorni delle multe) si contano
+// in righe di giorno, non in timestamp. Che il calendario sia giusto lo
+// dice la banca con la sua firma: è un punto di fiducia, dichiarato.
+//
 // `reserve.statement` è un'affermazione, non una prova. Il registro sa fare
 // i conti tra le sue righe; non può sapere se gli euro esistono. La riga
 // dice che la banca, con la sua firma, dichiara quel saldo a quella data,
@@ -220,8 +226,26 @@ export function regolaEstratto(riga, stato) {
   return [chiaveBanca(stato)];
 }
 
+/**
+ * `day`: la banca apre un giorno. Date crescenti; le righe di quel giorno
+ * non possono avere un ts precedente. `stato.giorno` è la data, `n_giorni`
+ * quante righe di giorno ci sono state: i termini si misurano su questo.
+ * @type {import('./registro.js').RegolaTipo}
+ */
+export function regolaGiorno(riga, stato) {
+  const b = /** @type {any} */ (riga.body);
+  soloCampi(b, ['data'], 'day');
+  if (typeof b.data !== 'string' || !RE_DATA.test(b.data) || Number.isNaN(Date.parse(b.data))) throw new Error('day: data non valida');
+  if (stato.giorno && b.data <= stato.giorno) throw new Error(`day: ${b.data} non è dopo ${stato.giorno}`);
+  if (riga.ts.slice(0, 10) < b.data) throw new Error(`day: la riga è datata ${riga.ts.slice(0, 10)}, prima del giorno che apre`);
+  stato.giorno = b.data;
+  stato.n_giorni = (stato.n_giorni ?? 0) + 1;
+  return [chiaveBanca(stato)];
+}
+
 /** Le regole della banca, pronte per il registro. */
 export const tipiBanca = {
+  day: regolaGiorno,
   'cap.set': regolaCapSet,
   sale: regolaSale,
   'reserve.interest': regolaInteressi,

@@ -6,7 +6,7 @@ import { tipiConversione, apriDatiConversione } from '../nucleo/conversione.js';
 import { regolaTransfer } from '../nucleo/trasferimento.js';
 import { regolaSpesaInChiaro } from '../nucleo/uscite.js';
 import { coppiaDaSeme, firma } from '../nucleo/chiavi.js';
-import { portafoglioDaFrase, creaIndirizzo } from '../nucleo/portafoglio.js';
+import { portafoglioDaFrase, creaIndirizzo, riconosci } from '../nucleo/portafoglio.js';
 import { generaFrase } from '../nucleo/frase.js';
 import { mieEntrate, saldo, costruisciRichiestaConversione, costruisciPagamentoRiservato } from '../nucleo/pagamento.js';
 import { impegno, mascheraCasuale } from '../nucleo/impegni.js';
@@ -55,6 +55,7 @@ test('andata e ritorno: vendita, richiesta con resto riservato, esecuzione al pr
   assert.ok(r.body.proof);
   assert.equal(r.body.in[0].ring.length, 2);
   assert.equal(reg.stato.conversioni[r.hash].stato, 'richiesta');
+  assert.ok(riconosci(reg.stato.conversioni[r.hash].ritorno, a), 'l\'indirizzo di ritorno è di a');
   assert.equal(reg.stato.circolazione_cent, 195238n, 'i manti chiesti circolano finché non sono bruciati');
   assert.equal(saldo(mieEntrate(reg, a)), 40000, 'ad a resta il resto');
   assert.equal(mieEntrate(reg, a)[0].chiaro, false);
@@ -98,6 +99,8 @@ test('richiesta di tutto: il resto c\'è lo stesso, da zero, così lo pseudo-imp
   assert.throws(() => reg.accoda(richiesta(reg, pb, a, 100000, (b) => ({ ...b, amount: 0 }))), /importo non valido/);
   assert.throws(() => reg.accoda(richiesta(reg, pb, a, 100000, (b) => ({ ...b, dati: { ...b.dati, memo: 'x' } }))), /dati cifrati/);
   assert.throws(() => reg.accoda(richiesta(reg, pb, a, 100000, (b) => ({ ...b, extra: 1 }))), /campi sconosciuti/);
+  assert.throws(() => reg.accoda(richiesta(reg, pb, a, 100000, (b) => { delete b.ritorno; return b; })), /ritorno mancante/);
+  assert.throws(() => reg.accoda(richiesta(reg, pb, a, 100000, (b) => ({ ...b, ritorno: { addr: 'ab', eph: b.ritorno.eph } }))), /ritorno non valido/);
   reg.accoda(r);
   assert.equal(saldo(mieEntrate(reg, a)), 0, 'il resto da zero vale zero');
   assert.equal(mieEntrate(reg, a).length, 1, 'ma esiste, e l\'app lo vede');

@@ -29,6 +29,13 @@
 // bruciati e che gli euro sono usciti dalla riserva calcolata; che siano
 // arrivati sul conto di qualcuno lo dice solo la banca.
 //
+// La richiesta porta anche un indirizzo di ritorno (chiave una tantum e
+// R, come un'uscita): il registro non sa di chi è la richiesta, quindi
+// una riga di restituzione potrà creare un'uscita solo verso un indirizzo
+// che la richiesta già porta. Il tipo di riga che lo usa arriva dopo; il
+// campo c'è da subito perché il formato di una riga nel registro non si
+// cambia più.
+//
 // Chi può chiedere: chiunque. Chi viene pagato: solo chi la banca ha
 // identificato, senza multe definitive non saldate. L'anello nasconde da
 // quali uscite vengono i manti, quindi il registro non può sapere di chi è
@@ -44,12 +51,24 @@ import { bilancio, impegnoInChiaro } from './impegni.js';
 import { verificaIntervalli, riempi } from './intervallo.js';
 import { controllaUsciteRiservate, controllaEntrateInAnello, firmeAnello } from './trasferimento.js';
 import { registraUscita, preparaStato } from './uscite.js';
+import { ed25519 } from '@noble/curves/ed25519.js';
 import { formaCausaleValida, decifraCausale } from './causale.js';
 import { chiaveCausale, riconosci } from './portafoglio.js';
 import { centesimi, valore, prezzoConversione, euroPerManti, controllaCopertura } from './banca.js';
 
 const RE_HEX64 = /^[0-9a-f]{64}$/;
 const RE_DATA = /^\d{4}-\d{2}-\d{2}$/;
+
+/** @param {unknown} hex */
+function puntoBuono(hex) {
+  if (typeof hex !== 'string' || !RE_HEX64.test(hex)) return false;
+  try {
+    const P = ed25519.Point.fromHex(hex, false);
+    return P.toHex() === hex && P.isTorsionFree();
+  } catch {
+    return false;
+  }
+}
 
 /** Lancia se il body ha campi oltre quelli ammessi. */
 function soloCampi(b, ammessi, tipo) {
@@ -63,7 +82,10 @@ function soloCampi(b, ammessi, tipo) {
  */
 export function regolaConversionRequest(riga, stato) {
   const b = /** @type {any} */ (riga.body);
-  soloCampi(b, ['in', 'amount', 'out', 'proof', 'dati'], 'conversion.request');
+  soloCampi(b, ['in', 'amount', 'out', 'proof', 'dati', 'ritorno'], 'conversion.request');
+  if (!b.ritorno || typeof b.ritorno !== 'object') throw new Error('conversion.request: indirizzo di ritorno mancante');
+  soloCampi(b.ritorno, ['addr', 'eph'], 'conversion.request: ritorno');
+  if (!puntoBuono(b.ritorno.addr) || !puntoBuono(b.ritorno.eph)) throw new Error('conversion.request: indirizzo di ritorno non valido');
   preparaStato(stato);
   if (!Number.isInteger(b.amount) || b.amount <= 0) throw new Error('conversion.request: importo non valido');
   if (!Array.isArray(b.out) || b.out.length !== 1) throw new Error('conversion.request: esattamente un resto riservato, anche da zero');
@@ -89,7 +111,7 @@ export function regolaConversionRequest(riga, stato) {
     registraUscita(stato, `${riga.hash}:${i}`, { addr: u.addr, commit: u.commit, amount: null });
   }
   stato.conversioni ??= {};
-  stato.conversioni[riga.hash] = { amount: b.amount, stato: 'richiesta', seq: riga.seq };
+  stato.conversioni[riga.hash] = { amount: b.amount, stato: 'richiesta', seq: riga.seq, ritorno: { addr: b.ritorno.addr, eph: b.ritorno.eph } };
   return { by: [], img };
 }
 
