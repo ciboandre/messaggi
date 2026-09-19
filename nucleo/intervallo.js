@@ -17,6 +17,11 @@
 // assorbe l'impegno e ogni punto mandato, in ordine. Chi verifica la
 // ricostruisce; se un punto è diverso, le sfide cambiano e la prova cade.
 //
+// Chi prova non è a tempo costante: sotto ci sono i BigInt di JavaScript.
+// Però nessuna istruzione ramifica sul segreto: i bit dell'importo entrano
+// in A come scalari 1 o 2, mai come "salta se zero". Chi verifica lavora
+// solo su dati pubblici e usa la moltiplicazione veloce.
+//
 // Solo un impegno per prova, per ora: aggregare più uscite in una prova
 // sola (m·64 bit) è il passo 9b.
 
@@ -24,7 +29,7 @@ import { ed25519, ed25519_hasher } from '@noble/curves/ed25519.js';
 import { concatBytes, numberToBytesLE, randomBytes } from '@noble/curves/utils.js';
 import { sha512 } from '@noble/hashes/sha2.js';
 import { scalareDaBytes } from './chiavi.js';
-import { H, controllaImporto } from './impegni.js';
+import { H, controllaImporto, controllaMaschera } from './impegni.js';
 
 const Punto = ed25519.Point;
 const G = Punto.BASE;
@@ -47,9 +52,9 @@ const pow = (x, n) => {
 };
 const scalareCasuale = () => scalareDaBytes(randomBytes(64));
 
-/** Moltiplicazione che accetta lo zero. */
-const per = (P, k) => (mod(k) === 0n ? Punto.ZERO : P.multiply(mod(k)));
-/** Σ k_i·P_i */
+/** Moltiplicazione su scalari pubblici: accetta lo zero, non è a tempo costante. */
+const per = (P, k) => P.multiplyUnsafe(mod(k));
+/** Σ k_i·P_i, scalari pubblici. */
 const combina = (scalari, punti) => scalari.reduce((acc, k, i) => acc.add(per(punti[i], k)), Punto.ZERO);
 /** Σ a_i b_i y^i, con i da 1 */
 const prodottoPesato = (a, b, y) => {
@@ -67,8 +72,19 @@ const prodottoPesato = (a, b, y) => {
 const generatore = (etichetta) => ed25519_hasher.hashToCurve(codifica.encode(etichetta), { DST: 'manti/intervallo/v1' });
 export const Gi = Array.from({ length: BIT }, (_, i) => generatore(`manti/Gi/v1/${i}`));
 export const Hi = Array.from({ length: BIT }, (_, i) => generatore(`manti/Hi/v1/${i}`));
+// precalcoli pubblici
+const sommaGi = Gi.reduce((acc, P) => acc.add(P), Punto.ZERO);
+const sommaHi = Hi.reduce((acc, P) => acc.add(P), Punto.ZERO);
+const Qi = Gi.map((P, i) => P.add(Hi[i]));
+const sommaQi = Qi.reduce((acc, P) => acc.add(P), Punto.ZERO);
 
 // ── trascrizione ─────────────────────────────────────────────────────────
+//
+// stato₀ = SHA-512("manti/intervallo/v1")
+// statoₖ = SHA-512(len(etichetta) ‖ etichetta ‖ statoₖ₋₁ ‖ n ‖ punto₁ ‖ … ‖ puntoₙ)
+// con len e n su un byte ciascuno, e ogni punto nei suoi 32 byte canonici.
+// I prefissi di lunghezza evitano che due sequenze diverse producano gli
+// stessi byte da hashare.
 
 class Trascrizione {
   constructor() {
@@ -76,7 +92,12 @@ class Trascrizione {
   }
   /** @param {string} etichetta @param {...import('@noble/curves/abstract/edwards.js').EdwardsPoint} punti */
   assorbi(etichetta, ...punti) {
-    this.stato = sha512(concatBytes(codifica.encode(etichetta), this.stato, ...punti.map((p) => p.toBytes())));
+    const nome = codifica.encode(etichetta);
+    if (nome.length > 255 || punti.length > 255) throw new RangeError('trascrizione: etichetta o punti oltre 255');
+    this.stato = sha512(concatBytes(
+      Uint8Array.of(nome.length), nome, this.stato,
+      Uint8Array.of(punti.length), ...punti.map((p) => p.toBytes()),
+    ));
   }
   sfida() {
     return scalareDaBytes(this.stato);
@@ -111,7 +132,9 @@ const scalareDaHex = (hex) => {
 };
 const puntoDaHex = (hex) => {
   if (typeof hex !== 'string' || !RE_HEX64.test(hex)) throw new Error('prova: punto malformato');
-  const P = Punto.fromHex(hex);
+  const P = Punto.fromHex(hex, false);
+  // una sola codifica per punto: altrimenti la stessa prova avrebbe più forme
+  if (P.toHex() !== hex) throw new Error('prova: codifica non canonica');
   if (!P.isTorsionFree()) throw new Error('prova: punto fuori dal sottogruppo');
   return P;
 };
@@ -153,13 +176,17 @@ function coefficientiAcappello(y, z) {
  */
 export function provaIntervallo(a, b) {
   const importo = controllaImporto(a);
+  controllaMaschera(b);
   const V = per(G, b).add(per(H, importo));
 
-  // bit dell'importo, e aR = aL − 1
+  // bit dell'importo, e aR = aL − 1. A = <aL,Gi> + <aR,Hi> + α·G si riscrive
+  //   A = α·G − ΣHi − ΣQi + Σ (aL_i + 1)·Qi      con Qi = Gi + Hi
+  // così ogni bit costa una moltiplicazione vera per 1 o per 2, senza rami.
   const aL = Array.from({ length: BIT }, (_, i) => (importo >> BigInt(i)) & 1n);
   const aR = aL.map((bit) => mod(bit - 1n));
   const alpha = scalareCasuale();
-  const A = combina(aL, Gi).add(combina(aR, Hi)).add(per(G, alpha));
+  const A = aL.reduce((acc, bit, i) => acc.add(Qi[i].multiply(bit + 1n)), G.multiply(alpha))
+    .subtract(sommaHi).subtract(sommaQi);
 
   const tr = new Trascrizione();
   tr.assorbi('V', V);
@@ -238,52 +265,64 @@ export function provaIntervallo(a, b) {
  */
 export function verificaIntervallo(commit, prova) {
   try {
-    if (!prova || typeof prova !== 'object') return false;
-    if (!Array.isArray(prova.L) || !Array.isArray(prova.R) || prova.L.length !== GIRI || prova.R.length !== GIRI) return false;
-    const V = puntoDaHex(commit);
-    const A = puntoDaHex(prova.A);
-    const L = prova.L.map(puntoDaHex);
-    const R = prova.R.map(puntoDaHex);
-    const A1 = puntoDaHex(prova.A1);
-    const B = puntoDaHex(prova.B);
-    const r = scalareDaHex(prova.r);
-    const s = scalareDaHex(prova.s);
-    const d = scalareDaHex(prova.d);
-
-    const tr = new Trascrizione();
-    tr.assorbi('V', V);
-    tr.assorbi('A', A);
-    const y = tr.sfida();
-    const z = tr.sfidaDerivata('z');
-
-    const { suHi, sulValore, suV } = coefficientiAcappello(y, z);
-    let P = A.add(per(combina(Array(BIT).fill(1n), Gi), mod(-z)))
-      .add(combina(suHi, Hi))
-      .add(per(H, sulValore))
-      .add(per(V, suV));
-    let gi = Gi.slice();
-    let hi = Hi.slice();
-
-    let n = BIT;
-    for (let giro = 0; giro < GIRI; giro++) {
-      const m = n / 2;
-      const ym = pow(y, m);
-      const yInvM = inv(ym);
-      tr.assorbi('LR', L[giro], R[giro]);
-      const e = tr.sfida();
-      const eInv = inv(e);
-      P = P.add(per(L[giro], mul(e, e))).add(per(R[giro], mul(eInv, eInv)));
-      gi = gi.slice(0, m).map((Pg, i) => per(Pg, eInv).add(per(gi[m + i], mul(e, yInvM))));
-      hi = hi.slice(0, m).map((Ph, i) => per(Ph, e).add(per(hi[m + i], eInv)));
-      n = m;
-    }
-
-    tr.assorbi('AB', A1, B);
-    const e = tr.sfida();
-    const sinistra = per(P, mul(e, e)).add(per(A1, e)).add(B);
-    const destra = per(gi[0], mul(e, r)).add(per(hi[0], mul(e, s))).add(per(H, mul(y, mul(r, s)))).add(per(G, d));
-    return sinistra.equals(destra);
+    return verificaOLancia(commit, prova);
   } catch {
     return false;
   }
+}
+
+/**
+ * Come verificaIntervallo, ma lancia sugli input malformati invece di
+ * rispondere false. Serve ai test per distinguere "prova che non regge" da
+ * "errore nel codice".
+ * @param {string} commit
+ * @param {Prova} prova
+ * @returns {boolean}
+ */
+export function verificaOLancia(commit, prova) {
+if (!prova || typeof prova !== 'object') throw new TypeError('prova: atteso un oggetto');
+  if (!Array.isArray(prova.L) || !Array.isArray(prova.R) || prova.L.length !== GIRI || prova.R.length !== GIRI) throw new Error('prova: servono 6 L e 6 R');
+  const V = puntoDaHex(commit);
+  const A = puntoDaHex(prova.A);
+  const L = prova.L.map(puntoDaHex);
+  const R = prova.R.map(puntoDaHex);
+  const A1 = puntoDaHex(prova.A1);
+  const B = puntoDaHex(prova.B);
+  const r = scalareDaHex(prova.r);
+  const s = scalareDaHex(prova.s);
+  const d = scalareDaHex(prova.d);
+
+  const tr = new Trascrizione();
+  tr.assorbi('V', V);
+  tr.assorbi('A', A);
+  const y = tr.sfida();
+  const z = tr.sfidaDerivata('z');
+
+  const { suHi, sulValore, suV } = coefficientiAcappello(y, z);
+  let P = A.add(per(sommaGi, mod(-z)))
+    .add(combina(suHi, Hi))
+    .add(per(H, sulValore))
+    .add(per(V, suV));
+  let gi = Gi.slice();
+  let hi = Hi.slice();
+
+  let n = BIT;
+  for (let giro = 0; giro < GIRI; giro++) {
+    const m = n / 2;
+    const ym = pow(y, m);
+    const yInvM = inv(ym);
+    tr.assorbi('LR', L[giro], R[giro]);
+    const e = tr.sfida();
+    const eInv = inv(e);
+    P = P.add(per(L[giro], mul(e, e))).add(per(R[giro], mul(eInv, eInv)));
+    gi = gi.slice(0, m).map((Pg, i) => per(Pg, eInv).add(per(gi[m + i], mul(e, yInvM))));
+    hi = hi.slice(0, m).map((Ph, i) => per(Ph, e).add(per(hi[m + i], eInv)));
+    n = m;
+  }
+
+  tr.assorbi('AB', A1, B);
+  const e = tr.sfida();
+  const sinistra = per(P, mul(e, e)).add(per(A1, e)).add(B);
+  const destra = per(gi[0], mul(e, r)).add(per(hi[0], mul(e, s))).add(per(H, mul(y, mul(r, s)))).add(per(G, d));
+  return sinistra.equals(destra);
 }

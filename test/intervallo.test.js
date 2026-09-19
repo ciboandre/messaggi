@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { ed25519 } from '@noble/curves/ed25519.js';
-import { provaIntervallo, verificaIntervallo, Gi, Hi, BIT, GIRI } from '../nucleo/intervallo.js';
+import { provaIntervallo, verificaIntervallo, verificaOLancia, Gi, Hi, BIT, GIRI } from '../nucleo/intervallo.js';
 import { H, impegno, mascheraCasuale, IMPORTO_MAX } from '../nucleo/impegni.js';
 
 const Punto = ed25519.Point;
@@ -24,6 +24,8 @@ test('una prova onesta passa, per 0, 1, un importo normale e il massimo', () => 
     const b = mascheraCasuale();
     const prova = provaIntervallo(a, b);
     assert.equal(prova.L.length, GIRI);
+    // la versione che lancia: una prova onesta non deve passare dal catch
+    assert.equal(verificaOLancia(impegno(a, b), prova), true, `importo ${a}`);
     assert.ok(verificaIntervallo(impegno(a, b), prova), `importo ${a}`);
   }
 });
@@ -45,6 +47,8 @@ test('un importo fuori intervallo non ha prova: 2^64 + 5 con i bit di 5, e −1'
   assert.ok(!verificaIntervallo(impegnoGrezzo(-1n, b), provaIntervallo(IMPORTO_MAX, b)));
   assert.throws(() => provaIntervallo(-1n, b), RangeError);
   assert.throws(() => provaIntervallo(IMPORTO_MAX + 1n, b), RangeError);
+  assert.throws(() => provaIntervallo(5, ORDINE), RangeError);
+  assert.throws(() => provaIntervallo(5, -1n), RangeError);
 });
 
 test('ogni campo manomesso fa cadere la prova; una prova malformata non lancia', () => {
@@ -68,6 +72,10 @@ test('ogni campo manomesso fa cadere la prova; una prova malformata non lancia',
   assert.ok(!verificaIntervallo('00', prova));
   assert.ok(!verificaIntervallo(C, null));
   assert.ok(!verificaIntervallo(C, 'prova'));
+  assert.throws(() => verificaOLancia(C, null), TypeError);
+  assert.throws(() => verificaOLancia(C, { ...prova, L: prova.L.slice(1) }), /6 L e 6 R/);
+  assert.throws(() => verificaOLancia(C, { ...prova, A: prova.A.toUpperCase() }), /malformato/);
+  assert.throws(() => verificaOLancia(C, { ...prova, r: 'ff'.repeat(32) }), /ordine/);
 });
 
 test('un impegno con torsione viene rifiutato', () => {
@@ -75,7 +83,15 @@ test('un impegno con torsione viene rifiutato', () => {
   const prova = provaIntervallo(1500, b);
   const torsione = Punto.fromHex('c7176a703d4dd84fba3c0b760d10670f2a2053fa2c39ccc64ec7fd7792ac037a'); // ordine 8
   assert.ok(!torsione.isTorsionFree());
-  assert.ok(!verificaIntervallo(Punto.fromHex(impegno(1500, b)).add(torsione).toHex(), prova));
+  const conTorsione = Punto.fromHex(impegno(1500, b)).add(torsione).toHex();
+  assert.ok(!verificaIntervallo(conTorsione, prova));
+  assert.throws(() => verificaOLancia(conTorsione, prova), /sottogruppo/);
+});
+
+test('un impegno all\'identità (importo 0, maschera 0) è legittimo', () => {
+  const prova = provaIntervallo(0, 0n);
+  assert.equal(impegno(0, 0n), Punto.ZERO.toHex());
+  assert.equal(verificaOLancia(impegno(0, 0n), prova), true);
 });
 
 test('dimensione: 15 punti e 3 scalari, sotto 1,3 KB in JSON', () => {

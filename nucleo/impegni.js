@@ -48,9 +48,10 @@ export function controllaImporto(a) {
 }
 
 /**
+ * Maschera in [0, ordine), o errore.
  * @param {bigint} b
  */
-function controllaMaschera(b) {
+export function controllaMaschera(b) {
   if (typeof b !== 'bigint' || b < 0n || b >= ORDINE) throw new RangeError('maschera fuori da [0, ordine)');
 }
 
