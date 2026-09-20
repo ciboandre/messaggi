@@ -25,10 +25,4 @@ Se cambia l'indirizzo del Mac in rete (altra Wi‑Fi, router che riassegna), si 
 
 ## I comandi della banca con il server in HTTPS
 
-Node non usa il portachiavi del Mac: gli si indica l'autorità di mkcert. In una finestra di Terminal.app, una volta:
-
-```
-export NODE_EXTRA_CA_CERTS="$(mkcert -CAROOT)/rootCA.pem" MANTI_SERVER=https://localhost:8787
-```
-
-poi i comandi normali (`node banca/cli.js giorno`, `vendita`, …) finché la finestra resta aperta.
+Basta `MANTI_SERVER=https://localhost:8787` davanti ai comandi: l'autorità di mkcert viene trovata da sola sul Mac (o la indica `MANTI_CA`).
