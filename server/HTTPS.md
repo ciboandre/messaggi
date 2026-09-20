@@ -22,3 +22,13 @@ Sul telefono, sulla stessa Wi‑Fi, una volta sola:
 Poi l'app: `https://<indirizzo>:8787/app/`. Da Safari, Condividi → Aggiungi alla schermata Home.
 
 Se cambia l'indirizzo del Mac in rete (altra Wi‑Fi, router che riassegna), si rifà solo il passo `mkcert -cert-file …` con il nuovo indirizzo: si possono elencare più indirizzi nello stesso comando. Se il telefono non carica, il firewall del Mac deve consentire a `node` le connessioni in entrata. La cartella `certificati/` non va nel repository.
+
+## I comandi della banca con il server in HTTPS
+
+Node non usa il portachiavi del Mac: gli si indica l'autorità di mkcert. In una finestra di Terminal.app, una volta:
+
+```
+export NODE_EXTRA_CA_CERTS="$(mkcert -CAROOT)/rootCA.pem" MANTI_SERVER=https://localhost:8787
+```
+
+poi i comandi normali (`node banca/cli.js giorno`, `vendita`, …) finché la finestra resta aperta.
