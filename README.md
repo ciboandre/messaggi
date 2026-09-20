@@ -18,6 +18,8 @@ L'app del correntista è in `app/`: la serve il server (`http://localhost:8787/a
 
 I pannelli di banca, azienda e polizia sono in `pannelli/` (`http://localhost:8787/pannelli/`): ogni ruolo ha le sue dodici parole (le mostra il pannello) e un PIN; la banca registra l'azienda con chiave e coordinate lette dalla sezione Chiavi. L'elenco dei dipendenti sta nel browser dell'azienda e si esporta a quello della polizia; nel registro non entra mai. Il pannello banca fa tutto ciò che fa `banca/cli.js` (che resta come riserva): le parole della banca vanno cifrate solo nel browser del dispositivo dedicato.
 
+Il giudice è `giudice/servizio.js`: le istruzioni pubbliche sono in `giudice/istruzioni.md`, il modello è `claude-opus-5`, la chiave API sta solo nell'ambiente (`ANTHROPIC_API_KEY`) della macchina dove gira. `nuova-frase` e `chiavi` danno alla banca ciò che serve per registrarlo; `prova` manda un fascicolo di esempio al modello; senza argomenti fa un giro ogni cinque minuti.
+
 **Chiunque può ricalcolare il sito.** Il registro è `ledger.jsonl`, una riga per transazione, scritto e committato dalla banca. Il sito pubblico lo genera una GitHub Action ogni giorno alle 05:00 UTC eseguendo solo `node motore/pubblica.js ledger.jsonl sito`: nessuna chiave, nessun segreto, nessuna data di generazione. Lo stesso comando sulla stessa copia del repository produce gli stessi byte, quindi chi non si fida della pagina la rifà da sé e la confronta. Se una riga non passa la verifica, il motore si ferma lì, il sito mostra l'ultimo stato buono con l'avviso, e il run fallisce in modo visibile.
 
 Metodo di lavoro: un passo alla volta, ogni passo discusso, autorizzato, committato e pushato.

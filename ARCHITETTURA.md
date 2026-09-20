@@ -224,14 +224,13 @@ L'**anagrafica** (nome ↔ coordinate ↔ identificato ↔ azienda ↔ verbali a
 
 ## 10. Il giudice
 
-Un servizio con la propria chiave. Quando una contestazione riceve la replica o passano 3 giorni senza:
+Un servizio (`giudice/servizio.js`) con la propria frase, quindi una chiave per firmare e un portafoglio per leggere i testi cifrati per lui. Quando una contestazione riceve la replica o passano 3 giorni di registro senza:
 
-1. costruisce il **fascicolo**: verbale, voce del tariffario alla data, contestazione e replica decifrate, e nient'altro;
-2. interroga il modello con le **istruzioni** in `giudice/istruzioni.md`;
-3. ottiene esito e motivazione;
-4. firma un `verdict` e lo invia al server.
+1. costruisce il **fascicolo**: verbale (numero, voce, regola, importo, giorno), tariffario in vigore, contestazione e replica decifrate, e nient'altro — nessun nome, nessun indirizzo; la descrizione del verbale è cifrata per il multato, non per il giudice, e la polizia la ripete nella replica se vuole che pesi;
+2. interroga il modello (`claude-opus-5`, parametro pubblico in testa al servizio) con le **istruzioni** in `giudice/istruzioni.md`, la cui `versione` deve essere quella registrata con `judge.register`, chiedendo una risposta in uno schema fisso: esito (annullata o confermata) e motivazione;
+3. firma un `verdict` con l'hash del fascicolo e lo invia al server.
 
-Se il modello non risponde o risponde con un esito non ammesso, nessuna sentenza: la contestazione resta aperta e nessun termine corre.
+Se il modello non risponde, rifiuta, o risponde fuori schema, nessuna sentenza: la contestazione resta aperta e si riprova al giro dopo. La chiave API sta solo nell'ambiente della macchina dove gira il servizio.
 
 ## 11. Il motore giornaliero
 
@@ -289,6 +288,6 @@ Se il modello non risponde o risponde con un esito non ammesso, nessuna sentenza
 | 19 | Pannello banca da terminale (`banca/cli.js`): frase di dodici parole della banca, genesi, giorno, vendite, tetto, interessi, estratti, correzioni, aziende, giudice, conversioni; ogni riga verificata e accodata, poi git push | A/B |
 | 19b | Conto di prova da terminale (`correntista/cli.js`): frase, coordinate, saldo, pagamento riservato, richiesta di conversione; righe in `ledger.jsonl` come quelle della banca | A/B |
 | 20 | Server via HTTP (`server/server.js`): unico scrittore, senza chiavi; `GET /stato`, `GET /registro?da=N`, `GET /prossima`, `POST /righe` con 201/400/409; scritture in fila; `MANTI_PUSH=1` fa il push dopo ogni riga. Banca e correntista lo usano con `MANTI_SERVER=http://…` al posto del file | C |
-| 21 | Servizio giudice con modello reale | C |
+| 21 | Servizio giudice con modello reale (`giudice/servizio.js`): istruzioni pubbliche con versione, fascicolo senza nomi, risposta in schema fisso, sentenza firmata; `nuova-frase`, `chiavi`, `prova`; test con un modello finto | C |
 | 22 | App del correntista dal mockup (`app/`): dodici parole con controllo, PIN (le parole cifrate nel telefono con WebCrypto), conto con saldo e movimenti, ricevi con QR, inquadra, bonifico, compra, converti, multe con pagamento e contestazione, rubrica, sicurezza. Il nucleo gira nel browser; il server la serve con le librerie; l'Action la copia sul sito in sola lettura | D |
 | 23 | Pannelli azienda e polizia dal mockup (`pannelli/`): frase del ruolo con PIN, conto e fine mese (stipendi uguali, premi in bozza, trattenute dei definitivi), compra manti, catalogo e tariffario modificabili e firmati, dipendenti (anagrafica nel browser, esportabile alla polizia), nomina della polizia; nuovo verbale, verbali, contestazioni con replica, conto polizia. Chiavi dei ruoli da `nucleo/ruoli.js`. Pannello banca dal mockup nello stesso posto: genesi su registro vuoto, giorno, riserva con i numeri, vendite (a un'azienda o a coordinate), conversioni con i dati aperti dalla chiave di vista ed esecuzione solo per chi è identificato, interessi ed estratto con l'hash del documento calcolato dal file, tetto, identificazioni (nel browser), aziende e giudice | D |

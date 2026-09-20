@@ -12,6 +12,7 @@
     "pubblica": "node motore/pubblica.js ledger.jsonl sito"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.127.0",
     "@noble/ciphers": "^2.4.0",
     "@noble/curves": "^2.4.0",
     "@noble/hashes": "^2.4.0",
