@@ -170,17 +170,12 @@ function pannelloAzienda() {
       </div>
     </div>
 
-    <div class="sezione" id="az-chiavi">
-      <div class="testa"><h2>Chiavi</h2></div>
-      <div class="card pad form" style="max-width:640px">
-        <div><b>Chiave pubblica dell'azienda</b><br><span class="mono" style="word-break:break-all">${esc(identita.chiave.pubblica)}</span></div>
-        <div><b>Coordinate dell'azienda</b> (il conto: qui arrivano i manti comprati)<br><span class="mono" style="word-break:break-all">${esc(coordinateLeggibili(identita.portafoglio.coordinate))}</span></div>
-        <p class="piccolo muto">La banca registra l'azienda con chiave, coordinate e nome: <code>node banca/cli.js azienda &lt;chiave&gt; &lt;coordinate&gt; "Nome"</code>.</p>
-      </div>
-    </div>
+    ${sezioneChiavi("Chiave pubblica dell'azienda", "Coordinate dell'azienda (il conto: qui arrivano i manti comprati)")}
+    <p class="piccolo muto" style="margin-top:8px">La banca registra l'azienda con chiave, coordinate e nome, dal suo pannello (Aziende e giudice).</p>
     <div class="firma"><span>Pannello dell'azienda · ogni azione qui è una transazione firmata con la chiave azienda e finisce nel registro pubblico, senza nomi.</span></div>
   </main></div>`);
 
+  legaParole();
   // stipendio e compra: calcoli
   $('#stip').onchange = () => { try { bozze.scrivi('stipendio', centesimi($('#stip').value)); pannelloAzienda(); } catch (e) { errore('#err-mese', e); } };
   const compra = () => { try { const e = centesimi($('#r-eur').value); const m = mantiPerEuro(BigInt(e), prezzoAcquisto(s)); $('#r-manti').textContent = manti(m) + ' manti'; $('#r-dopo').textContent = manti(BigInt(saldo) + m) + ' manti'; } catch { $('#r-manti').textContent = '—'; } };
@@ -338,17 +333,12 @@ function pannelloPolizia() {
       </div>
     </div>
 
-    <div class="sezione" id="po-chiavi"><div class="testa"><h2>Chiavi</h2></div>
-      <div class="card pad form" style="max-width:640px">
-        <div><b>Chiave pubblica della polizia</b><br><span class="mono" style="word-break:break-all">${esc(identita.chiave.pubblica)}</span></div>
-        <div><b>Coordinate della polizia</b> (il conto)<br><span class="mono" style="word-break:break-all">${esc(coordinateLeggibili(identita.portafoglio.coordinate))}</span></div>
-        <p class="piccolo muto">L'azienda le mette nella nomina (pannello azienda → Polizia).</p>
-        <div class="campo"><label>Elenco dei dipendenti, esportato dal pannello azienda</label><textarea id="importa" placeholder='[{"nome":…}]'></textarea></div><button class="btn" id="importa-btn">Importa</button><div class="errore" id="err-imp"></div>
-      </div>
-    </div>
+    ${sezioneChiavi('Chiave pubblica della polizia', 'Coordinate della polizia (il conto)')}
+    <div class="card pad form" style="max-width:640px;margin-top:12px"><p class="piccolo muto">L'azienda le mette nella nomina (pannello azienda → Polizia).</p><div class="campo"><label>Elenco dei dipendenti, esportato dal pannello azienda</label><textarea id="importa" placeholder='[{"nome":…}]'></textarea></div><button class="btn" id="importa-btn">Importa</button><div class="errore" id="err-imp"></div></div>
     <div class="firma"><span>Pannello della polizia · verbali e repliche sono firmati con la chiave polizia. Il conto è un conto normale.</span></div>
   </main></div>`);
 
+  legaParole();
   const importo = () => { const x = az?.tariffario?.[$('#v-voce').value]; $('#v-imp').textContent = x ? manti(x.amount) + ' manti' : '—'; };
   $('#v-voce').onchange = importo; importo();
   $('#v-emetti').onclick = async () => {
@@ -378,6 +368,25 @@ function pannelloPolizia() {
     } catch (e) { errore(`#err-rep-${numero}`, e); }
   };
   $('#importa-btn').onclick = () => { try { const l = JSON.parse($('#importa').value); if (!Array.isArray(l)) throw new Error('x'); anagrafica.salva(l); pannelloPolizia(); } catch { errore('#err-imp', 'Incolla l\'elenco esportato dal pannello azienda.'); } };
+}
+
+/** Chiavi del ruolo e le parole, mostrate solo con il PIN. Vale per tutti i ruoli. */
+function sezioneChiavi(titoloChiave, titoloCoord) {
+  return `<div class="sezione" id="${ruolo === 'banca' ? 'ba' : ruolo === 'azienda' ? 'az' : 'po'}-chiavi"><div class="testa"><h2>Chiavi e parole</h2></div>
+    <div class="card pad form" style="max-width:640px">
+      <div><b>${titoloChiave}</b><br><span class="mono" style="word-break:break-all">${esc(identita.chiave.pubblica)}</span></div>
+      <div><b>${titoloCoord}</b><br><span class="mono" style="word-break:break-all">${esc(coordinateLeggibili(identita.portafoglio.coordinate))}</span></div>
+      <div><b>Le dodici parole</b><p class="piccolo muto">Sono in questo browser, cifrate con il PIN. Il foglio resta l'unica copia che sopravvive al browser.</p><button class="btn" id="mostra-parole">Mostra con il PIN</button><div id="parole-qui"></div></div>
+    </div></div>`;
+}
+function legaParole() {
+  const b = $('#mostra-parole');
+  if (!b) return;
+  b.onclick = async () => {
+    const p = prompt('PIN'); if (p === null) return;
+    const f = await cassaforte.apri(ruolo, p);
+    $('#parole-qui').innerHTML = f ? `<div class="parole" style="margin-top:8px">${f.split(' ').map((x) => `<span>${esc(x)}</span>`).join('')}</div>` : '<div class="errore">PIN sbagliato.</div>';
+  };
 }
 
 // ── banca ──
@@ -412,7 +421,7 @@ function pannelloBanca() {
   const aziende = Object.entries(s.aziende ?? {});
   const pct = tetto > 0n ? Number((riserva * 100n) / tetto) : 0;
 
-  mostra(`<div class="pann">${menu(['Ogni giorno', { id: 'ba-riserva', nome: 'Riserva' }, { id: 'ba-vendite', nome: 'Vendite' }, { id: 'ba-conv', nome: 'Conversioni', pill: inAttesa.length || null }, 'Ogni mese', { id: 'ba-interessi', nome: 'Interessi ed estratto' }, 'Raramente', { id: 'ba-tetto', nome: 'Tetto' }, { id: 'ba-ident', nome: 'Identificazioni' }, { id: 'ba-aziende', nome: 'Aziende e giudice' }])}
+  mostra(`<div class="pann">${menu(['Ogni giorno', { id: 'ba-riserva', nome: 'Riserva' }, { id: 'ba-vendite', nome: 'Vendite' }, { id: 'ba-conv', nome: 'Conversioni', pill: inAttesa.length || null }, 'Ogni mese', { id: 'ba-interessi', nome: 'Interessi ed estratto' }, 'Raramente', { id: 'ba-tetto', nome: 'Tetto' }, { id: 'ba-ident', nome: 'Identificazioni' }, { id: 'ba-aziende', nome: 'Aziende e giudice' }, { id: 'ba-chiavi', nome: 'Chiavi e parole' }])}
   <main>
     ${sonoLaBanca ? '' : '<div class="nota bad" style="margin-bottom:16px"><b>Queste parole non sono quelle della banca di questo registro.</b> Le righe verrebbero rifiutate.</div>'}
     <div id="ba-riserva">
@@ -516,9 +525,11 @@ function pannelloBanca() {
       </div>
       <p class="piccolo muto" style="margin-top:8px">Ogni azienda ha il proprio conto, catalogo, tariffario e polizia. Riserva e valore del manto sono unici per tutte.</p>
     </div>
+    ${sezioneChiavi('Chiave pubblica della banca', 'Coordinate della banca (qui arrivano i dati cifrati delle conversioni)')}
     <div class="firma"><span>Pannello della banca · vendite, conversioni, interessi, estratti e tetto sono righe firmate con la chiave banca. Non esiste un pulsante per prelevare dalla riserva.</span></div>
   </main></div>`);
 
+  legaParole();
   const firmaBanca = (type, body, err) => async () => { try { await invia(conto, () => ({ type, body: typeof body === 'function' ? body() : body, firmatari: [identita.firmatario] })); pannelloBanca(); } catch (e) { errore(err, e); } };
   $('#apri-giorno').onclick = firmaBanca('day', { data: oggi }, '#err-giorno');
   // vendite
