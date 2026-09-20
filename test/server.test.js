@@ -129,3 +129,29 @@ test('banca e correntista via server: MANTI_SERVER al posto del file, stesse fun
     await s.chiudi();
   }
 });
+
+test('server in HTTPS con un certificato autofirmato, e il certificato di casa su porta + 1', async () => {
+  const { mkdtempSync, writeFileSync } = await import('node:fs');
+  const { execFileSync } = await import('node:child_process');
+  const d = mkdtempSync(join(tmpdir(), 'manti-tls-'));
+  try {
+    execFileSync('openssl', ['req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-keyout', join(d, 'k.pem'), '-out', join(d, 'c.pem'), '-days', '1', '-subj', '/CN=localhost'], { stdio: 'ignore' });
+  } catch {
+    return; // senza openssl il test non ha senso
+  }
+  writeFileSync(join(d, 'ca.pem'), 'finto');
+  const s = avvia({ percorso: join(d, 'ledger.jsonl'), porta: 0, tls: { cert: join(d, 'c.pem'), chiave: join(d, 'k.pem') }, ca: join(d, 'ca.pem') });
+  try {
+    const { Agent } = await import('node:https');
+    const https = await import('node:https');
+    const stato = await new Promise((ok, no) => https.get({ host: 'localhost', port: s.porta(), path: '/stato', agent: new Agent({ rejectUnauthorized: false }) }, (r) => { let b = ''; r.on('data', (c) => { b += c; }); r.on('end', () => ok({ status: r.statusCode, body: b })); }).on('error', no));
+    assert.equal(stato.status, 200);
+    assert.equal(JSON.parse(stato.body).ultima_riga, null);
+    const ca = await fetch(`http://localhost:${s.portaCa()}/ca.pem`);
+    assert.equal(ca.status, 200);
+    assert.equal(await ca.text(), 'finto');
+    assert.match(await (await fetch(`http://localhost:${s.portaCa()}/`)).text(), /Certificato di casa/);
+  } finally {
+    await s.chiudi();
+  }
+});

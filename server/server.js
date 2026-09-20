@@ -16,9 +16,16 @@
 //
 // Le scritture sono in fila, una alla volta. Con MANTI_PUSH=1 dopo ogni
 // riga accodata fa git add/commit/push del registro, così il sito si
-// rifà da solo. Solo `node:http`, niente dipendenze.
+// rifà da solo. Solo `node:http` e `node:https`, niente dipendenze.
+//
+// HTTPS: con MANTI_CERT e MANTI_CHIAVE (PEM) il server ascolta in TLS.
+// Serve al telefono: fotocamera e appunti nel browser esistono solo su
+// HTTPS. In casa i certificati li fa mkcert; con MANTI_CA (il rootCA.pem
+// di mkcert) il server lo offre anche in chiaro su /ca.pem, porta + 1,
+// così il telefono lo scarica e lo installa una volta.
 
 import { createServer } from 'node:http';
+import { createServer as createServerTls } from 'node:https';
 import { spawn } from 'node:child_process';
 import { readFileSync, existsSync, statSync } from 'node:fs';
 import { join, dirname, extname, normalize } from 'node:path';
@@ -50,9 +57,9 @@ function servi(res, urlPath) {
 
 /**
  * Avvia il server. Restituisce { server, chiudi }.
- * @param {{ percorso: string, porta?: number, push?: boolean, cartellaGit?: string }} opz
+ * @param {{ percorso: string, porta?: number, push?: boolean, cartellaGit?: string, tls?: { cert: string, chiave: string }, ca?: string }} opz
  */
-export function avvia({ percorso, porta = 8787, push = false, cartellaGit = process.cwd() }) {
+export function avvia({ percorso, porta = 8787, push = false, cartellaGit = process.cwd(), tls = null, ca = null }) {
   const registro = apriRegistro(percorso, { tipi });
   let coda = Promise.resolve();
   const log = (m) => process.stdout.write(`${new Date().toISOString()} ${m}\n`);
@@ -72,7 +79,7 @@ export function avvia({ percorso, porta = 8787, push = false, cartellaGit = proc
     }));
   };
 
-  const server = createServer((req, res) => {
+  const gestisci = (req, res) => {
     const url = new URL(req.url ?? '/', 'http://x');
     if (req.method === 'OPTIONS') {
       res.writeHead(204, { 'access-control-allow-origin': '*', 'access-control-allow-methods': 'GET, POST', 'access-control-allow-headers': 'content-type' });
@@ -115,15 +122,37 @@ export function avvia({ percorso, porta = 8787, push = false, cartellaGit = proc
       return;
     }
     invia(res, 404, { errore: 'non trovato' });
-  });
+  };
 
+  const server = tls
+    ? createServerTls({ cert: readFileSync(tls.cert), key: readFileSync(tls.chiave) }, gestisci)
+    : createServer(gestisci);
   server.listen(porta);
-  return { server, registro, chiudi: () => new Promise((r) => server.close(() => r())), porta: () => /** @type {any} */ (server.address())?.port };
+  // il certificato dell'autorità, in chiaro, per installarlo sul telefono
+  let serverCa = null;
+  if (ca) {
+    serverCa = createServer((req, res) => {
+      if (req.url === '/ca.pem') {
+        res.writeHead(200, { 'content-type': 'application/x-pem-file', 'content-disposition': 'attachment; filename="manti-ca.pem"' });
+        return res.end(readFileSync(ca));
+      }
+      res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+      res.end('<!doctype html><meta name="viewport" content="width=device-width"><body style="font-family:system-ui;padding:24px"><h2>Certificato di casa</h2><p>Scarica e installa <a href="/ca.pem">manti-ca.pem</a>, poi su iPhone: Impostazioni → Generali → VPN e gestione dispositivo → installa il profilo; poi Impostazioni → Generali → Info → Impostazioni certificati → attiva la fiducia. Dopo apri <b>https://</b> con la porta del server.</p>');
+    });
+    serverCa.listen(porta === 0 ? 0 : porta + 1);
+  }
+  return {
+    server, registro,
+    chiudi: () => Promise.all([new Promise((r) => server.close(() => r())), serverCa ? new Promise((r) => serverCa.close(() => r())) : null]),
+    porta: () => /** @type {any} */ (server.address())?.port,
+    portaCa: () => /** @type {any} */ (serverCa?.address())?.port ?? null,
+  };
 }
 
 if (process.argv[1] && import.meta.url === new URL(process.argv[1], 'file:').href) {
   const percorso = process.env.MANTI_LEDGER ?? 'ledger.jsonl';
   const porta = Number(process.env.MANTI_PORTA ?? 8787);
-  const s = avvia({ percorso, porta, push: process.env.MANTI_PUSH === '1' });
-  console.log(`server della banca su http://localhost:${porta}, registro ${percorso}, ${s.registro.righe.length} righe${process.env.MANTI_PUSH === '1' ? ', push dopo ogni riga' : ''}`);
+  const tls = process.env.MANTI_CERT && process.env.MANTI_CHIAVE ? { cert: process.env.MANTI_CERT, chiave: process.env.MANTI_CHIAVE } : null;
+  const s = avvia({ percorso, porta, push: process.env.MANTI_PUSH === '1', tls, ca: process.env.MANTI_CA ?? null });
+  console.log(`server della banca su ${tls ? 'https' : 'http'}://localhost:${porta}, registro ${percorso}, ${s.registro.righe.length} righe${process.env.MANTI_PUSH === '1' ? ', push dopo ogni riga' : ''}${process.env.MANTI_CA ? `; certificato di casa su http://localhost:${porta + 1}/ca.pem` : ''}`);
 }
