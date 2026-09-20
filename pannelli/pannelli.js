@@ -14,12 +14,14 @@ import { identitaRuolo } from '../nucleo/ruoli.js';
 import { creaIndirizzo, chiaveCausale, decodificaCoordinate, riconosci, coordinateLeggibili } from '../nucleo/portafoglio.js';
 import { cifraCausale, decifraCausale } from '../nucleo/causale.js';
 import { costruisciPagamento } from '../nucleo/pagamento.js';
-import { prezzoAcquisto, mantiPerEuro, spazioSottoTetto, divisioneMulta } from '../nucleo/banca.js';
+import { prezzoAcquisto, prezzoConversione, mantiPerEuro, euroPerManti, spazioSottoTetto, valore } from '../nucleo/banca.js';
 import { definitivoNonSaldato } from '../nucleo/multe.js';
+import { apriDatiConversione } from '../nucleo/conversione.js';
+import { sha256 } from '../nucleo/canonico.js';
 import { $, esc, manti, euro, prezzo, giornoBreve, centesimi, cassaforte, anagrafica, bozze, invia, apriConto, menu, SIMBOLO } from './comune.js';
 
 const vista = $('#vista');
-let ruolo = null;       // 'azienda' | 'polizia'
+let ruolo = null;       // 'azienda' | 'polizia' | 'banca'
 let identita = null;    // { chiave, portafoglio, firmatario }
 let conto = null;       // il conto del ruolo sul server
 const mostra = (html) => { vista.innerHTML = html; window.scrollTo(0, 0); };
@@ -31,15 +33,16 @@ const stato = () => /** @type {any} */ (conto.registro.stato);
 function scegliRuolo() {
   $('#chi').textContent = 'pannelli';
   mostra(`<h1>Pannelli</h1><p class="muto" style="margin-top:6px;max-width:62ch">L'azienda paga stipendi e premi, scrive catalogo e tariffario, registra i dipendenti, nomina la polizia. La polizia emette verbali e replica alle contestazioni. Ogni azione è una riga firmata nel registro pubblico, senza nomi.</p>
-    <div class="griglia g2" style="margin-top:20px">
+    <div class="griglia g3" style="margin-top:20px">
       <div class="card pad form"><h2>Azienda</h2><p class="piccolo muto">${cassaforte.esiste('azienda') ? 'Le parole dell\'azienda sono in questo browser.' : 'Nessuna azienda in questo browser.'}</p><button class="btn primario largo" data-ruolo="azienda">Entra come azienda</button></div>
       <div class="card pad form"><h2>Polizia</h2><p class="piccolo muto">${cassaforte.esiste('polizia') ? 'Le parole della polizia sono in questo browser.' : 'Nessuna polizia in questo browser.'}</p><button class="btn primario largo" data-ruolo="polizia">Entra come polizia</button></div>
+      <div class="card pad form"><h2>Banca</h2><p class="piccolo muto">${cassaforte.esiste('banca') ? 'Le parole della banca sono in questo browser.' : 'Solo sul dispositivo dedicato della banca.'}</p><button class="btn largo" data-ruolo="banca">Entra come banca</button></div>
     </div>`);
   for (const b of document.querySelectorAll('[data-ruolo]')) b.onclick = () => { ruolo = b.dataset.ruolo; cassaforte.esiste(ruolo) ? pin() : parole(); };
 }
 
 function parole() {
-  mostra(`<h1>${ruolo === 'azienda' ? 'Azienda' : 'Polizia'}: le dodici parole</h1>
+  mostra(`<h1>${{ azienda: 'Azienda', polizia: 'Polizia', banca: 'Banca' }[ruolo]}: le dodici parole</h1>
     <div class="griglia g2" style="margin-top:16px">
       <div class="card pad form"><h2>Nuove</h2><p class="piccolo muto">Le parole sono la chiave del ruolo: chi le ha firma al posto tuo. Scrivile su carta.</p><button class="btn primario largo" id="nuove">Genera</button><div id="nuove-qui"></div></div>
       <div class="card pad form"><h2>Le ho già</h2><div class="campo"><textarea id="frase" autocapitalize="none" spellcheck="false" placeholder="dodici parole separate da spazi"></textarea></div><div class="errore" id="err"></div><button class="btn largo" id="usa">Avanti</button></div>
@@ -65,13 +68,14 @@ function pin(fraseNuova = null) {
     conto = apriConto(identita.portafoglio);
     mostra('<div class="muto" style="padding:40px;text-align:center">Leggo il registro…</div>');
     try { await conto.aggiorna(); } catch (e) { mostra(`<div class="nota bad">${esc(e.message)}</div>`); return; }
-    (ruolo === 'azienda' ? pannelloAzienda : pannelloPolizia)();
-    setInterval(async () => { try { if (await conto.aggiorna()) (ruolo === 'azienda' ? pannelloAzienda : pannelloPolizia)(); } catch {} }, 30000);
+    pannello();
+    setInterval(async () => { try { if (await conto.aggiorna()) pannello(); } catch {} }, 30000);
   };
   $('#apri').onclick = vai;
   $('#pin').onkeydown = (e) => { if (e.key === 'Enter') vai(); };
   if ($('#altre')) $('#altre').onclick = () => { if (confirm('Cancella le parole di questo ruolo da questo browser?')) { cassaforte.cancella(ruolo); parole(); } };
 }
+const pannello = () => ({ azienda: pannelloAzienda, polizia: pannelloPolizia, banca: pannelloBanca })[ruolo]();
 $('#esci').onclick = () => location.reload();
 
 // ── azienda ──
@@ -374,6 +378,195 @@ function pannelloPolizia() {
     } catch (e) { errore(`#err-rep-${numero}`, e); }
   };
   $('#importa-btn').onclick = () => { try { const l = JSON.parse($('#importa').value); if (!Array.isArray(l)) throw new Error('x'); anagrafica.salva(l); pannelloPolizia(); } catch { errore('#err-imp', 'Incolla l\'elenco esportato dal pannello azienda.'); } };
+}
+
+// ── banca ──
+
+const identificati = {
+  tutti() { return JSON.parse(localStorage.getItem('manti.identificati') ?? '[]'); },
+  salva(l) { localStorage.setItem('manti.identificati', JSON.stringify(l)); },
+};
+/** Le vendite fatte da questo pannello: a chi, per ricordarlo (nel registro c'è solo l'indirizzo). */
+const vendite = { tutte() { return bozze.leggi('vendite', {}); }, nota(hash, chi) { const v = this.tutte(); v[hash] = chi; bozze.scrivi('vendite', v); } };
+
+function pannelloBanca() {
+  const s = stato();
+  const sonoLaBanca = !s.genesi || s.genesi.banca.chiave === identita.chiave.pubblica;
+  if (!s.genesi) {
+    $('#chi').textContent = 'banca · registro vuoto';
+    mostra(`<div class="card pad form" style="max-width:560px;margin:30px auto"><h2>Registro vuoto: la genesi</h2><p class="piccolo muto">La riga 0: la chiave e le coordinate di questa banca, e i parametri delle regole (sovrapprezzo 5%, commissione 2%, multe bruciate 50%, 15 giorni). Una volta sola.</p><div class="campo"><label>Tetto della riserva, in euro</label><input id="ge-tetto" value="4000,00"></div><div class="errore" id="err-ge"></div><button class="btn primario largo" id="ge-firma">Firma la genesi</button></div>`);
+    $('#ge-firma').onclick = async () => { try { await invia(conto, () => ({ type: 'genesis', body: { banca: { chiave: identita.chiave.pubblica, coordinate: identita.portafoglio.coordinate }, parametri: { sovrapprezzo_pct: 5, commissione_pct: 2, multe_bruciate_pct: 50, tetto_cent: centesimi($('#ge-tetto').value), giorni_multa: 15 } }, firmatari: [identita.firmatario] })); pannelloBanca(); } catch (e) { errore('#err-ge', e); } };
+    return;
+  }
+  $('#chi').textContent = sonoLaBanca ? 'banca' : 'chiave non della banca';
+  const v = valore(s);
+  const riserva = s.riserva_cent ?? 0n; const tetto = s.tetto_cent ?? 0n;
+  const oggi = new Date().toISOString().slice(0, 10);
+  const giornoAperto = s.giorno === oggi;
+  const conversioni = Object.entries(s.conversioni ?? {}).map(([hash, c]) => ({ hash, ...c, riga: conto.registro.righe.find((r) => r.hash === hash) })).sort((a, b) => b.seq - a.seq);
+  const inAttesa = conversioni.filter((c) => c.stato === 'richiesta');
+  const dati = (c) => (c.riga ? apriDatiConversione(c.riga.body.dati, identita.portafoglio) : null);
+  const eIdentificato = (testo) => identificati.tutti().some((i) => testo && testo.includes(i.nome));
+  const righeVendite = conto.registro.righe.filter((r) => r.type === 'sale').reverse();
+  const interessi = conto.registro.righe.filter((r) => r.type === 'reserve.interest');
+  const aziende = Object.entries(s.aziende ?? {});
+  const pct = tetto > 0n ? Number((riserva * 100n) / tetto) : 0;
+
+  mostra(`<div class="pann">${menu(['Ogni giorno', { id: 'ba-riserva', nome: 'Riserva' }, { id: 'ba-vendite', nome: 'Vendite' }, { id: 'ba-conv', nome: 'Conversioni', pill: inAttesa.length || null }, 'Ogni mese', { id: 'ba-interessi', nome: 'Interessi ed estratto' }, 'Raramente', { id: 'ba-tetto', nome: 'Tetto' }, { id: 'ba-ident', nome: 'Identificazioni' }, { id: 'ba-aziende', nome: 'Aziende e giudice' }])}
+  <main>
+    ${sonoLaBanca ? '' : '<div class="nota bad" style="margin-bottom:16px"><b>Queste parole non sono quelle della banca di questo registro.</b> Le righe verrebbero rifiutate.</div>'}
+    <div id="ba-riserva">
+      <div class="testata">
+        <div class="who"><i style="background:linear-gradient(135deg,#0F0F14,#3B5BFF)"></i><div><div class="piccolo muto">Banca · chiave <span class="mono">${esc(identita.chiave.pubblica.slice(0, 4))}…${esc(identita.chiave.pubblica.slice(-4))}</span> · registro al ${esc(s.giorno ?? '—')}</div><h1 style="font-size:1.6rem">Riserva</h1></div></div>
+        <button class="btn ${giornoAperto ? '' : 'primario'}" id="apri-giorno" ${giornoAperto || !sonoLaBanca ? 'disabled' : ''}>${giornoAperto ? `Giorno ${oggi} aperto` : `Apri il giorno ${oggi}`}</button>
+      </div>
+      <div class="saldo-card" style="margin-top:14px;background:linear-gradient(135deg,#0F0F14 0%,#1B1F3A 50%,#3B5BFF 100%)">
+        <div class="tasso">tetto ${euro(tetto)}</div><div class="l">Euro in riserva, conto dedicato</div>
+        <div class="m">${euro(riserva).replace(' €', '')}<small>€</small></div>
+        <div class="e">copre ${manti(s.circolazione_cent ?? 0n)} manti a ${prezzo(v)} · spazio sotto il tetto ${euro(spazioSottoTetto(s))}</div>
+        <div class="budget-barra" style="background:rgba(255,255,255,.2);margin-top:12px"><i style="width:${Math.min(100, pct)}%;background:#fff"></i></div>
+      </div>
+      <div class="griglia g3" style="margin-top:16px">
+        <div class="card stat"><h3>Valore ufficiale</h3><div class="v">${prezzo(v)}</div><div class="s">${euro(riserva)} ÷ ${manti(s.circolazione_cent ?? 0n)}</div></div>
+        <div class="card stat"><h3>Vendi a</h3><div class="v">${prezzo(prezzoAcquisto(s))}</div><div class="s">+5%, in riserva</div></div>
+        <div class="card stat"><h3>Riconverti a</h3><div class="v">${prezzo(prezzoConversione(s))}</div><div class="s">−2%, resta in riserva</div></div>
+        <div class="card stat"><h3>Entrate totali</h3><div class="v">${euro((s.incassati_cent ?? 0n) + (s.interessi_cent ?? 0n))}</div><div class="s">${euro(s.incassati_cent ?? 0n)} vendite + ${euro(s.interessi_cent ?? 0n)} interessi</div></div>
+        <div class="card stat"><h3>Uscite totali</h3><div class="v">${euro(s.restituiti_cent ?? 0n)}</div><div class="s">${conversioni.filter((c) => c.stato !== 'richiesta').length} conversioni eseguite</div></div>
+        <div class="card stat"><h3>Tuo guadagno</h3><div class="v">0,00<small> €</small></div><div class="s">tutto va in riserva. Un canone alle aziende è fuori dal sistema</div></div>
+      </div>
+      <div class="errore" id="err-giorno"></div>
+    </div>
+
+    <div class="sezione" id="ba-vendite">
+      <div class="testa"><h2>Vendite</h2><span class="piccolo muto">firmi quando gli euro sono arrivati sul conto di riserva</span></div>
+      <div class="griglia g2">
+        <div class="card pad form">
+          <div class="campo"><label>Euro ricevuti</label><input id="ve-eur" placeholder="500,00"></div>
+          <div class="campo"><label>A chi</label><select id="ve-az"><option value="">— coordinate qui sotto —</option>${aziende.map(([k, a]) => `<option value="${esc(a.coordinate)}">${esc(a.nome)}</option>`).join('')}</select><input id="ve-coord" placeholder="coordinate mnt1… del compratore" autocapitalize="none"></div>
+          <div class="campo"><label>Nome, solo per te</label><input id="ve-chi" placeholder="es. Mario Rossi, bonifico del 20/9"></div>
+          <div class="campo"><label>Riferimento del pagamento in euro (pubblico)</label><input id="ve-rif" placeholder="es. bonifico 20/9 CRO 1234"></div>
+          <div class="conto"><div><span>Prezzo di oggi</span><span class="num">${prezzo(prezzoAcquisto(s))}</span></div><div class="tot"><span>Manti da consegnare</span><span class="num" id="ve-manti">—</span></div></div>
+          <div class="errore" id="err-ve"></div>
+          <button class="btn primario" id="ve-firma" ${sonoLaBanca && spazioSottoTetto(s) > 0n ? '' : 'disabled'}>Firma la vendita</button>
+          <p class="piccolo muto">Il prezzo lo calcola il motore al momento della firma. Non puoi vendere se la riserva è al tetto: il pulsante si disattiva da solo. Firmata, è definitiva.</p>
+        </div>
+        <div class="card scroll"><table><thead><tr><th>Quando</th><th>Chi</th><th class="r">Euro</th><th class="r">Prezzo</th><th class="r">Manti</th><th>Rif.</th></tr></thead><tbody>
+          ${righeVendite.length ? righeVendite.map((r) => `<tr><td>${giornoBreve(r.ts.slice(0, 10))}</td><td>${esc(vendite.tutte()[r.hash] ?? 'privato')} <span class="mono">${esc(r.body.out[0].addr.slice(0, 6))}…</span></td><td class="r">${euro(r.body.euro_cent)}</td><td class="r">${prezzo(r.body.prezzo)}</td><td class="r">${manti(r.body.out.reduce((a, u) => a + u.amount, 0))}</td><td class="piccolo muto">${esc(r.body.pagamento)}</td></tr>`).join('') : '<tr><td colspan="6" class="muto">nessuna</td></tr>'}
+        </tbody></table></div>
+      </div>
+    </div>
+
+    <div class="sezione" id="ba-conv">
+      <div class="testa"><h2>Conversioni</h2><span class="piccolo muto">esegui, paga gli euro fuori dal sistema, segna pagata</span></div>
+      <div class="card pad"><div class="scroll"><table><thead><tr><th>Richiesta</th><th>Chi</th><th class="r">Manti</th><th class="r">Prezzo</th><th class="r">Euro</th><th>Stato</th><th></th></tr></thead><tbody>
+        ${conversioni.length ? conversioni.map((c) => { const d = dati(c); const ident = eIdentificato(d); return `<tr><td>riga ${c.seq}</td><td>${d ? esc(d) : '<i class="muto">non leggibili</i>'}${d && !ident ? ' <span class="pill warn">non identificato</span>' : ''}</td><td class="r">${manti(c.amount)}</td><td class="r">${c.stato === 'richiesta' ? prezzo(prezzoConversione(s)) + ' oggi' : prezzo(c.prezzo)}</td><td class="r"><b>${c.stato === 'richiesta' ? (prezzoConversione(s) === null ? '—' : euro(euroPerManti(BigInt(c.amount), prezzoConversione(s)))) : euro(c.euro_cent)}</b></td><td>${c.stato === 'richiesta' ? '<span class="pill warn">da eseguire</span>' : c.stato === 'eseguita' ? '<span class="pill acc">eseguita, da pagare</span>' : `<span class="pill ok">pagata ${esc(c.pagata)}</span>`}</td><td>${c.stato === 'richiesta' ? `<button class="btn mini primario" data-esegui="${c.hash}" ${sonoLaBanca && ident ? '' : 'disabled'} title="${ident ? '' : 'prima identifica il richiedente'}">Esegui</button>` : c.stato === 'eseguita' ? `<button class="btn mini" data-pagata="${c.hash}" ${sonoLaBanca ? '' : 'disabled'}>Segna pagata</button>` : ''}</td></tr>`; }).join('') : '<tr><td colspan="7" class="muto">nessuna</td></tr>'}
+      </tbody></table></div><div class="errore" id="err-conv"></div>
+      <div class="nota piccolo" style="margin-top:14px">Vedi nome e IBAN perché il richiedente li ha cifrati per te. Esegui solo chi hai identificato (sezione Identificazioni) e senza multe definitive non saldate. Nel registro pubblico ci sono solo manti bruciati ed euro dovuti.</div></div>
+    </div>
+
+    <div class="sezione" id="ba-interessi">
+      <div class="testa"><h2>Interessi ed estratto conto</h2></div>
+      <div class="griglia g2">
+        <div class="card pad form">
+          <h3>Interessi del conto di riserva</h3>
+          <div class="campo"><label>Euro accreditati</label><input id="in-eur" placeholder="6,25"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div class="campo"><label>Dal</label><input id="in-da" type="date"></div><div class="campo"><label>Al</label><input id="in-a" type="date"></div></div>
+          <div class="errore" id="err-in"></div>
+          <button class="btn primario" id="in-firma" ${sonoLaBanca ? '' : 'disabled'}>Firma gli interessi</button>
+          <h3 style="margin-top:12px">Estratto conto del mese</h3>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div class="campo"><label>Mese</label><input id="es-mese" type="month" value="${esc((s.giorno ?? oggi).slice(0, 7))}"></div><div class="campo"><label>Saldo dell'estratto</label><input id="es-saldo" placeholder="3454,44"></div></div>
+          <div class="campo"><label>Il documento (PDF o immagine): ne viene calcolato l'hash</label><input id="es-file" type="file"></div>
+          <div class="conto"><div><span>Riserva calcolata dal registro</span><span class="num">${euro(riserva)}</span></div><div class="tot"><span>Differenza</span><span class="num" id="es-diff">—</span></div></div>
+          <div class="campo" id="es-nota-campo" hidden><label>Nota: perché non coincide (pubblica)</label><input id="es-nota"></div>
+          <div class="errore" id="err-es"></div>
+          <button class="btn primario" id="es-firma" ${sonoLaBanca ? '' : 'disabled'}>Firma l'estratto</button>
+          <p class="piccolo muto">L'estratto è l'unica prova che il registro non può dare da solo: è un'affermazione firmata. Il documento va pubblicato dove il sito lo indica, con lo stesso hash.</p>
+        </div>
+        <div class="card pad"><h3>Storico</h3><table style="margin-top:8px"><thead><tr><th>Mese</th><th class="r">Estratto</th><th class="r">Registro</th><th>Esito</th></tr></thead><tbody>
+          ${Object.entries(s.estratti ?? {}).sort().reverse().map(([m, e]) => `<tr><td>${esc(m)}</td><td class="r">${euro(e.saldo_cent)}</td><td class="r">${euro(e.riserva_cent)}</td><td>${e.nota ? `<span class="pill warn" title="${esc(e.nota)}">nota</span>` : '<span class="pill ok">coincide</span>'}</td></tr>`).join('') || '<tr><td colspan="4" class="muto">nessuno</td></tr>'}
+        </tbody></table>
+        <h3 style="margin-top:14px">Interessi</h3><table style="margin-top:8px"><tbody>${interessi.slice().reverse().map((r) => `<tr><td>${esc(r.body.da)} → ${esc(r.body.a)}</td><td class="r">${euro(r.body.euro_cent)}</td><td>${s.correzioni?.[r.hash] ? '<span class="pill bad">corretto</span>' : ''}</td></tr>`).join('') || '<tr><td class="muto">nessuno</td></tr>'}</tbody></table></div>
+      </div>
+    </div>
+
+    <div class="sezione" id="ba-tetto"><div class="testa"><h2>Tetto della riserva</h2></div>
+      <div class="card pad form" style="max-width:520px">
+        <div class="conto"><div><span>Tetto attuale</span><span class="num">${euro(tetto)}</span></div><div><span>Riserva</span><span class="num">${euro(riserva)}</span></div><div class="tot"><span>Spazio per nuove vendite</span><span class="num">${euro(spazioSottoTetto(s))}</span></div></div>
+        <div class="campo"><label>Nuovo tetto</label><input id="te-eur" placeholder="es. 6000,00"></div><div class="errore" id="err-te"></div>
+        <div><button class="btn primario" id="te-firma" ${sonoLaBanca ? '' : 'disabled'}>Firma il nuovo tetto</button></div>
+        <p class="piccolo muto">È una transazione pubblica: tutti vedono quando e a quanto lo hai cambiato. Le nuove vendite partono dal prezzo di acquisto del giorno, mai sotto.</p>
+      </div>
+    </div>
+
+    <div class="sezione" id="ba-ident"><div class="testa"><h2>Identificazioni</h2><span class="piccolo muto">servono solo per convertire · solo in questo browser</span></div>
+      <div class="card scroll"><table><thead><tr><th>Nome</th><th>Come</th><th>Quando</th><th></th></tr></thead><tbody>
+        ${identificati.tutti().length ? identificati.tutti().map((i, k) => `<tr><td>${esc(i.nome)}</td><td class="muto piccolo">${esc(i.come)}</td><td>${esc(i.quando)}</td><td><a class="piccolo" data-togli-id="${k}">togli</a></td></tr>`).join('') : '<tr><td colspan="4" class="muto">nessuno</td></tr>'}
+      </tbody></table></div>
+      <div class="card pad form" style="margin-top:12px;max-width:640px"><b>Identifica una persona</b><div class="campo"><input id="id-nome" placeholder="nome e cognome, come lo scriverà nella richiesta"></div><div class="campo"><input id="id-come" placeholder="come: documento visto di persona, …"></div><button class="btn acc" id="id-agg">Salva</button></div>
+      <p class="piccolo muto" style="margin-top:8px">Chi non si identifica può fare tutto tranne convertire. Una richiesta viene considerata identificata se i dati cifrati contengono il nome così com'è scritto qui. L'anagrafica non è nel registro e non si pubblica.</p>
+    </div>
+
+    <div class="sezione" id="ba-aziende"><div class="testa"><h2>Aziende e giudice</h2></div>
+      <div class="card scroll"><table><thead><tr><th>Nome</th><th>Chiave</th><th class="r">Pagati</th><th>Catalogo</th><th>Polizia</th></tr></thead><tbody>
+        ${aziende.length ? aziende.map(([k, a]) => `<tr><td>${esc(a.nome)}</td><td class="mono">${esc(k.slice(0, 8))}…</td><td class="r">${manti(a.pagati_cent)}</td><td>v${a.catalogo_v} · ${Object.keys(a.catalogo).length} voci</td><td>${a.polizia ? `<span class="mono">${esc(a.polizia.chiave.slice(0, 8))}…</span>` : '<span class="muto">nessuna</span>'}</td></tr>`).join('') : '<tr><td colspan="5" class="muto">nessuna</td></tr>'}
+      </tbody></table></div>
+      <div class="griglia g2" style="margin-top:12px">
+        <div class="card pad form"><b>Registra un'azienda</b><div class="campo"><input id="az-chiave" placeholder="chiave pubblica (dal pannello azienda, Chiavi)" autocapitalize="none"></div><div class="campo"><input id="az-coord" placeholder="coordinate mnt1…" autocapitalize="none"></div><div class="campo"><input id="az-nome" placeholder="nome pubblico"></div><div class="errore" id="err-az"></div><button class="btn acc" id="az-reg" ${sonoLaBanca ? '' : 'disabled'}>Firma la registrazione</button></div>
+        <div class="card pad form"><b>Giudice</b><p class="piccolo muto">${s.giudice ? `In carica: <span class="mono">${esc(s.giudice.chiave.slice(0, 8))}…</span> · istruzioni ${esc(s.giudice.versione)}` : 'Nessun giudice registrato: senza, non si può contestare.'}</p><div class="campo"><input id="gi-chiave" placeholder="chiave pubblica del giudice" autocapitalize="none"></div><div class="campo"><input id="gi-coord" placeholder="coordinate mnt1…" autocapitalize="none"></div><div class="campo"><input id="gi-ver" placeholder="versione delle istruzioni, es. istruzioni-1"></div><div class="errore" id="err-gi"></div><button class="btn acc" id="gi-reg" ${sonoLaBanca ? '' : 'disabled'}>Firma la registrazione</button></div>
+      </div>
+      <p class="piccolo muto" style="margin-top:8px">Ogni azienda ha il proprio conto, catalogo, tariffario e polizia. Riserva e valore del manto sono unici per tutte.</p>
+    </div>
+    <div class="firma"><span>Pannello della banca · vendite, conversioni, interessi, estratti e tetto sono righe firmate con la chiave banca. Non esiste un pulsante per prelevare dalla riserva.</span></div>
+  </main></div>`);
+
+  const firmaBanca = (type, body, err) => async () => { try { await invia(conto, () => ({ type, body: typeof body === 'function' ? body() : body, firmatari: [identita.firmatario] })); pannelloBanca(); } catch (e) { errore(err, e); } };
+  $('#apri-giorno').onclick = firmaBanca('day', { data: oggi }, '#err-giorno');
+  // vendite
+  const calc = () => { try { $('#ve-manti').textContent = manti(mantiPerEuro(BigInt(centesimi($('#ve-eur').value)), prezzoAcquisto(s))) + ' manti'; } catch { $('#ve-manti').textContent = '—'; } };
+  $('#ve-eur').oninput = calc;
+  $('#ve-az').onchange = () => { $('#ve-coord').value = $('#ve-az').value; if ($('#ve-az').value) $('#ve-chi').value = $('#ve-az').selectedOptions[0].textContent; };
+  $('#ve-firma').onclick = async () => {
+    const coord = $('#ve-coord').value.trim().replace(/\s+/g, '').toLowerCase();
+    try { decodificaCoordinate(coord); } catch { errore('#err-ve', 'Coordinate non valide.'); return; }
+    if (!$('#ve-rif').value.trim()) { errore('#err-ve', 'Serve il riferimento del pagamento.'); return; }
+    let e; try { e = centesimi($('#ve-eur').value); } catch (x) { errore('#err-ve', x); return; }
+    if (!confirm(`Firmi la vendita di ${euro(e)} a ${prezzo(prezzoAcquisto(s))}. Gli euro sono arrivati?`)) return;
+    try {
+      const esito = await invia(conto, (reg) => { const p = prezzoAcquisto(reg.stato); const i = creaIndirizzo(coord); return { type: 'sale', body: { euro_cent: e, prezzo: Number(p), pagamento: $('#ve-rif').value.trim(), out: [{ addr: i.addr, eph: i.eph, amount: Number(mantiPerEuro(BigInt(e), p)), tag: 'vendita' }] }, firmatari: [identita.firmatario] }; });
+      if ($('#ve-chi').value.trim()) vendite.nota(esito.hash, $('#ve-chi').value.trim());
+      pannelloBanca();
+    } catch (x) { errore('#err-ve', x); }
+  };
+  // conversioni
+  for (const b of document.querySelectorAll('[data-esegui]')) b.onclick = firmaBanca('conversion.execute', () => { const c = stato().conversioni[b.dataset.esegui]; const p = prezzoConversione(stato()); return { richiesta: b.dataset.esegui, prezzo: Number(p), euro_cent: Number(euroPerManti(BigInt(c.amount), p)) }; }, '#err-conv');
+  for (const b of document.querySelectorAll('[data-pagata]')) b.onclick = firmaBanca('conversion.paid', () => ({ richiesta: b.dataset.pagata, data: new Date().toISOString().slice(0, 10) }), '#err-conv');
+  // interessi ed estratto
+  $('#in-firma').onclick = async () => { try { await invia(conto, () => ({ type: 'reserve.interest', body: { euro_cent: centesimi($('#in-eur').value), da: $('#in-da').value, a: $('#in-a').value }, firmatari: [identita.firmatario] })); pannelloBanca(); } catch (e) { errore('#err-in', e); } };
+  let hashDoc = null;
+  $('#es-file').onchange = async () => { const f = $('#es-file').files[0]; if (!f) return; hashDoc = sha256(new Uint8Array(await f.arrayBuffer())); };
+  $('#es-saldo').oninput = () => { try { const d = BigInt(centesimi($('#es-saldo').value)) - riserva; $('#es-diff').textContent = euro(d < 0n ? -d : d) + (d === 0n ? ' · coincide' : d > 0n ? ' in più sull\'estratto' : ' in meno sull\'estratto'); $('#es-nota-campo').hidden = d === 0n; } catch { $('#es-diff').textContent = '—'; } };
+  $('#es-firma').onclick = async () => {
+    if (!hashDoc) { errore('#err-es', 'Scegli il documento dell\'estratto.'); return; }
+    try { await invia(conto, () => ({ type: 'reserve.statement', body: { mese: $('#es-mese').value, saldo_cent: centesimi($('#es-saldo').value), documento: hashDoc, ...($('#es-nota').value.trim() ? { nota: $('#es-nota').value.trim() } : {}) }, firmatari: [identita.firmatario] })); pannelloBanca(); } catch (e) { errore('#err-es', e); }
+  };
+  // tetto
+  $('#te-firma').onclick = async () => { try { const t = centesimi($('#te-eur').value); if (!confirm(`Nuovo tetto ${euro(t)}: pubblico e definitivo.`)) return; await invia(conto, () => ({ type: 'cap.set', body: { tetto_cent: t }, firmatari: [identita.firmatario] })); pannelloBanca(); } catch (e) { errore('#err-te', e); } };
+  // identificazioni
+  $('#id-agg').onclick = () => { if (!$('#id-nome').value.trim()) return; identificati.salva([...identificati.tutti(), { nome: $('#id-nome').value.trim(), come: $('#id-come').value.trim(), quando: oggi }]); pannelloBanca(); };
+  for (const a of document.querySelectorAll('[data-togli-id]')) a.onclick = () => { const l = identificati.tutti(); l.splice(Number(a.dataset.togliId), 1); identificati.salva(l); pannelloBanca(); };
+  // aziende e giudice
+  $('#az-reg').onclick = async () => {
+    const chiave = $('#az-chiave').value.trim().toLowerCase(); const coord = $('#az-coord').value.trim().replace(/\s+/g, '').toLowerCase();
+    if (!/^[0-9a-f]{64}$/.test(chiave)) { errore('#err-az', 'Chiave: 64 esadecimali.'); return; }
+    try { decodificaCoordinate(coord); } catch { errore('#err-az', 'Coordinate non valide.'); return; }
+    try { await invia(conto, () => ({ type: 'company.register', body: { chiave, coordinate: coord, nome: $('#az-nome').value.trim() }, firmatari: [identita.firmatario] })); pannelloBanca(); } catch (e) { errore('#err-az', e); }
+  };
+  $('#gi-reg').onclick = async () => {
+    const chiave = $('#gi-chiave').value.trim().toLowerCase(); const coord = $('#gi-coord').value.trim().replace(/\s+/g, '').toLowerCase();
+    if (!/^[0-9a-f]{64}$/.test(chiave)) { errore('#err-gi', 'Chiave: 64 esadecimali.'); return; }
+    try { decodificaCoordinate(coord); } catch { errore('#err-gi', 'Coordinate non valide.'); return; }
+    try { await invia(conto, () => ({ type: 'judge.register', body: { chiave, coordinate: coord, versione: $('#gi-ver').value.trim() }, firmatari: [identita.firmatario] })); pannelloBanca(); } catch (e) { errore('#err-gi', e); }
+  };
 }
 
 scegliRuolo();
