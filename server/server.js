@@ -8,7 +8,7 @@
 // mandata la rifirma sulla nuova posizione. Una riga invalida: 400 con
 // il motivo, e non entra.
 //
-//   GET  /app/…  /nucleo/…  /lib/…   l'app del correntista e le librerie (statici)
+//   GET  /app/… /pannelli/… /nucleo/… /lib/…   app, pannelli e librerie (statici)
 //   GET  /stato             lo stato pubblico (come sito/stato.json)
 //   GET  /registro?da=N     le righe da N in poi, JSONL (per le app)
 //   GET  /prossima          { seq, prev, ts } su cui costruire la riga
@@ -39,7 +39,7 @@ const CORPO_MAX = 512 * 1024;
 const RADICE = join(dirname(fileURLToPath(import.meta.url)), '..');
 const TIPI_FILE = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.webmanifest': 'application/manifest+json' };
 /** Le cartelle servite così come sono: l'app, il nucleo, e le librerie da node_modules. */
-const STATICI = { '/app/': join(RADICE, 'app'), '/nucleo/': join(RADICE, 'nucleo'), '/lib/': join(RADICE, 'node_modules') };
+const STATICI = { '/app/': join(RADICE, 'app'), '/pannelli/': join(RADICE, 'pannelli'), '/nucleo/': join(RADICE, 'nucleo'), '/lib/': join(RADICE, 'node_modules') };
 
 function servi(res, urlPath) {
   const prefisso = Object.keys(STATICI).find((p) => urlPath.startsWith(p));

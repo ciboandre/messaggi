@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Manti · pannelli</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="stile.css">
+<script type="importmap">
+{ "imports": {
+  "@noble/curves/": "../lib/@noble/curves/",
+  "@noble/hashes/": "../lib/@noble/hashes/",
+  "@noble/ciphers/": "../lib/@noble/ciphers/",
+  "@scure/base": "../lib/@scure/base/index.js",
+  "@scure/bip39": "../lib/@scure/bip39/index.js",
+  "@scure/bip39/": "../lib/@scure/bip39/",
+  "qrcode-generator": "../lib/qrcode-generator/dist/qrcode.mjs"
+} }
+</script>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="manto" viewBox="0 0 100 100"><path d="M28 80 V24 L50 52 L72 24 V80" stroke-width="11"/><path d="M50 10 V92" stroke-width="7"/></symbol>
+</svg>
+<div class="testata-sito"><div class="in">
+  <div class="nome"><i><svg class="sym sym-tile"><use href="#manto"/></svg></i>Manti <span id="chi">pannelli</span></div>
+  <div class="link"><a href="../app/">app</a><a id="esci" style="cursor:pointer">esci</a></div>
+</div></div>
+<section class="vista" id="vista"><div class="muto" style="padding:40px;text-align:center">Carico…</div></section>
+<script type="module" src="pannelli.js"></script>
+</body>
+</html>

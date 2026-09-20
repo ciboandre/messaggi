@@ -11,18 +11,14 @@
 // ricevere e per leggere i dati cifrati delle conversioni), e si
 // buttano via.
 //
-// Derivazione, dalla frase al seme BIP39 di 64 byte:
-//   chiave di firma  = SHA-512("manti/banca/firma/v1" ‖ seme)[0..32]
-//   portafoglio      = portafoglioDaSeme(seme), come per i correntisti
+// Derivazione: nucleo/ruoli.js, ruolo "banca".
 //
 // Qui non c'è I/O di terminale: cli.js chiede la frase, questo file fa.
 
-import { sha512 } from '@noble/hashes/sha2.js';
-import { concatBytes } from '@noble/curves/utils.js';
 import { existsSync, readFileSync } from 'node:fs';
-import { coppiaDaSeme, firma } from '../nucleo/chiavi.js';
-import { fraseValida, semeDaFrase, generaFrase } from '../nucleo/frase.js';
-import { portafoglioDaSeme, decodificaCoordinate, creaIndirizzo } from '../nucleo/portafoglio.js';
+import { generaFrase } from '../nucleo/frase.js';
+import { decodificaCoordinate, creaIndirizzo } from '../nucleo/portafoglio.js';
+import { identitaRuolo } from '../nucleo/ruoli.js';
 import { preparaRiga, firmaRiga } from '../nucleo/registro.js';
 import { apriRegistro, accodaSuFile } from '../nucleo/registro-file.js';
 import { tipi } from '../nucleo/tipi.js';
@@ -30,7 +26,6 @@ import { valore, prezzoAcquisto, prezzoConversione, mantiPerEuro, euroPerManti, 
 import { apriDatiConversione } from '../nucleo/conversione.js';
 import { registroDalServer, inviaRiga } from '../strumenti/cliente.js';
 
-const codifica = new TextEncoder();
 const RE_HEX64 = /^[0-9a-f]{64}$/;
 
 /** I parametri delle regole (REGOLE_MONETA.md, sezione 2). */
@@ -46,11 +41,7 @@ export const PARAMETRI = { sovrapprezzo_pct: 5, commissione_pct: 2, multe_brucia
  * @param {string} frase
  */
 export function identitaBanca(frase) {
-  if (!fraseValida(frase)) throw new Error('frase non valida');
-  const seme = semeDaFrase(frase);
-  const chiave = coppiaDaSeme(sha512(concatBytes(codifica.encode('manti/banca/firma/v1'), seme)).subarray(0, 32));
-  const portafoglio = portafoglioDaSeme(seme);
-  return { chiave, portafoglio, firmatario: { by: chiave.pubblica, firma: (/** @type {string} */ h) => firma(chiave.privata, h) } };
+  return identitaRuolo(frase, 'banca');
 }
 
 /** Una frase nuova per la banca: si scrive su carta, non su disco. */
