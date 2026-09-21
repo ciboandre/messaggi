@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#1B1F3A">
+<title>Manto</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* La pagina del manto: reclama, ritira, saldo. Nessun server, nessuna chiave:
+   legge dalla rete con l'RPC pubblico, firma con il portafoglio del browser. */
+:root {
+  --ground:#F4F4F7; --surface:#FFFFFF; --surface-2:#F0F0F4; --line:#E9E9EE;
+  --ink:#0F0F14; --ink-2:#6B6B78; --ink-3:#A0A0AC;
+  --accent:#3B5BFF; --accent-soft:#E9EDFF; --grad-a:#1B1F3A; --grad-b:#3B5BFF; --grad-c:#7C4DFF;
+  --ok:#17A05E; --ok-soft:#E3F6EC; --warn:#E08A00; --warn-soft:#FFF2DC; --bad:#E5484D; --bad-soft:#FDE7E8;
+  --cta:#0F0F14; --cta-ink:#FFFFFF;
+  --display:"Manrope","Inter",-apple-system,"Segoe UI",sans-serif; --body:"Inter",-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,monospace; --r:20px; --r-s:14px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --ground:#0B0B0F; --surface:#16161C; --surface-2:#1E1E26; --line:#23232C;
+  --ink:#F3F3F7; --ink-2:#9A9AA8; --ink-3:#62626F; --accent:#6C85FF; --accent-soft:#1C2246;
+  --ok:#34C77B; --ok-soft:#12301F; --warn:#F2A93B; --warn-soft:#362810; --bad:#FF6B6F; --bad-soft:#3A1B1D;
+  --cta:#FFFFFF; --cta-ink:#0F0F14;
+} }
+:root[data-theme="dark"] {
+  --ground:#0B0B0F; --surface:#16161C; --surface-2:#1E1E26; --line:#23232C;
+  --ink:#F3F3F7; --ink-2:#9A9AA8; --ink-3:#62626F; --accent:#6C85FF; --accent-soft:#1C2246;
+  --ok:#34C77B; --ok-soft:#12301F; --warn:#F2A93B; --warn-soft:#362810; --bad:#FF6B6F; --bad-soft:#3A1B1D;
+  --cta:#FFFFFF; --cta-ink:#0F0F14;
+}
+* { box-sizing:border-box }
+body { margin:0; background:var(--ground); color:var(--ink); font-family:var(--body); font-size:16px; line-height:1.5; -webkit-font-smoothing:antialiased }
+.pagina { max-width:520px; margin:0 auto; padding:24px 16px 48px }
+header { display:flex; align-items:center; gap:12px; margin-bottom:20px }
+header svg { width:40px; height:40px; border-radius:12px; background:linear-gradient(135deg,var(--grad-a),var(--grad-b),var(--grad-c)); padding:6px }
+header svg path { stroke:#fff; fill:none; stroke-linecap:round; stroke-linejoin:round }
+h1 { font-family:var(--display); font-size:22px; font-weight:800; margin:0; letter-spacing:-.01em }
+header small { display:block; color:var(--ink-2); font-size:13px }
+.scheda { background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:20px; margin-bottom:14px; box-shadow:0 1px 2px rgba(15,15,20,.04),0 8px 24px rgba(15,15,20,.06) }
+.eti { font-size:12px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-3); margin-bottom:6px }
+.grande { font-family:var(--display); font-size:40px; font-weight:800; letter-spacing:-.02em; line-height:1.1 }
+.grande small { font-size:18px; color:var(--ink-2); font-weight:600; margin-left:4px }
+.riga { display:flex; justify-content:space-between; gap:12px; padding:10px 0; border-top:1px solid var(--line); font-size:15px }
+.riga:first-of-type { border-top:0 }
+.riga span:last-child { font-weight:600; font-variant-numeric:tabular-nums }
+.mono { font-family:var(--mono); font-size:13px; color:var(--ink-2); word-break:break-all }
+button { font:inherit; font-weight:600; border:0; border-radius:var(--r-s); padding:14px 18px; cursor:pointer; width:100%; margin-top:10px; transition:opacity .15s }
+button:disabled { opacity:.45; cursor:default }
+.cta { background:var(--cta); color:var(--cta-ink) }
+.sec { background:var(--accent-soft); color:var(--accent) }
+.nota { font-size:14px; color:var(--ink-2); margin:8px 0 0 }
+.avviso { border-radius:var(--r-s); padding:12px 14px; font-size:14px; margin-top:12px; display:none }
+.avviso.ok { display:block; background:var(--ok-soft); color:var(--ok) }
+.avviso.warn { display:block; background:var(--warn-soft); color:var(--warn) }
+.avviso.bad { display:block; background:var(--bad-soft); color:var(--bad) }
+a { color:var(--accent) }
+footer { font-size:13px; color:var(--ink-3); margin-top:24px }
+</style>
+</head>
+<body>
+<div class="pagina">
+  <header>
+    <svg viewBox="0 0 100 100" aria-hidden="true"><path d="M28 80 V24 L50 52 L72 24 V80" stroke-width="11"/><path d="M50 10 V92" stroke-width="7"/></svg>
+    <div><h1>Manto</h1><small id="rete">Base Sepolia, rete di prova</small></div>
+  </header>
+
+  <div class="scheda">
+    <div class="eti">Oggi, giorno <span id="oggi">…</span></div>
+    <div class="grande">1.000<small>manti</small></div>
+    <div class="riga"><span>Hanno reclamato oggi</span><span id="reclami">…</span></div>
+    <div class="riga"><span>A testa, se resta così</span><span id="aTesta">…</span></div>
+    <div class="riga"><span>Manti esistenti</span><span id="totale">…</span></div>
+  </div>
+
+  <div class="scheda" id="portafoglio">
+    <div class="eti">Il tuo portafoglio</div>
+    <div id="senza">
+      <p class="nota" style="margin-top:0">Serve un portafoglio nel browser (MetaMask, Rabby o Coinbase Wallet). Firma lui: questa pagina non ha chiavi.</p>
+      <button class="cta" id="collega">Collega il portafoglio</button>
+    </div>
+    <div id="con" hidden>
+      <div class="mono" id="indirizzo"></div>
+      <div class="grande" style="margin-top:8px"><span id="saldo">…</span><small>manti</small></div>
+      <div class="riga"><span>In attesa</span><span id="attesa">…</span></div>
+      <div class="riga"><span>Ritirabili</span><span id="ritirabili">…</span></div>
+      <button class="cta" id="reclama">Reclama i manti di oggi</button>
+      <button class="sec" id="ritira">Ritira</button>
+      <p class="nota">Reclami oggi, ritiri da domani: la tua parte è 1.000 diviso quanti hanno reclamato oggi. Il ritiro non scade; il reclamo di domani ritira da sé quello di oggi.</p>
+    </div>
+    <div class="avviso" id="avviso"></div>
+  </div>
+
+  <footer>
+    Contratto <a id="linkContratto" class="mono" target="_blank" rel="noopener"></a><br>
+    Nessun proprietario, nessuna pausa, nessuna regola modificabile. <a href="https://github.com/ciboandre/messaggi/blob/main/REGOLE.md" target="_blank" rel="noopener">Le regole</a>.
+  </footer>
+</div>
+
+<script>
+const RETE = {
+  id: '0x14a34', nome: 'Base Sepolia', rpc: 'https://sepolia.base.org',
+  esploratore: 'https://sepolia.basescan.org', simbolo: 'ETH',
+  contratto: '0x77e091Fd9f727E23A5252F6a7CD64344dAD56A0a',
+};
+const SEL = { reclama:'0xb1c9b14f', ritira:'0xb6017c6a', oggi:'0xf41ca68e', reclami:'0xec495884',
+  balanceOf:'0x70a08231', ritirabili:'0xbfb5db49', giornoInAttesa:'0x74cee241', totalSupply:'0x18160ddd' };
+
+const $ = id => document.getElementById(id);
+const pad = v => BigInt(v).toString(16).padStart(64, '0');
+const manti = c => (Number(c) / 100).toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+let conto = null;
+
+// Letture: RPC pubblico, senza portafoglio.
+async function rpc(method, params) {
+  const r = await fetch(RETE.rpc, { method:'POST', headers:{'content-type':'application/json'},
+    body: JSON.stringify({ jsonrpc:'2.0', id:1, method, params }) });
+  const j = await r.json();
+  if (j.error) throw new Error(j.error.message);
+  return j.result;
+}
+const leggi = (sel, arg = '') => rpc('eth_call', [{ to: RETE.contratto, data: sel + arg }, 'latest']).then(BigInt);
+
+async function aggiornaRete() {
+  const [oggi, totale] = await Promise.all([leggi(SEL.oggi), leggi(SEL.totalSupply)]);
+  const reclami = await leggi(SEL.reclami, pad(oggi));
+  $('oggi').textContent = oggi;
+  $('reclami').textContent = reclami;
+  $('aTesta').textContent = reclami === 0n ? '—' : manti(100000n / reclami);
+  $('totale').textContent = manti(totale);
+  return oggi;
+}
+
+async function aggiornaConto(oggi) {
+  if (!conto) return;
+  const a = pad(conto);
+  const [saldo, rit] = await Promise.all([leggi(SEL.balanceOf, a), leggi(SEL.ritirabili, a)]);
+  const r = await rpc('eth_call', [{ to: RETE.contratto, data: SEL.giornoInAttesa + a }, 'latest']);
+  const presente = BigInt('0x' + r.slice(2, 66)) === 1n, giorno = BigInt('0x' + r.slice(66, 130));
+  $('saldo').textContent = manti(saldo);
+  $('ritirabili').textContent = manti(rit);
+  $('attesa').textContent = !presente ? 'niente' : giorno === oggi ? 'oggi, reclamato' : 'giorno ' + giorno;
+  $('reclama').disabled = presente && giorno === oggi;
+  $('ritira').disabled = rit === 0n;
+}
+
+async function aggiorna() {
+  try { await aggiornaConto(await aggiornaRete()); }
+  catch (e) { avvisa('bad', 'Non riesco a leggere dalla rete: ' + e.message); }
+}
+
+function avvisa(tipo, testo) { const a = $('avviso'); a.className = 'avviso ' + tipo; a.innerHTML = testo; }
+
+// Scritture: il portafoglio del browser.
+async function collega() {
+  const eth = window.ethereum;
+  if (!eth) return avvisa('warn', 'Nessun portafoglio trovato. Installa <a href="https://metamask.io" target="_blank" rel="noopener">MetaMask</a> o <a href="https://rabby.io" target="_blank" rel="noopener">Rabby</a> e ricarica.');
+  try {
+    [conto] = await eth.request({ method: 'eth_requestAccounts' });
+    await sullaRete();
+    $('senza').hidden = true; $('con').hidden = false;
+    $('indirizzo').textContent = conto;
+    avvisa('', '');
+    await aggiorna();
+  } catch (e) { avvisa('bad', e.message); }
+}
+
+async function sullaRete() {
+  const eth = window.ethereum;
+  try { await eth.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: RETE.id }] }); }
+  catch (e) {
+    if (e.code !== 4902) throw e;
+    await eth.request({ method: 'wallet_addEthereumChain', params: [{ chainId: RETE.id, chainName: RETE.nome,
+      rpcUrls: [RETE.rpc], blockExplorerUrls: [RETE.esploratore],
+      nativeCurrency: { name: 'Ether', symbol: RETE.simbolo, decimals: 18 } }] });
+  }
+}
+
+async function manda(sel, cosa) {
+  try {
+    await sullaRete();
+    avvisa('warn', 'Conferma nel portafoglio…');
+    const hash = await window.ethereum.request({ method: 'eth_sendTransaction', params: [{ from: conto, to: RETE.contratto, data: sel }] });
+    avvisa('warn', `${cosa}: inviato, aspetto la rete… <a href="${RETE.esploratore}/tx/${hash}" target="_blank" rel="noopener">transazione</a>`);
+    for (let i = 0; i < 60; i++) {
+      await new Promise(r => setTimeout(r, 2000));
+      const ric = await rpc('eth_getTransactionReceipt', [hash]);
+      if (ric) {
+        avvisa(ric.status === '0x1' ? 'ok' : 'bad', ric.status === '0x1' ? `${cosa}: fatto.` : `${cosa}: la rete ha rifiutato.`);
+        return aggiorna();
+      }
+    }
+    avvisa('warn', 'Ancora in attesa: ricarica tra poco.');
+  } catch (e) { avvisa('bad', e.message.includes('rejected') ? 'Annullato.' : e.message); }
+}
+
+$('collega').onclick = collega;
+$('reclama').onclick = () => manda(SEL.reclama, 'Reclamo');
+$('ritira').onclick = () => manda(SEL.ritira, 'Ritiro');
+$('linkContratto').textContent = RETE.contratto;
+$('linkContratto').href = RETE.esploratore + '/address/' + RETE.contratto;
+if (window.ethereum) {
+  window.ethereum.on?.('accountsChanged', a => { conto = a[0] || null; if (!conto) { $('senza').hidden = false; $('con').hidden = true; } aggiorna(); });
+  window.ethereum.request({ method: 'eth_accounts' }).then(a => { if (a[0]) collega(); }).catch(() => {});
+}
+aggiorna();
+setInterval(aggiorna, 30000);
+</script>
+</body>
+</html>

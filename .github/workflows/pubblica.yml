@@ -20,7 +20,7 @@ on:
     - cron: '0 5 * * *'
   push:
     branches: [main]
-    paths: ['ledger.jsonl', 'motore/**', 'nucleo/**', 'package-lock.json', '.github/workflows/pubblica.yml']
+    paths: ['ledger.jsonl', 'motore/**', 'nucleo/**', 'contratto/pagina/**', 'package-lock.json', '.github/workflows/pubblica.yml']
   workflow_dispatch:
 
 permissions:
@@ -53,7 +53,8 @@ jobs:
           echo "esito=$?" >> "$GITHUB_OUTPUT"
       - name: L'app del correntista accanto al sito
         run: |
-          mkdir -p sito/app sito/pannelli sito/nucleo sito/lib
+          mkdir -p sito/app sito/pannelli sito/nucleo sito/lib sito/manto
+          cp -R contratto/pagina/. sito/manto/
           cp -R app/. sito/app/
           cp -R pannelli/. sito/pannelli/
           cp nucleo/*.js sito/nucleo/
