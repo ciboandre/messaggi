@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#1B1F3A">
+<link rel="icon" href="manto.png">
+<link rel="apple-touch-icon" href="manto.png">
 <title>Manto</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600&display=swap">
 <style>
@@ -87,6 +89,7 @@ footer { font-size:13px; color:var(--ink-3); margin-top:24px }
       <div class="riga"><span>Ritirabili</span><span id="ritirabili">…</span></div>
       <button class="cta" id="reclama">Reclama i manti di oggi</button>
       <button class="sec" id="ritira">Ritira</button>
+      <button class="sec" id="mostra">Mostra il manto nel portafoglio</button>
       <p class="nota">Reclami oggi, ritiri da domani: la tua parte è 1.000 diviso quanti hanno reclamato oggi. Il ritiro non scade; il reclamo di domani ritira da sé quello di oggi.</p>
     </div>
     <div class="avviso" id="avviso"></div>
@@ -222,6 +225,15 @@ async function manda(sel, cosa) {
 $('collega').onclick = collega;
 $('reclama').onclick = () => manda(SEL.reclama, 'Reclamo');
 $('ritira').onclick = () => manda(SEL.ritira, 'Ritiro');
+// Chiede al portafoglio di elencare il manto, con il logo.
+$('mostra').onclick = async () => {
+  try {
+    await sullaRete();
+    await window.ethereum.request({ method: 'wallet_watchAsset', params: { type: 'ERC20', options: {
+      address: RETE.contratto, symbol: 'MANTO', decimals: 2, image: new URL('manto.png', location.href).href } } });
+    avvisa('ok', 'Il manto è nella lista del portafoglio.');
+  } catch (e) { avvisa('bad', e.message.includes('rejected') ? 'Annullato.' : e.message); }
+};
 $('rete').textContent = RETE.etichetta;
 $('linkContratto').textContent = RETE.contratto;
 $('linkContratto').href = RETE.esploratore + '/address/' + RETE.contratto;
