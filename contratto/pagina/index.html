@@ -111,9 +111,9 @@ footer { font-size:13px; color:var(--ink-3); margin-top:24px }
 
 <script>
 const RETI = {
-  base: { id: '0x2105', nome: 'Base', rpc: 'https://mainnet.base.org', esploratore: 'https://basescan.org',
+  base: { id: '0x2105', nome: 'Base', rpc: ['https://mainnet.base.org', 'https://base-rpc.publicnode.com'], esploratore: 'https://basescan.org',
     simbolo: 'ETH', contratto: '0xe76bc5865004BB319bDc22B2CfCaC8d1379ce207', etichetta: 'su Base' },
-  sepolia: { id: '0x14a34', nome: 'Base Sepolia', rpc: 'https://sepolia.base.org', esploratore: 'https://sepolia.basescan.org',
+  sepolia: { id: '0x14a34', nome: 'Base Sepolia', rpc: ['https://sepolia.base.org', 'https://base-sepolia-rpc.publicnode.com'], esploratore: 'https://sepolia.basescan.org',
     simbolo: 'ETH', contratto: '0x77e091Fd9f727E23A5252F6a7CD64344dAD56A0a', etichetta: 'Base Sepolia, rete di prova: questi manti non valgono niente' },
 };
 const RETE = RETI[new URLSearchParams(location.search).get('rete')] || (RETI.base.contratto ? RETI.base : RETI.sepolia);
@@ -125,13 +125,24 @@ const pad = v => BigInt(v).toString(16).padStart(64, '0');
 const manti = c => (Number(c) / 100).toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: 'always' });
 let conto = null;
 
-// Letture: RPC pubblico, senza portafoglio.
+// Letture: RPC pubblici, senza portafoglio. Se uno limita le richieste, si passa al successivo.
+let rpcAttuale = 0;
 async function rpc(method, params) {
-  const r = await fetch(RETE.rpc, { method:'POST', headers:{'content-type':'application/json'},
-    body: JSON.stringify({ jsonrpc:'2.0', id:1, method, params }) });
-  const j = await r.json();
-  if (j.error) throw new Error(j.error.message);
-  return j.result;
+  let ultimo;
+  for (let tentativo = 0; tentativo < RETE.rpc.length * 2; tentativo++) {
+    const url = RETE.rpc[rpcAttuale % RETE.rpc.length];
+    try {
+      const r = await fetch(url, { method:'POST', headers:{'content-type':'application/json'},
+        body: JSON.stringify({ jsonrpc:'2.0', id:1, method, params }) });
+      const j = await r.json();
+      if (j.error) throw new Error(j.error.message);
+      return j.result;
+    } catch (e) {
+      ultimo = e; rpcAttuale++;
+      await new Promise(r => setTimeout(r, 300));
+    }
+  }
+  throw ultimo;
 }
 const leggi = (sel, arg = '') => rpc('eth_call', [{ to: RETE.contratto, data: sel + arg }, 'latest']).then(BigInt);
 
@@ -185,7 +196,7 @@ async function sullaRete() {
   catch (e) {
     if (e.code !== 4902) throw e;
     await eth.request({ method: 'wallet_addEthereumChain', params: [{ chainId: RETE.id, chainName: RETE.nome,
-      rpcUrls: [RETE.rpc], blockExplorerUrls: [RETE.esploratore],
+      rpcUrls: [RETE.rpc[0]], blockExplorerUrls: [RETE.esploratore],
       nativeCurrency: { name: 'Ether', symbol: RETE.simbolo, decimals: 18 } }] });
   }
 }
@@ -220,7 +231,7 @@ if (window.ethereum) {
   window.ethereum.request({ method: 'eth_accounts' }).then(a => { if (a[0]) collega(); }).catch(() => {});
 }
 aggiorna();
-setInterval(aggiorna, 30000);
+setInterval(aggiorna, 60000);
 </script>
 </body>
 </html>
