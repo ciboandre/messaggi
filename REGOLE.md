@@ -1,49 +1,44 @@
 # Regole del manto
 
-Il manto è il credito prepagato di 2m2.it. È una moneta che, una volta creata, non dipende da nessuno: un contratto immutabile su Base (rete di secondo livello di Ethereum), senza proprietario, senza interruttore, senza regole modificabili. Il contratto sa fare solo ciò che è scritto in questo file. La **promessa** che dà valore al manto (un manto vale un euro di merce su 2m2.it) la fa il negozio, fuori dal contratto, e vale finché il negozio la mantiene.
+Il manto è una moneta che, una volta creata, non dipende da nessuno: un contratto immutabile su Base (rete di secondo livello di Ethereum), senza proprietario, senza interruttore, senza regole modificabili, senza nessun indirizzo nominato. Il contratto sa fare solo ciò che è scritto qui. Chi la crea non riceve nulla dal contratto: partecipa come tutti.
 
-## 1. Emissione: 1.000 manti al giorno, per sempre, al negozio
+## 1. Emissione: 1.000 manti al giorno, per sempre
 
-- Il giorno di creazione è il giorno 0. Ogni giorno nascono **1.000 manti**, accreditati all'**indirizzo del negozio**. Chiunque può chiamare il contratto per far accreditare i giorni maturati; i giorni non ancora accreditati si accumulano.
+- Il giorno di creazione è il giorno 0. Ogni giorno, compreso il giorno 0, nascono al massimo **1.000 manti**.
 - La quantità è fissa: non cambia mai, non ha tetto, non si dimezza.
-- Alla creazione il negozio riceve una **scorta iniziale di 100.000 manti**, subito disponibile, per vendite e cashback dal primo giorno.
 - Un manto si divide in 100 centesimi.
 
-Conseguenza: dopo 1 anno esistono 465.000 manti, dopo 10 anni 3.750.000. Tutti nascono nelle mani del negozio; da lì escono solo venduti o regalati.
+Conseguenza: dopo 1 anno esistono al più 365.000 manti, dopo 10 anni 3.650.000. L'inflazione annua è del 100% il primo anno, del 10% il decimo, e continua a scendere.
 
-## 2. L'indirizzo del negozio
+## 2. Destinatari: chi li reclama, in parti uguali
 
-- È l'unico indirizzo che il contratto conosce. Non ha alcun potere sugli altri: non blocca, non confisca, non cambia regole. Riceve i manti nuovi, e basta.
-- L'indirizzo del negozio **può cedere il ruolo a un altro indirizzo**, con una sola operazione firmata da sé stesso. Serve per cambiare chiave se quella in uso è compromessa o persa in modo ordinato. Nessun altro può farlo.
-- Se la chiave del negozio va persa senza cessione, i manti nuovi continuano ad accumularsi su un indirizzo morto. È il rischio da custodire: chiave sul server, cifrata, con copia di riserva su carta.
+- Chiunque, in un dato giorno, chiama il contratto per **reclamare** entra nell'elenco di quel giorno. Il reclamo costa solo la commissione di rete; il contratto non chiede altro.
+- I 1.000 manti del giorno si dividono **in parti uguali** tra gli indirizzi che hanno reclamato. Un indirizzo conta una volta sola al giorno. Il resto della divisione (al più qualche centesimo) non nasce.
+- Il giorno dopo, chi ha reclamato **ritira** la sua parte; il ritiro non scade, e il reclamo del giorno successivo ritira da sé quello precedente.
+- Se nessuno reclama, quel giorno i manti **non nascono**: non si accumulano e non si recuperano.
+- Non c'è mining, non c'è interesse sul saldo, non c'è nessun privilegio.
 
-## 3. Come si ottengono i manti
+## 3. Creatore
 
-- **Acquisto**: su 2m2.it si compra il prodotto "manti". **100 manti costano 90 €** (10% di sconto a chi anticipa). Pagato l'ordine, il negozio invia i manti all'indirizzo Base indicato dal cliente.
-- **Cashback**: ogni ordine pagato in euro su 2m2.it rende al cliente il **3% in manti**, inviati al suo indirizzo se ne ha indicato uno.
-- **Tra persone**: i manti si passano liberamente da un indirizzo all'altro, senza chiedere a nessuno. Il contratto non distingue tra chi li ha comprati e chi li ha ricevuti.
-
-Nessuno reclama manti gratis dal contratto: le regole precedenti col reclamo giornaliero sono sostituite da queste.
-
-## 4. Come si spendono
-
-- **1 manto = 1 € di merce su 2m2.it, IVA inclusa**, senza tetto: un ordine si può pagare interamente in manti, o in parte manti e in parte euro.
-- Al checkout il cliente manda i manti all'indirizzo del negozio con il numero d'ordine; il negozio vede la transazione sulla rete e segna l'ordine pagato.
-- I manti **non scadono**: il contratto non sa cosa sia una scadenza.
-- I manti non si riconvertono in euro dal negozio: si spendono in merce o si passano ad altri.
-- Altri negozi potranno accettare manti alle loro condizioni; è un accordo tra loro e i clienti, il contratto non c'entra.
-
-## 5. Il creatore
-
-Il creatore è il negozio: guadagna dagli euro incassati in anticipo e dai clienti che tornano a spendere manti. Non esiste una quota separata del creatore né una commissione sui trasferimenti: ogni manto che passa di mano arriva intero.
+Nessuna quota, nessuna commissione, nessun indirizzo speciale. Il creatore reclama come chiunque e compra manti da chi li ha, come chiunque. Ogni manto che passa di mano arriva intero.
 
 ## Ciò che il contratto non fa
 
-Non ha proprietario, non ha pausa, non blocca conti, non cambia le regole, non stampa fuori regola, non tassa i trasferimenti. Prezzo di vendita, cashback e valore in merce sono promesse del negozio, non righe del contratto: si possono cambiare per il futuro, mai per i manti già in giro.
+Non ha proprietario, non ha pausa, non blocca conti, non cambia le regole, non stampa fuori regola, non distingue tra indirizzi, non tassa i trasferimenti. Non c'è banca, giudice, polizia, multe, conversione in euro.
+
+## Il manto e 2m2.it
+
+Ciò che dà valore al manto sta fuori dal contratto, ed è una promessa del negozio, valida finché il negozio la mantiene:
+
+- **2m2.it compra manti** da chi li ha, a un prezzo che annuncia. All'inizio il negozio è l'unico compratore, cioè il mercato.
+- **2m2.it accetta manti in pagamento con uno sconto**: chi paga in manti spende meno di chi paga in euro, alle condizioni pubblicate sul sito. Sconto e prezzo di acquisto si possono cambiare per il futuro, mai per gli ordini già fatti.
+- Altri negozi potranno fare lo stesso alle loro condizioni: è un accordo tra loro e i clienti, il contratto non c'entra.
+
+Reclamare ogni giorno è il modo di ricordarsi del negozio ogni giorno: è a questo che servono i social.
 
 ## Limiti da tenere presenti
 
 - **Dipende da Base.** Il sequencer è di Coinbase e il software di Base può essere aggiornato da un gruppo ristretto; non possono toccare i saldi, ma la rete di tutti i giorni dipende da loro. Ogni operazione costa una frazione di centesimo in ETH.
-- **Un errore nel codice resta per sempre.** Contratto minimo, standard ERC-20, provato a lungo su Base Sepolia prima della rete vera.
-- **I manti venduti sono un debito in merce.** Per ogni manto in giro il negozio deve un euro di merce. Non vanno venduti più di quanti se ne possano onorare.
-- **Legale e fiscale.** Buono prepagato spendibile in una rete limitata di negozi: fuori da moneta elettronica e MiCA finché resta tale. La vendita di manti si tratta come un buono (monovalore o multivalore): da confermare con il commercialista prima di vendere.
+- **Un errore nel codice resta per sempre.** Contratto minimo, standard ERC-20, senza librerie esterne, provato a lungo su Base Sepolia prima della rete vera.
+- **Il manto vale quanto il negozio lo paga.** Se il negozio smette di comprarlo e accettarlo, resta un contatore. Chi lo reclama lo sa.
+- **Legale e fiscale.** Il contratto non vende nulla e non promette nulla. L'acquisto di manti da parte del negozio e lo sconto a chi paga in manti sono operazioni ordinarie del negozio: da confermare con il commercialista (come trattare i manti acquistati e lo sconto in fattura).
