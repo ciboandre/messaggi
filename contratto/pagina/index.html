@@ -63,7 +63,7 @@ footer { font-size:13px; color:var(--ink-3); margin-top:24px }
 <div class="pagina">
   <header>
     <svg viewBox="0 0 100 100" aria-hidden="true"><path d="M28 80 V24 L50 52 L72 24 V80" stroke-width="11"/><path d="M50 10 V92" stroke-width="7"/></svg>
-    <div><h1>Manto</h1><small id="rete">Base Sepolia, rete di prova</small></div>
+    <div><h1>Manto</h1><small id="rete"></small></div>
   </header>
 
   <div class="scheda">
@@ -92,24 +92,37 @@ footer { font-size:13px; color:var(--ink-3); margin-top:24px }
     <div class="avviso" id="avviso"></div>
   </div>
 
+  <div class="scheda">
+    <div class="eti">Le regole</div>
+    <div class="riga"><span>Ogni giorno nascono</span><span>1.000 manti</span></div>
+    <div class="riga"><span>Vanno a</span><span>chi li reclama, in parti uguali</span></div>
+    <div class="riga"><span>Se nessuno reclama</span><span>non nascono</span></div>
+    <div class="riga"><span>Il ritiro</span><span>dal giorno dopo, non scade</span></div>
+    <div class="riga"><span>Proprietario</span><span>nessuno</span></div>
+    <div class="riga"><span>Quote, commissioni, pausa</span><span>nessuna</span></div>
+    <p class="nota">Il contratto è immutabile: nessuno può cambiare queste regole, fermarlo o toccare i saldi altrui. Un manto vale quanto qualcuno è disposto a darti per averlo, o ad accettarlo in pagamento.</p>
+  </div>
+
   <footer>
     Contratto <a id="linkContratto" class="mono" target="_blank" rel="noopener"></a><br>
-    Nessun proprietario, nessuna pausa, nessuna regola modificabile. <a href="https://github.com/ciboandre/messaggi/blob/main/REGOLE.md" target="_blank" rel="noopener">Le regole</a>.
+    <a id="linkSorgente" target="_blank" rel="noopener">Sorgente verificato</a>, leggibile da chiunque.
   </footer>
 </div>
 
 <script>
-const RETE = {
-  id: '0x14a34', nome: 'Base Sepolia', rpc: 'https://sepolia.base.org',
-  esploratore: 'https://sepolia.basescan.org', simbolo: 'ETH',
-  contratto: '0x77e091Fd9f727E23A5252F6a7CD64344dAD56A0a',
+const RETI = {
+  base: { id: '0x2105', nome: 'Base', rpc: 'https://mainnet.base.org', esploratore: 'https://basescan.org',
+    simbolo: 'ETH', contratto: '0xe76bc5865004BB319bDc22B2CfCaC8d1379ce207', etichetta: 'su Base' },
+  sepolia: { id: '0x14a34', nome: 'Base Sepolia', rpc: 'https://sepolia.base.org', esploratore: 'https://sepolia.basescan.org',
+    simbolo: 'ETH', contratto: '0x77e091Fd9f727E23A5252F6a7CD64344dAD56A0a', etichetta: 'Base Sepolia, rete di prova: questi manti non valgono niente' },
 };
+const RETE = RETI[new URLSearchParams(location.search).get('rete')] || (RETI.base.contratto ? RETI.base : RETI.sepolia);
 const SEL = { reclama:'0xb1c9b14f', ritira:'0xb6017c6a', oggi:'0xf41ca68e', reclami:'0xec495884',
   balanceOf:'0x70a08231', ritirabili:'0xbfb5db49', giornoInAttesa:'0x74cee241', totalSupply:'0x18160ddd' };
 
 const $ = id => document.getElementById(id);
 const pad = v => BigInt(v).toString(16).padStart(64, '0');
-const manti = c => (Number(c) / 100).toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const manti = c => (Number(c) / 100).toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: 'always' });
 let conto = null;
 
 // Letture: RPC pubblico, senza portafoglio.
@@ -198,8 +211,10 @@ async function manda(sel, cosa) {
 $('collega').onclick = collega;
 $('reclama').onclick = () => manda(SEL.reclama, 'Reclamo');
 $('ritira').onclick = () => manda(SEL.ritira, 'Ritiro');
+$('rete').textContent = RETE.etichetta;
 $('linkContratto').textContent = RETE.contratto;
 $('linkContratto').href = RETE.esploratore + '/address/' + RETE.contratto;
+$('linkSorgente').href = 'https://repo.sourcify.dev/' + parseInt(RETE.id, 16) + '/' + RETE.contratto;
 if (window.ethereum) {
   window.ethereum.on?.('accountsChanged', a => { conto = a[0] || null; if (!conto) { $('senza').hidden = false; $('con').hidden = true; } aggiorna(); });
   window.ethereum.request({ method: 'eth_accounts' }).then(a => { if (a[0]) collega(); }).catch(() => {});
