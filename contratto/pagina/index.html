@@ -50,6 +50,11 @@ header small { display:block; color:var(--ink-2); font-size:13px }
 .mono { font-family:var(--mono); font-size:13px; color:var(--ink-2); word-break:break-all }
 button { font:inherit; font-weight:600; border:0; border-radius:var(--r-s); padding:14px 18px; cursor:pointer; width:100%; margin-top:10px; transition:opacity .15s }
 button:disabled { opacity:.45; cursor:default }
+.campo { display:flex; gap:8px; align-items:center; margin-top:14px }
+.campo input { flex:1; font:inherit; font-size:18px; font-weight:600; padding:12px 14px; border:1px solid var(--line); border-radius:var(--r-s); background:var(--surface-2); color:var(--ink); min-width:0 }
+.campo span { color:var(--ink-2); font-weight:600 }
+.campo + button { margin-top:8px }
+.stima { font-size:13px; color:var(--ink-2); margin:6px 0 0 }
 .cta { background:var(--cta); color:var(--cta-ink) }
 .sec { background:var(--accent-soft); color:var(--accent) }
 .nota { font-size:14px; color:var(--ink-2); margin:8px 0 0 }
@@ -70,10 +75,12 @@ footer { font-size:13px; color:var(--ink-3); margin-top:24px }
 
   <div class="scheda">
     <div class="eti">Oggi, giorno <span id="oggi">…</span></div>
-    <div class="grande">1.000<small>manti</small></div>
-    <div class="riga"><span>Hanno reclamato oggi</span><span id="reclami">…</span></div>
-    <div class="riga"><span>A testa, se resta così</span><span id="aTesta">…</span></div>
-    <div class="riga"><span>Manti esistenti</span><span id="totale">…</span></div>
+    <div class="grande">100<small>manti in asta</small></div>
+    <div class="riga"><span>Versati oggi</span><span id="versatiOggi">…</span></div>
+    <div class="riga"><span>Prezzo di oggi, per manto</span><span id="prezzoOggi">…</span></div>
+    <div class="riga"><span>Manti esistenti</span><span id="esistenti">…</span></div>
+    <div class="riga"><span>Riserva</span><span id="riserva">…</span></div>
+    <div class="riga"><span>Pavimento, per manto</span><span id="pavimento">…</span></div>
   </div>
 
   <div class="scheda" id="portafoglio">
@@ -85,25 +92,34 @@ footer { font-size:13px; color:var(--ink-3); margin-top:24px }
     <div id="con" hidden>
       <div class="mono" id="indirizzo"></div>
       <div class="grande" style="margin-top:8px"><span id="saldo">…</span><small>manti</small></div>
-      <div class="riga"><span>In attesa</span><span id="attesa">…</span></div>
+      <div class="riga"><span>ETH disponibili</span><span id="eth">…</span></div>
+      <div class="riga"><span>Versati oggi da te</span><span id="mioOggi">…</span></div>
       <div class="riga"><span>Ritirabili</span><span id="ritirabili">…</span></div>
-      <button class="cta" id="reclama">Reclama i manti di oggi</button>
-      <button class="sec" id="ritira">Ritira</button>
+
+      <div class="campo"><input id="quantoEth" type="number" min="0" step="0.0001" placeholder="0.001" inputmode="decimal"><span>ETH</span></div>
+      <button class="cta" id="versa">Versa per i manti di oggi</button>
+      <p class="stima" id="stimaVersa">Entri nell'asta di oggi: domani ritiri la tua parte dei 100 manti.</p>
+
+      <button class="sec" id="ritira">Ritira i manti dei giorni conclusi</button>
+
+      <div class="campo"><input id="quantoManti" type="number" min="0" step="0.01" placeholder="10" inputmode="decimal"><span>manti</span></div>
+      <button class="sec" id="brucia">Brucia e ricevi ETH dalla riserva</button>
+      <p class="stima" id="stimaBrucia">Bruciare è per sempre: ricevi subito la tua parte della riserva.</p>
+
       <button class="sec" id="mostra">Mostra il manto nel portafoglio</button>
-      <p class="nota">Reclami oggi, ritiri da domani: la tua parte è 1.000 diviso quanti hanno reclamato oggi. Il ritiro non scade; il reclamo di domani ritira da sé quello di oggi.</p>
     </div>
     <div class="avviso" id="avviso"></div>
   </div>
 
   <div class="scheda">
     <div class="eti">Le regole</div>
-    <div class="riga"><span>Ogni giorno nascono</span><span>1.000 manti</span></div>
-    <div class="riga"><span>Vanno a</span><span>chi li reclama, in parti uguali</span></div>
-    <div class="riga"><span>Se nessuno reclama</span><span>non nascono</span></div>
-    <div class="riga"><span>Il ritiro</span><span>dal giorno dopo, non scade</span></div>
-    <div class="riga"><span>Proprietario</span><span>nessuno</span></div>
-    <div class="riga"><span>Quote, commissioni, pausa</span><span>nessuna</span></div>
-    <p class="nota">Il contratto è immutabile: nessuno può cambiare queste regole, fermarlo o toccare i saldi altrui. Un manto vale quanto qualcuno è disposto a darti per averlo, o ad accettarlo in pagamento.</p>
+    <div class="riga"><span>Ogni giorno nascono</span><span>100 manti</span></div>
+    <div class="riga"><span>Vanno a</span><span>chi versa ETH, in proporzione</span></div>
+    <div class="riga"><span>Gli ETH versati</span><span>restano nel contratto, per sempre</span></div>
+    <div class="riga"><span>Chi brucia manti</span><span>riceve la sua parte della riserva</span></div>
+    <div class="riga"><span>Se nessuno versa</span><span>non nascono</span></div>
+    <div class="riga"><span>Proprietario, quote, commissioni</span><span>nessuno</span></div>
+    <p class="nota">Il contratto è immutabile: nessuno può cambiare queste regole, fermarlo, toccare i saldi altrui o prelevare la riserva. Il pavimento è la media di quanto è stato pagato finora; sopra, un manto vale quanto qualcuno è disposto a darti per averlo o ad accettarlo in pagamento.</p>
   </div>
 
   <footer>
@@ -115,18 +131,23 @@ footer { font-size:13px; color:var(--ink-3); margin-top:24px }
 <script>
 const RETI = {
   base: { id: '0x2105', nome: 'Base', rpc: ['https://mainnet.base.org', 'https://base-rpc.publicnode.com'], esploratore: 'https://basescan.org',
-    simbolo: 'ETH', contratto: '0xe76bc5865004BB319bDc22B2CfCaC8d1379ce207', etichetta: 'su Base' },
+    simbolo: 'ETH', contratto: '', etichetta: 'su Base' },
   sepolia: { id: '0x14a34', nome: 'Base Sepolia', rpc: ['https://sepolia.base.org', 'https://base-sepolia-rpc.publicnode.com'], esploratore: 'https://sepolia.basescan.org',
-    simbolo: 'ETH', contratto: '0x77e091Fd9f727E23A5252F6a7CD64344dAD56A0a', etichetta: 'Base Sepolia, rete di prova: questi manti non valgono niente' },
+    simbolo: 'ETH', contratto: '', etichetta: 'Base Sepolia, rete di prova: questi manti e questi ETH non valgono niente' },
+  locale: { id: '0x7a69', nome: 'Anvil', rpc: ['http://127.0.0.1:8545'], esploratore: '',
+    simbolo: 'ETH', contratto: '0x5FbDB2315678afecb367f032d93F642f64180aa3', etichetta: 'rete locale di prova (anvil)' },
 };
 const RETE = RETI[new URLSearchParams(location.search).get('rete')] || (RETI.base.contratto ? RETI.base : RETI.sepolia);
-const SEL = { reclama:'0xb1c9b14f', ritira:'0xb6017c6a', oggi:'0xf41ca68e', reclami:'0xec495884',
-  balanceOf:'0x70a08231', ritirabili:'0xbfb5db49', giornoInAttesa:'0x74cee241', totalSupply:'0x18160ddd' };
+const SEL = { versa:'0x90f62c54', ritira:'0xb6017c6a', brucia:'0x3f6dc5bb', oggi:'0xf41ca68e', versatoNelGiorno:'0x29c678bf',
+  versato:'0xaf75f88e', ritirabili:'0xbfb5db49', esistenti:'0x949113a3', riserva:'0x6f97a0fa', pavimento:'0x260a7e46',
+  balanceOf:'0x70a08231' };
+const EMISSIONE = 10000n; // 100 manti in centesimi
 
 const $ = id => document.getElementById(id);
 const pad = v => BigInt(v).toString(16).padStart(64, '0');
 const manti = c => (Number(c) / 100).toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: 'always' });
-let conto = null;
+const eth = w => { const v = Number(w) / 1e18; return v === 0 ? '0 ETH' : v.toLocaleString('it-IT', { maximumSignificantDigits: 4 }) + ' ETH'; };
+let conto = null, stato = {};
 
 // Letture: RPC pubblici, senza portafoglio. Se uno limita le richieste, si passa al successivo.
 let rpcAttuale = 0;
@@ -140,51 +161,68 @@ async function rpc(method, params) {
       const j = await r.json();
       if (j.error) throw new Error(j.error.message);
       return j.result;
-    } catch (e) {
-      ultimo = e; rpcAttuale++;
-      await new Promise(r => setTimeout(r, 300));
-    }
+    } catch (e) { ultimo = e; rpcAttuale++; await new Promise(r => setTimeout(r, 300)); }
   }
   throw ultimo;
 }
 const leggi = (sel, arg = '') => rpc('eth_call', [{ to: RETE.contratto, data: sel + arg }, 'latest']).then(BigInt);
 
 async function aggiornaRete() {
-  const [oggi, totale] = await Promise.all([leggi(SEL.oggi), leggi(SEL.totalSupply)]);
-  const reclami = await leggi(SEL.reclami, pad(oggi));
+  const [oggi, esistenti, riserva, pavimento] = await Promise.all([leggi(SEL.oggi), leggi(SEL.esistenti), leggi(SEL.riserva), leggi(SEL.pavimento)]);
+  const versati = await leggi(SEL.versatoNelGiorno, pad(oggi));
+  stato = { oggi, esistenti, riserva, pavimento, versati };
   $('oggi').textContent = oggi;
-  $('reclami').textContent = reclami;
-  $('aTesta').textContent = reclami === 0n ? '—' : manti(100000n / reclami);
-  $('totale').textContent = manti(totale);
-  return oggi;
+  $('versatiOggi').textContent = eth(versati);
+  $('prezzoOggi').textContent = versati === 0n ? '—' : eth(versati / 100n);
+  $('esistenti').textContent = manti(esistenti);
+  $('riserva').textContent = eth(riserva);
+  $('pavimento').textContent = esistenti === 0n ? '—' : eth(pavimento * 100n);
+  stimaVersa(); stimaBrucia();
 }
 
-async function aggiornaConto(oggi) {
+async function aggiornaConto() {
   if (!conto) return;
   const a = pad(conto);
-  const [saldo, rit] = await Promise.all([leggi(SEL.balanceOf, a), leggi(SEL.ritirabili, a)]);
-  const r = await rpc('eth_call', [{ to: RETE.contratto, data: SEL.giornoInAttesa + a }, 'latest']);
-  const presente = BigInt('0x' + r.slice(2, 66)) === 1n, giorno = BigInt('0x' + r.slice(66, 130));
+  const [saldo, rit, mio, wei] = await Promise.all([leggi(SEL.balanceOf, a), leggi(SEL.ritirabili, a),
+    leggi(SEL.versato, pad(stato.oggi) + a), rpc('eth_getBalance', [conto, 'latest']).then(BigInt)]);
   $('saldo').textContent = manti(saldo);
+  $('eth').textContent = eth(wei);
+  $('mioOggi').textContent = eth(mio);
   $('ritirabili').textContent = manti(rit);
-  $('attesa').textContent = !presente ? 'niente' : giorno === oggi ? 'oggi, reclamato' : 'giorno ' + giorno;
-  $('reclama').disabled = presente && giorno === oggi;
   $('ritira').disabled = rit === 0n;
+  $('brucia').disabled = saldo === 0n;
+  stato.saldo = saldo;
 }
 
 async function aggiorna() {
-  try { await aggiornaConto(await aggiornaRete()); }
+  try { await aggiornaRete(); await aggiornaConto(); }
   catch (e) { avvisa('bad', 'Non riesco a leggere dalla rete: ' + e.message); }
 }
+
+function stimaVersa() {
+  const v = Number($('quantoEth').value || 0);
+  if (!v || !stato.versati && stato.versati !== 0n) return $('stimaVersa').textContent = "Entri nell'asta di oggi: domani ritiri la tua parte dei 100 manti.";
+  const wei = BigInt(Math.round(v * 1e18));
+  const parte = EMISSIONE * wei / (stato.versati + wei);
+  $('stimaVersa').textContent = `Se nessun altro versasse più oggi, domani ritireresti ${manti(parte)} manti.`;
+}
+function stimaBrucia() {
+  const v = Number($('quantoManti').value || 0);
+  if (!v || !stato.esistenti) return $('stimaBrucia').textContent = 'Bruciare è per sempre: ricevi subito la tua parte della riserva.';
+  const c = BigInt(Math.round(v * 100));
+  $('stimaBrucia').textContent = `Riceveresti circa ${eth(c * stato.riserva / stato.esistenti)}.`;
+}
+$('quantoEth').oninput = stimaVersa;
+$('quantoManti').oninput = stimaBrucia;
 
 function avvisa(tipo, testo) { const a = $('avviso'); a.className = 'avviso ' + tipo; a.innerHTML = testo; }
 
 // Scritture: il portafoglio del browser.
 async function collega() {
-  const eth = window.ethereum;
-  if (!eth) return avvisa('warn', 'Nessun portafoglio trovato. Installa <a href="https://metamask.io" target="_blank" rel="noopener">MetaMask</a> o <a href="https://rabby.io" target="_blank" rel="noopener">Rabby</a> e ricarica.');
+  const ethereum = window.ethereum;
+  if (!ethereum) return avvisa('warn', 'Nessun portafoglio trovato. Installa <a href="https://metamask.io" target="_blank" rel="noopener">MetaMask</a> o <a href="https://rabby.io" target="_blank" rel="noopener">Rabby</a> e ricarica.');
   try {
-    [conto] = await eth.request({ method: 'eth_requestAccounts' });
+    [conto] = await ethereum.request({ method: 'eth_requestAccounts' });
     await sullaRete();
     $('senza').hidden = true; $('con').hidden = false;
     $('indirizzo').textContent = conto;
@@ -194,21 +232,23 @@ async function collega() {
 }
 
 async function sullaRete() {
-  const eth = window.ethereum;
-  try { await eth.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: RETE.id }] }); }
+  const ethereum = window.ethereum;
+  try { await ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: RETE.id }] }); }
   catch (e) {
     if (e.code !== 4902) throw e;
-    await eth.request({ method: 'wallet_addEthereumChain', params: [{ chainId: RETE.id, chainName: RETE.nome,
+    await ethereum.request({ method: 'wallet_addEthereumChain', params: [{ chainId: RETE.id, chainName: RETE.nome,
       rpcUrls: [RETE.rpc[0]], blockExplorerUrls: [RETE.esploratore],
       nativeCurrency: { name: 'Ether', symbol: RETE.simbolo, decimals: 18 } }] });
   }
 }
 
-async function manda(sel, cosa) {
+async function manda(data, cosa, value) {
   try {
     await sullaRete();
     avvisa('warn', 'Conferma nel portafoglio…');
-    const hash = await window.ethereum.request({ method: 'eth_sendTransaction', params: [{ from: conto, to: RETE.contratto, data: sel }] });
+    const tx = { from: conto, to: RETE.contratto, data };
+    if (value) tx.value = '0x' + value.toString(16);
+    const hash = await window.ethereum.request({ method: 'eth_sendTransaction', params: [tx] });
     avvisa('warn', `${cosa}: inviato, aspetto la rete… <a href="${RETE.esploratore}/tx/${hash}" target="_blank" rel="noopener">transazione</a>`);
     for (let i = 0; i < 60; i++) {
       await new Promise(r => setTimeout(r, 2000));
@@ -223,9 +263,20 @@ async function manda(sel, cosa) {
 }
 
 $('collega').onclick = collega;
-$('reclama').onclick = () => manda(SEL.reclama, 'Reclamo');
+$('versa').onclick = () => {
+  const v = Number($('quantoEth').value || 0);
+  if (!(v > 0)) return avvisa('warn', 'Scrivi quanti ETH versare.');
+  manda(SEL.versa, 'Versamento', BigInt(Math.round(v * 1e18)));
+};
 $('ritira').onclick = () => manda(SEL.ritira, 'Ritiro');
-// Chiede al portafoglio di elencare il manto, con il logo.
+$('brucia').onclick = () => {
+  const v = Number($('quantoManti').value || 0);
+  if (!(v > 0)) return avvisa('warn', 'Scrivi quanti manti bruciare.');
+  const c = BigInt(Math.round(v * 100));
+  if (c > stato.saldo) return avvisa('warn', 'Non hai così tanti manti.');
+  if (!confirm(`Bruciare ${manti(c)} manti per sempre e ricevere circa ${eth(c * stato.riserva / stato.esistenti)}?`)) return;
+  manda(SEL.brucia + pad(c), 'Bruciatura');
+};
 $('mostra').onclick = async () => {
   try {
     await sullaRete();
@@ -235,15 +286,17 @@ $('mostra').onclick = async () => {
   } catch (e) { avvisa('bad', e.message.includes('rejected') ? 'Annullato.' : e.message); }
 };
 $('rete').textContent = RETE.etichetta;
-$('linkContratto').textContent = RETE.contratto;
+$('linkContratto').textContent = RETE.contratto || 'non ancora pubblicato';
 $('linkContratto').href = RETE.esploratore + '/address/' + RETE.contratto;
 $('linkSorgente').href = 'https://repo.sourcify.dev/' + parseInt(RETE.id, 16) + '/' + RETE.contratto;
-if (window.ethereum) {
-  window.ethereum.on?.('accountsChanged', a => { conto = a[0] || null; if (!conto) { $('senza').hidden = false; $('con').hidden = true; } aggiorna(); });
-  window.ethereum.request({ method: 'eth_accounts' }).then(a => { if (a[0]) collega(); }).catch(() => {});
+if (RETE.contratto) {
+  if (window.ethereum) {
+    window.ethereum.on?.('accountsChanged', a => { conto = a[0] || null; if (!conto) { $('senza').hidden = false; $('con').hidden = true; } aggiorna(); });
+    window.ethereum.request({ method: 'eth_accounts' }).then(a => { if (a[0]) collega(); }).catch(() => {});
+  }
+  aggiorna();
+  setInterval(aggiorna, 60000);
 }
-aggiorna();
-setInterval(aggiorna, 60000);
 </script>
 </body>
 </html>
