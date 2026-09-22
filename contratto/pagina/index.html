@@ -106,7 +106,8 @@ footer { font-size:13px; color:var(--ink-3); margin-top:24px }
       <button class="sec" id="brucia">Brucia e ricevi ETH dalla riserva</button>
       <p class="stima" id="stimaBrucia">Bruciare è per sempre: ricevi subito la tua parte della riserva.</p>
 
-      <button class="sec" id="mostra">Mostra il manto nel portafoglio</button>
+      <button class="sec" id="mostra" hidden>Mostra il manto nel portafoglio</button>
+      <p class="stima" id="importa"></p>
     </div>
     <div class="avviso" id="avviso"></div>
   </div>
@@ -288,6 +289,14 @@ $('brucia').onclick = () => {
   if (!confirm(`Bruciare ${manti(c)} manti per sempre e ricevere circa ${eth(c * stato.riserva / stato.esistenti)}?`)) return;
   manda(SEL.brucia + pad(c), 'Bruciatura');
 };
+// Su MetaMask mobile la richiesta di elencare un token viene sempre rifiutata:
+// il bottone compare solo dove funziona, altrove si spiega come importarlo a mano.
+const mobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
+if (mobile) {
+  $('importa').innerHTML = `Per vedere i manti nella lista del portafoglio: Tokens → Import a token → rete ${RETE.nome} → incolla <span class="mono">${RETE.contratto}</span>.`;
+} else {
+  $('mostra').hidden = false;
+}
 $('mostra').onclick = async () => {
   try {
     await sullaRete();
