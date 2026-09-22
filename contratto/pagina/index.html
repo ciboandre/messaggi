@@ -130,7 +130,7 @@ footer { font-size:13px; color:var(--ink-3); margin-top:24px }
 
 <script>
 const RETI = {
-  base: { id: '0x2105', nome: 'Base', rpc: ['https://mainnet.base.org', 'https://base-rpc.publicnode.com'], esploratore: 'https://basescan.org',
+  base: { id: '0x2105', nome: 'Base', rpc: ['https://mainnet.base.org', 'https://base-rpc.publicnode.com', 'https://base.drpc.org', 'https://1rpc.io/base', 'https://base-mainnet.public.blastapi.io'], esploratore: 'https://basescan.org',
     simbolo: 'ETH', contratto: '0xB3c1dE4791BEee9a32b1a9F34548e862ECB60eeF', etichetta: 'su Base' },
   sepolia: { id: '0x14a34', nome: 'Base Sepolia', rpc: ['https://sepolia.base.org', 'https://base-sepolia-rpc.publicnode.com'], esploratore: 'https://sepolia.basescan.org',
     simbolo: 'ETH', contratto: '', etichetta: 'Base Sepolia, rete di prova: questi manti e questi ETH non valgono niente' },
@@ -168,7 +168,8 @@ async function rpc(method, params) {
 const leggi = (sel, arg = '') => rpc('eth_call', [{ to: RETE.contratto, data: sel + arg }, 'latest']).then(BigInt);
 
 async function aggiornaRete() {
-  const [oggi, esistenti, riserva, pavimento] = await Promise.all([leggi(SEL.oggi), leggi(SEL.esistenti), leggi(SEL.riserva), leggi(SEL.pavimento)]);
+  const oggi = await leggi(SEL.oggi), esistenti = await leggi(SEL.esistenti);
+  const riserva = await leggi(SEL.riserva), pavimento = await leggi(SEL.pavimento);
   const versati = await leggi(SEL.versatoNelGiorno, pad(oggi));
   stato = { oggi, esistenti, riserva, pavimento, versati };
   $('oggi').textContent = oggi;
@@ -183,8 +184,9 @@ async function aggiornaRete() {
 async function aggiornaConto() {
   if (!conto) return;
   const a = pad(conto);
-  const [saldo, rit, mio, wei] = await Promise.all([leggi(SEL.balanceOf, a), leggi(SEL.ritirabili, a),
-    leggi(SEL.versato, pad(stato.oggi) + a), rpc('eth_getBalance', [conto, 'latest']).then(BigInt)]);
+  const saldo = await leggi(SEL.balanceOf, a), rit = await leggi(SEL.ritirabili, a);
+  const mio = await leggi(SEL.versato, pad(stato.oggi) + a);
+  const wei = BigInt(await rpc('eth_getBalance', [conto, 'latest']));
   $('saldo').textContent = manti(saldo);
   $('eth').textContent = eth(wei);
   $('mioOggi').textContent = eth(mio);
@@ -194,9 +196,18 @@ async function aggiornaConto() {
   stato.saldo = saldo;
 }
 
-async function aggiorna() {
-  try { await aggiornaRete(); await aggiornaConto(); }
-  catch (e) { avvisa('bad', 'Non riesco a leggere dalla rete: ' + e.message); }
+let inCorso = false;
+async function aggiorna(tentativi = 2) {
+  if (inCorso) return;
+  inCorso = true;
+  try { await aggiornaRete(); await aggiornaConto(); if ($('avviso').textContent.startsWith('Non riesco')) avvisa('', ''); }
+  catch (e) {
+    inCorso = false;
+    if (tentativi > 0) { rpcAttuale++; await new Promise(r => setTimeout(r, 1500)); return aggiorna(tentativi - 1); }
+    avvisa('bad', 'Non riesco a leggere dalla rete. Tocca per riprovare.');
+    $('avviso').onclick = () => aggiorna();
+  }
+  finally { inCorso = false; }
 }
 
 function stimaVersa() {
